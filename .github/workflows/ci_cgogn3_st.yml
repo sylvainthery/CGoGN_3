@@ -6,7 +6,6 @@ on:
 jobs:
   build:
     runs-on: ${{matrix.config.os}}
-    shell: ${{matrix.config.shell}}
     strategy:
       fail-fast: false
       matrix:
