@@ -33,8 +33,8 @@ jobs:
         with:
           runner: ${{matrix.config}}
         shell: ${{runner.shell}}
-          run: |
-            mkdir Build
-            cd Build
-            ${{runner.cmake_cmd}}
-            cmake --build .
+        run: |
+          mkdir Build
+          cd Build
+          ${{runner.cmake_cmd}}
+          cmake --build .
