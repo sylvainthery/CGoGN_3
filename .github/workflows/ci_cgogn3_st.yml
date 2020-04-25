@@ -28,7 +28,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v1
-        shell: pwsh
       - name: 'install deps'
         run: vcpkg install zlib eigen3 glfw3 tinyxml2
       - name: 'Trying to compile cgogn_3'
