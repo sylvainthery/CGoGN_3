@@ -5,8 +5,6 @@ on:
        - CI_test
 jobs:
   build:
-    name: ${{matrix.name}}
-    runs-on: ${{matrix.os}}
     strategy:
       matrix:
         config:
@@ -24,6 +22,9 @@ jobs:
             install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
             cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
           }
+
+    name: ${{matrix.name}}
+    runs-on: ${{matrix.os}}
 
 
     steps:
