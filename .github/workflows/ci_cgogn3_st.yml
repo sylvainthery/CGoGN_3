@@ -25,9 +25,11 @@ jobs:
           }
     steps:
       - name: 'Package installations'
+        shell: ${{runner.shell}}
         run: ${{ runner.install_deps}}
       - uses: actions/checkout@v1
       - name: 'Trying to compile cgogn_3'
+        shell: ${{runner.shell}}
         run: |
           mkdir Build
           cd Build
