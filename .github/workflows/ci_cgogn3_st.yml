@@ -1,0 +1,23 @@
+name: CGoGN3_ST
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+     branch:
+       - CI_testing
+
+jobs:
+  build:
+    name: CGoGN3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Package installations
+        shell: bash
+        run: |
+        sudo apt update
+        sudo apt install libeigen3-dev libglfx3-dev libtinyxml2-dev zlib1g-dev
+      - name: Trying_to_compile_cgogn_3
+        run:  |
+        mkdir Build
+        cd Build
+        cmake ..
+        make -j 4
