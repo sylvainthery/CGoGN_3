@@ -29,7 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: 'install deps'
-        run: vcpkg install zlib eigen3 glfw3 tinyxml2
+        run: |
+        vcpkg update
+        vcpkg install zlib:x64-windows eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
@@ -39,11 +41,13 @@ jobs:
 
   build-OsX:
     name: 'On Mac'
-    runs-on: mac-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
       - name: 'install deps'
-        run: brew install zlib eigen3 glfw3 tinyxml2
+        run: |
+        brew update
+        brew install zlib eigen3 glfw3 tinyxml2
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
