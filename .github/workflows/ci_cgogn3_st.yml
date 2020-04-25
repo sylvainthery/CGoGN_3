@@ -23,13 +23,6 @@ jobs:
   #         cmake ..
   #         cmake --build . --target cgogn_core
 
-  wget:
-    runs-on: windows-latest
-    steps:
-    - name: wget
-      uses: wei/wget@v1
-      with:
-        args:
   build-windows:
     name: 'On Windows'
     runs-on: windows-latest
@@ -42,7 +35,7 @@ jobs:
         run:  |
           mkdir Build
           cd Build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake
+          cmake .. "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\vcpkg\scripts\buildsystems\vcpkg.cmake"
           cmake --build . --target cgogn_core
 
 # name: CGoGN3_ST
