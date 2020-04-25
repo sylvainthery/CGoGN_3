@@ -3,7 +3,7 @@ name: CGoGN3_ST
 on:
   push:
      branch:
-       - CI_testing
+       - CI_test
 
 jobs:
   build:
