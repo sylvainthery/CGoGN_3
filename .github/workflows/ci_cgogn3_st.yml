@@ -22,10 +22,8 @@ jobs:
           }
     steps:
       - uses: actions/checkout@v1
-        with: 
-          runner: ${{matrix.config}}
       - name: 'Package installations'
-          run: ${{runner.install_deps}}
+          run: ${{matrix.config.install_deps}}
       - name: 'Trying to compile cgogn_3'
         run: |
           mkdir Build
