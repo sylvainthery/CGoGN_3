@@ -23,13 +23,14 @@ jobs:
             cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
           }
     steps:
-      - name: 'Package installations'
-        with :
-          shell: ${{matrix.config.shell}}
-          run: ${{ matrix.config.install_deps}}
       - uses: actions/checkout@v1
+      - name: 'Package installations'
+        with:
+          shell: ${{matrix.config.shell}}
+        with:
+          run: ${{ matrix.config.install_deps}}
       - name: 'Trying to compile cgogn_3'
-        with :
+        with:
           shell: ${{matrix.config.shell}}
           run: |
             mkdir Build
