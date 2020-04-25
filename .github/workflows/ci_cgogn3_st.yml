@@ -41,7 +41,7 @@ jobs:
         run:  |
           mkdir Build
           cd Build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake ..
           make cgogn_core
 
 # name: CGoGN3_ST
