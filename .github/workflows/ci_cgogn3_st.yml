@@ -7,7 +7,6 @@ jobs:
   build:
     strategy:
       matrix:
-        config:
         - {
             name: 'Compilation de CGoGN_3 sous Ubuntu',
             os: ubuntu-lastest,
