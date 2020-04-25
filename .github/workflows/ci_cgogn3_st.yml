@@ -1,5 +1,5 @@
-name: CGoGN3_ST
-# This is firsy yesy of CI.
+name: 'CGoGN3_ST'
+# This is first test of CI.
 on:
   push:
      branch:
@@ -7,15 +7,15 @@ on:
 
 jobs:
   build:
-    name: CGoGN3
+    name: 'CGoGN3'
     runs-on: ubuntu-latest
     steps:
-      - name: Package installations
+      - name: 'Package installations'
         shell: bash
         run: |
           sudo apt update
           sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev
-      - name: Trying_to_compile_cgogn_3
+      - name: 'Trying_to_compile_cgogn_3'
         run:  |
           mkdir Build
           cd Build
