@@ -6,22 +6,22 @@ on:
        - CI_test
 
 jobs:
-  build-linux:
-    name: 'On Linux'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: 'Package installations'
-        shell: bash
-        run: |
-          sudo apt update
-          sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev
-      - name: 'Trying to compile cgogn_3'
-        run:  |
-          mkdir Build
-          cd Build
-          cmake ..
-          make cgogn_core 
+  # build-linux:
+  #   name: 'On Linux'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: 'Package installations'
+  #       shell: bash
+  #       run: |
+  #         sudo apt update
+  #         sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev
+  #     - name: 'Trying to compile cgogn_3'
+  #       run:  |
+  #         mkdir Build
+  #         cd Build
+  #         cmake ..
+  #         make cgogn_core 
 
   build-windows:
     name: 'On Windows'
@@ -41,7 +41,7 @@ jobs:
         run:  |
           mkdir Build
           cd Build
-          cmake .. -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..
           make cgogn_core
 
 # name: CGoGN3_ST
