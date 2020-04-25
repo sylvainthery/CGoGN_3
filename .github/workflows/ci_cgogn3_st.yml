@@ -23,17 +23,21 @@ jobs:
   #         cmake ..
   #         cmake --build . --target cgogn_core
 
+  wget:
+    runs-on: windows-latest
+    steps:
+    - name: wget
+      uses: wei/wget@v1
+      with:
+        args:
   build-windows:
     name: 'On Windows'
     runs-on: windows-latest
     steps:
-      - name: wget
-        uses: wei/wget@v1
-          with:
-            args: https://mycore.core-cloud.net/index.php/s/ZrdcynlC2rXxf7x/download -O vcpkg.zip
-          run: 7z x ./vcpkg.zip
       - uses: actions/checkout@v1
         shell: pwsh
+      - name: 'install deps'
+        vcpkg install eigen3 glfw3 tinxml2 zlib
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
