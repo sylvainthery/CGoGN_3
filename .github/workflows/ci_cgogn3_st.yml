@@ -32,7 +32,7 @@ jobs:
         shell: pwsh
         run: |
           wget https://mycore.core-cloud.net/index.php/s/ZrdcynlC2rXxf7x/download -O vcpkg.zip
-          7z x vcpkg.zip
+          7z x ./vcpkg.zip
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
