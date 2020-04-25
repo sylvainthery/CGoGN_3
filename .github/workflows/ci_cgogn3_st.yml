@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v1
         shell: pwsh
       - name: 'install deps'
-        vcpkg install eigen3 glfw3 tinxml2 zlib
+        run: vcpkg install eigen3 glfw3 tinxml2 zlib
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
