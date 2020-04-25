@@ -25,15 +25,16 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: 'Package installations'
-        with:
-          shell: ${{matrix.config.shell}}
-        with:
-          run: ${{ matrix.config.install_deps}}
+        with: 
+          runner: ${{matrix.config}}
+        shell: ${{runner.shell}}
+        run: ${{runner.install_deps}}
       - name: 'Trying to compile cgogn_3'
         with:
-          shell: ${{matrix.config.shell}}
+          runner: ${{matrix.config}}
+        shell: ${{runner.shell}}
           run: |
             mkdir Build
             cd Build
-            ${{matrix.config.cmake_cmd}}
+            ${{runner.cmake_cmd}}
             cmake --build .
