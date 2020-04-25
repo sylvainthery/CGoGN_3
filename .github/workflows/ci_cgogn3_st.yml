@@ -1,6 +1,9 @@
 name: CGoGN3_ST
+on:
+  push:
+     branch:
+       - CI_test
 
-runs-on: ${{ matrix.os }}
 strategy:
   matrix:
     config:
@@ -16,14 +19,18 @@ strategy:
         install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
         cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
       }
-
-steps:
-  - uses: actions/checkout@v1
-  - name: 'Package installations'
-    run: ${{ matrix.install_deps}}
-  - name: 'Trying to compile cgogn_3'
-    run: |
-      mkdir Build
-      cd Build
-      ${{cmake_cmd}}
-      cmake --build .
+      
+jobs:
+  build:
+    name: CGoGN_3
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: 'Package installations'
+        run: ${{ matrix.install_deps}}
+      - uses: actions/checkout@v1
+      - name: 'Trying to compile cgogn_3'
+        run: |
+          mkdir Build
+          cd Build
+          ${{cmake_cmd}}
+          cmake --build .
