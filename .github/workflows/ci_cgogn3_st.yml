@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ${{matrix.config.os}}
+    shell: ${{matrix.config.shell}}
     strategy:
       fail-fast: false
       matrix:
@@ -27,12 +28,10 @@ jobs:
       - name: 'Package installations'
         with: 
           runner: ${{matrix.config}}
-        shell: ${{runner.shell}}
         run: ${{runner.install_deps}}
       - name: 'Trying to compile cgogn_3'
         with:
           runner: ${{matrix.config}}
-        shell: ${{runner.shell}}
         run: |
           mkdir Build
           cd Build
