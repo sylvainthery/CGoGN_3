@@ -27,17 +27,19 @@ jobs:
     name: 'On Windows'
     runs-on: windows-latest
     steps:
+      - name: wget
+        uses: wei/wget@v1
+          with:
+            args: https://mycore.core-cloud.net/index.php/s/ZrdcynlC2rXxf7x/download -O vcpkg.zip
+          run: 7z x ./vcpkg.zip
       - uses: actions/checkout@v1
-      - name: 'Package installations'
         shell: pwsh
-        run: wget https://mycore.core-cloud.net/index.php/s/ZrdcynlC2rXxf7x/download -O vcpkg.zip
-          # 7z x ./vcpkg.zip
-      # - name: 'Trying to compile cgogn_3'
-      #   run:  |
-      #     mkdir Build
-      #     cd Build
-      #     cmake .. -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake
-      #     cmake --build . --target cgogn_core
+      - name: 'Trying to compile cgogn_3'
+        run:  |
+          mkdir Build
+          cd Build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake
+          cmake --build . --target cgogn_core
 
 # name: CGoGN3_ST
 # on:
