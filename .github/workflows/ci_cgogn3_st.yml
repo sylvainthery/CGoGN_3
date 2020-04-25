@@ -21,7 +21,7 @@ jobs:
           mkdir Build
           cd Build
           cmake ..
-          make -j 
+          make cgogn::core 
 
   build-windows:
     name: 'On Windows'
@@ -32,17 +32,17 @@ jobs:
         shell: pwsh
         run: |
           git clone https://github.com/Microsoft/vcpkg.git;
-          cd ..\vcpkg;
+          cd vcpkg;
           .\bootstrap-vcpkg.bat ;
           .\vcpkg integrate install;
           .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows;
-          cd ..\..
+          cd ..
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
           cd Build
           cmake .. -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..
-          make -j 
+          make cgogn::core
 
 # name: CGoGN3_ST
 # on:
