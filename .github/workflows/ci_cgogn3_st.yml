@@ -9,23 +9,21 @@ jobs:
       matrix:
         config:
         - {
-            name: 'Compilation de CGoGN_3 sous Ubuntu',
             os: ubuntu-latest,
             shell: bash,
             install_deps: 'sudo apt update; sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev',
             cmake_cmd: 'cmake ..'
           }
         - {
-            name: 'Compilation de CGoGN_3 sous Windows',
             os: windows-latest,
             shell: pwsh,
             install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
             cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
           }
 
-    name: ${{matrix.config.name}}
-    runs-on: ${{matrix.config.os}}
+     runs-on: ${{matrix.config.os}}
 
+     shell: ${{matrix.config.shell}}
 
     steps:
       - name: 'Package installations'
