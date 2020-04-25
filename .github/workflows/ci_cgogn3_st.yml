@@ -21,21 +21,21 @@ jobs:
   #         mkdir Build
   #         cd Build
   #         cmake ..
-  #         cmake --build . --target cgogn_core
+  #         cmake --build . 
 
-  build-windows:
-    name: 'On Windows'
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: 'install deps'
-        run: vcpkg install zlib:x64-windows eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows
-      - name: 'Trying to compile cgogn_3'
-        run: |
-          mkdir Build
-          cd Build
-          cmake .. "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
-          cmake --build . --target cgogn_core
+  # build-windows:
+  #   name: 'On Windows'
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - name: 'install deps'
+  #       run: vcpkg install zlib:x64-windows eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows
+  #     - name: 'Trying to compile cgogn_3'
+  #       run: |
+  #         mkdir Build
+  #         cd Build
+  #         cmake .. "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+  #         cmake --build .
 
   build-OsX:
     name: 'On Mac'
@@ -43,13 +43,14 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: 'install deps'
-        run: brew install zlib eigen3 glfw3 tinyxml2
+        run: brew install zlib eigen glfw tinyxml2
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
           cd Build
           cmake .. 
           cmake --build . 
+          
 # name: CGoGN3_ST
 # on:
 #   push:
