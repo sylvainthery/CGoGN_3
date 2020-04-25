@@ -7,6 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
+        config:
         - {
             name: 'Compilation de CGoGN_3 sous Ubuntu',
             os: ubuntu-lastest,
@@ -22,17 +23,17 @@ jobs:
             cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
           }
 
-    name: ${{matrix.name}}
-    runs-on: ${{matrix.os}}
+    name: ${{matrix.config.name}}
+    runs-on: ${{matrix.config.os}}
 
 
     steps:
       - name: 'Package installations'
-        run: ${{ matrix.install_deps}}
+        run: ${{ runner.install_deps}}
       - uses: actions/checkout@v1
       - name: 'Trying to compile cgogn_3'
         run: |
           mkdir Build
           cd Build
-          ${{matrix.cmake_cmd}}
+          ${{runner.cmake_cmd}}
           cmake --build .
