@@ -5,8 +5,8 @@ on:
        - CI_test
 jobs:
   build:
-    name: ${{ matrix.name}}
-    runs-on: ${{ matrix.name}}
+    name: ${{matrix.name}}
+    runs-on: ${{matrix.name}}
     strategy:
       matrix:
         config:
@@ -34,5 +34,5 @@ jobs:
         run: |
           mkdir Build
           cd Build
-          ${{cmake_cmd}}
+          ${{matrix.cmake_cmd}}
           cmake --build .
