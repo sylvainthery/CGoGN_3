@@ -3,27 +3,29 @@ on:
   push:
      branch:
        - CI_test
-
-strategy:
-  matrix:
-    config:
-    - {
-        os: ubuntu-lastest,
-        shell: bash,
-        install_deps: 'sudo apt update; sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev',
-        cmake_cmd: 'cmake ..'
-      }
-    - {
-        os: windows-lastest,
-        shell: pwsh,
-        install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
-        cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
-      }
-      
 jobs:
   build:
-    name: CGoGN_3
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name}}
+    runs-on: ${{ matrix.name}}
+    strategy:
+      matrix:
+        config:
+        - {
+            name: 'Compilation de CGoGN_3 sous Ubuntu',
+            os: ubuntu-lastest,
+            shell: bash,
+            install_deps: 'sudo apt update; sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev',
+            cmake_cmd: 'cmake ..'
+          }
+        - {
+            name: 'Compilation de CGoGN_3 sous Windows',
+            os: windows-lastest,
+            shell: pwsh,
+            install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
+            cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
+          }
+
+
     steps:
       - name: 'Package installations'
         run: ${{ matrix.install_deps}}
