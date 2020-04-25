@@ -21,7 +21,7 @@ jobs:
   #         mkdir Build
   #         cd Build
   #         cmake ..
-  #         make cgogn_core 
+  #         cmake --build . --target cgogn_core
 
   build-windows:
     name: 'On Windows'
@@ -31,14 +31,14 @@ jobs:
       - name: 'Package installations'
         shell: pwsh
         run: |
-          vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows
-          cd ..
+          wget https://mycore.core-cloud.net/index.php/s/ZrdcynlC2rXxf7x/download -O vcpkg.zip
+          7z x vcpkg.zip
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
           cd Build
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake ..
-          make cgogn_core
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=..\vcpkg\scripts\buildsystems\vcpkg.cmake
+          cmake --build . --target cgogn_core
 
 # name: CGoGN3_ST
 # on:
