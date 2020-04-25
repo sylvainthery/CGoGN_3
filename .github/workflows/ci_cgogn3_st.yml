@@ -29,11 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: 'install deps'
-        run: |
-        vcpkg update
-        vcpkg install zlib:x64-windows eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows
+        run: vcpkg install zlib:x64-windows eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows
       - name: 'Trying to compile cgogn_3'
-        run:  |
+        run: |
           mkdir Build
           cd Build
           cmake .. "-DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
@@ -45,9 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: 'install deps'
-        run: |
-        brew update
-        brew install zlib eigen3 glfw3 tinyxml2
+        run: brew install zlib eigen3 glfw3 tinyxml2
       - name: 'Trying to compile cgogn_3'
         run:  |
           mkdir Build
