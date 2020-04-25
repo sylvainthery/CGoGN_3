@@ -1,32 +1,78 @@
 name: CGoGN3_ST
+# This is first test of CI.
 on:
   push:
      branch:
        - CI_test
+
 jobs:
-  build:
-    runs-on: ${{matrix.config.os}}
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-        - {
-            os: ubuntu-latest,
-            install_deps: 'sudo apt update; sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev',
-            cmake_cmd: 'cmake ..'
-          }
-        - {
-            os: windows-latest,
-            install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
-            cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
-          }
+  build-linux:
+    name: 'On Linux'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - name: 'Package installations'
-          run: ${{matrix.config.install_deps}}
-      - name: 'Trying to compile cgogn_3'
+        shell: bash
         run: |
+          sudo apt update
+          sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev
+      - name: 'Trying to compile cgogn_3'
+        run:  |
           mkdir Build
           cd Build
-          ${{runner.cmake_cmd}}
-          cmake --build .
+          cmake ..
+          make -j 
+
+  build-windows:
+    name: 'On Windows'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: 'Package installations'
+        shell: pwsh
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git;
+          cd ..\vcpkg;
+          .\bootstrap-vcpkg.bat ;
+          .\vcpkg integrate install;
+          .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows;
+          cd ..\..
+      - name: 'Trying to compile cgogn_3'
+        run:  |
+          mkdir Build
+          cd Build
+          cmake .. -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..
+          make -j 
+
+# name: CGoGN3_ST
+# on:
+#   push:
+#      branch:
+#        - CI_test
+# jobs:
+#   build:
+#     runs-on: ${{matrix.config.os}}
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         config:
+#         - {
+#             os: ubuntu-latest,
+#             install_deps: 'sudo apt update; sudo apt install libeigen3-dev libglfw3-dev libtinyxml2-dev zlib1g-dev',
+#             cmake_cmd: 'cmake ..'
+#           }
+#         - {
+#             os: windows-latest,
+#             install_deps: 'git clone https://github.com/Microsoft/vcpkg.git; cd vcpkg; .\bootstrap-vcpkg.bat ; .\vcpkg integrate install; .\vcpkg install eigen3:x64-windows glfw3:x64-windows tinyxml2:x64-windows zlib:x64-windows:x64-windows; cd ..',
+#             cmake_cmd: 'cmake -G ninja -DCMAKE_TOOLCHAIN_FILE=..\..\scripts\buildsystems\vcpkg.cmake ..'
+#           }
+#     steps:
+#       - uses: actions/checkout@v1
+#       - name: 'Package installations'
+#           run: ${{matrix.config.install_deps}}
+#       - name: 'Trying to compile cgogn_3'
+#         run: |
+#           mkdir Build
+#           cd Build
+#           ${{runner.cmake_cmd}}
+#           cmake --build .
