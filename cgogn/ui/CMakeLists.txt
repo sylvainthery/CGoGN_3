@@ -26,8 +26,6 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/moving_frame.h"
 		"${CMAKE_CURRENT_LIST_DIR}/view.h"
 		"${CMAKE_CURRENT_LIST_DIR}/view.cpp"
-
-		"${CMAKE_CURRENT_LIST_DIR}/tools.h"
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

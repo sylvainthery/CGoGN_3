@@ -27,9 +27,9 @@
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
 
-#include <cgogn/ui/modules/mesh_provider/mesh_provider.h>
-#include <cgogn/ui/modules/Gregory_render/gregory_render_pc.h>
-#include <cgogn/ui/modules/surface_render/surface_render.h>
+#include <cgogn/core/ui_modules/mesh_provider.h>
+#include <cgogn/gregory/ui_modules/gregory_render_pc.h>
+#include <cgogn/render/ui_modules/surface_render.h>
 using Mesh = cgogn::CMap2;
 
 //#include <cgogn/ui/modules/surface_selection/surface_selection.h>
