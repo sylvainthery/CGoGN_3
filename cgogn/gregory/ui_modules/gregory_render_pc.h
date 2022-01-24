@@ -97,7 +97,7 @@ private:
 			return true;
 		});
 		dr->end();
-		dr->line_width(2.0);
+		dr->line_width(5.0);
 		dr->begin(GL_LINES); // or GL_POINTS, GL_LINES, GL_TRIANGLES
  		dr->color3f(0.0,1.0,0.0);
 		foreach_cell(*m,[&](Edge e) -> bool
@@ -124,7 +124,7 @@ protected:
 		mesh_provider_ = static_cast<ui::MeshProvider<MESH>*>(
 			app_.module("MeshProvider (" + std::string{mesh_traits<MESH>::name} + ")"));
 
-		mesh_provider_->foreach_mesh([this](MESH* m, const std::string&) {init_pc(m);});
+		mesh_provider_->foreach_mesh([this](MESH& m, const std::string&) {init_pc(&m);});
 
 		connections_.push_back(boost::synapse::connect<typename MeshProvider<MESH>::mesh_added>(
 			mesh_provider_, this, &GregoryRenderPC<MESH>::init_pc));
@@ -136,7 +136,7 @@ protected:
 		{
 			if (p.show_)
 			{
-				MeshData<MESH>* md = mesh_provider_->mesh_data(m);
+				//MeshData<MESH>* md = mesh_provider_->mesh_data(*m);
 				const rendering::GLMat4& proj_matrix = view->projection_matrix();
 				const rendering::GLMat4& view_matrix = view->modelview_matrix();
 				p.renderer_->draw(proj_matrix, view_matrix);
@@ -148,11 +148,14 @@ protected:
 	{
 		bool need_update = false;
 
-		imgui_view_selector(this, selected_view_, [&](View* v) { selected_view_ = v; });
-		imgui_mesh_selector(mesh_provider_, selected_mesh_, [&](MESH* m) {
-			selected_mesh_ = m;
-			mesh_provider_->mesh_data(m)->outlined_until_ = App::frame_time_ + 1.0;
-		});
+		if (app_.nb_views() > 1)
+			imgui_view_selector(this, selected_view_, [&](View* v) { selected_view_ = v; });
+
+		imgui_mesh_selector(mesh_provider_, selected_mesh_, "Mesh", [&](MESH& m)
+			{
+				selected_mesh_ = &m;
+				mesh_provider_->mesh_data(m).outlined_until_ = App::frame_time_ + 1.0;
+			});
 
 		if (selected_view_ && selected_mesh_)
 		{

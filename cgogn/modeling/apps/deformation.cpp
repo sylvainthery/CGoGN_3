@@ -29,15 +29,13 @@
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
 
-#include <cgogn/ui/modules/surface_render_vector/surface_render_vector.h>
-#include <cgogn/ui/modules/surface_selection/surface_selection.h>
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/geometry/ui_modules/surface_differential_properties.h>
 #include <cgogn/geometry/ui_modules/surface_selection.h>
 #include <cgogn/modeling/ui_modules/surface_deformation.h>
 #include <cgogn/rendering/ui_modules/surface_render.h>
 #include <cgogn/rendering/ui_modules/vector_per_face_render.h>
-#include <cgogn/rendering/ui_modules/vector_per_verte_render.h>
+#include <cgogn/rendering/ui_modules/vector_per_vertex_render.h>
 
 #define DEFAULT_MESH_PATH CGOGN_STR(CGOGN_DATA_PATH) "/meshes/"
 

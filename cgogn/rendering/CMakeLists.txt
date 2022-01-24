@@ -10,8 +10,8 @@ add_library(cgogn::rendering ALIAS ${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
 	PRIVATE
-#		"${CMAKE_CURRENT_LIST_DIR}/drawer.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/drawer.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/drawer.h"
+		"${CMAKE_CURRENT_LIST_DIR}/drawer.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/topo_drawer.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/topo_drawer.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/volume_drawer.h"
@@ -63,6 +63,9 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_flat_scalar_per_face.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_flat_color_per_face.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_flat_color_per_face.cpp"
+
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_round_point_color.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_round_point_color.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_phong.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_phong.cpp"

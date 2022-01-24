@@ -42,10 +42,10 @@ class CGOGN_RENDERING_EXPORT ShaderParamNoIllumColorPerVertex : public ShaderPar
 public:
 	bool double_side_;
 
-	inline void pick_parameters(const PossibleParameters& pp) override
-	{
-		double_side_ = pp.double_side_;
-	}
+	// inline void pick_parameters(const PossibleParameters& pp) override
+	// {
+	// 	double_side_ = pp.double_side_;
+	// }
 
 	using ShaderType = ShaderNoIllumColorPerVertex;
 

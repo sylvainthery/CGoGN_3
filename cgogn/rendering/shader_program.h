@@ -444,6 +444,11 @@ public:
 	{
 	}
 
+	inline ShaderProgram* get_shader()
+	{
+		return shader_;
+	}
+
 	inline bool attributes_initialized() const
 	{
 		return attributes_initialized_; // >= (1u << shader_->nb_attributes()) - 1;
@@ -467,6 +472,8 @@ public:
 	 * @brief release vao and shader
 	 */
 	void release();
+
+
 
 	/**
 	 * @brief set vbos into the vao

@@ -29,7 +29,7 @@
 
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/gregory/ui_modules/gregory_render_pc.h>
-#include <cgogn/render/ui_modules/surface_render.h>
+#include <cgogn/rendering/ui_modules/surface_render.h>
 using Mesh = cgogn::CMap2;
 
 //#include <cgogn/ui/modules/surface_selection/surface_selection.h>
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
 	std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
 
-	mp.set_mesh_bb_vertex_position(m, vertex_position);
+	mp.set_mesh_bb_vertex_position(*m, vertex_position);
 	sr.set_vertex_position(*v1, *m, vertex_position);
 
 	return app.launch();
