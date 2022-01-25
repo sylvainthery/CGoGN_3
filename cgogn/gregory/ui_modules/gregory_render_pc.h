@@ -87,7 +87,7 @@ private:
 		dr = std::make_unique<cgogn::rendering::DisplayListDrawer>();
 		dr->new_list();
 
-		dr->ball_size(1.0);
+		dr->ball_size(2.0);
  		dr->begin(GL_POINTS); // or GL_POINTS, GL_LINES, GL_TRIANGLES
  		dr->color3f(1.0,0.0,0.0);
 		foreach_cell(*m,[&](Vertex v) -> bool

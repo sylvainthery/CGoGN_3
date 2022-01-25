@@ -49,11 +49,11 @@ int main(int argc, char** argv)
 	using Vec3 = cgogn::geometry::Vec3;
 	using Scalar = cgogn::geometry::Scalar;
 
-	std::string filename;
-	if (argc < 2)
-		filename = std::string(DEFAULT_MESH_PATH) + std::string("off/simple/cube.off");
-	else
-		filename = std::string(argv[1]);
+	//std::string filename;
+	//if (argc < 2)
+	//	filename = std::string(DEFAULT_MESH_PATH) + std::string("off/simple/cube.off");
+	//else
+	//	filename = std::string(argv[1]);
 
 	cgogn::thread_start();
 
@@ -70,13 +70,20 @@ int main(int argc, char** argv)
 	cgogn::ui::View* v1 = app.current_view();
 	v1->link_module(&mp);
 	v1->link_module(&sr);
-	v1->link_module(&gr);
+//	v1->link_module(&gr);
 
-	// cgogn::ui::View* v2 = app.add_view();
-	// v2->link_module(&mp);
-	// v2->link_module(&gr);
+	cgogn::ui::View* v2 = app.add_view();
+	v2->link_module(&mp);
+	v2->link_module(&gr);
+	cgogn::ui::View* v3 = app.add_view();
+	v3->link_module(&mp);
+	v3->link_module(&gr);
+	cgogn::ui::View* v4 = app.add_view();
+	v4->link_module(&mp);
+	v4->link_module(&gr);
 
-	Mesh* m = mp.load_surface_from_file(filename);
+
+	Mesh* m = mp.load_surface_from_file(std::string(DEFAULT_MESH_PATH) + std::string("off/simple/cube.off"));
 	if (!m)
 	{
 		std::cout << "File could not be loaded" << std::endl;

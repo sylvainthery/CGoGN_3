@@ -247,7 +247,7 @@ void DisplayListDrawer::Renderer::draw(const GLMat4& projection, const GLMat4& m
 			// get direct access to the shader to modify parameters while keeping the original param binded
 			ShaderBoldLineColor* shader_bl_ = static_cast<ShaderBoldLineColor*>(param_bl_->get_shader());
 			GLVec2 wd(pp.width / float32(viewport[2]), pp.width / float32(viewport[3]));
-			shader_bl_->set_uniform_value(1, wd);
+			shader_bl_->set_uniform_value(0, wd);
 
 			if (pp.aa)
 			{
