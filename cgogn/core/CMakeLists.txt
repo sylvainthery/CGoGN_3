@@ -42,6 +42,23 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/phi.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/phi.h"
 
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/cell.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_base.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_base.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_info.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_ops.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap0.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap1.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap2.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/cph3.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/cph3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/dart_marker.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/dart.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/orbit_traversal.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/beta.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/beta.cpp"
+
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph_ops.h"
 
