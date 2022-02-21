@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_CELL_H_
-#define CGOGN_CORE_TYPES_CMAP_CELL_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CELL_H_
+#define CGOGN_CORE_TYPES_GMAP_CELL_H_
 
 #include <cgogn/core/types/cmap/dart.h>
 
@@ -31,49 +31,56 @@
 
 /**
  * \file cgogn/core/types/cmap/cell.h
- * \brief Orbit and cell definitions used in cgogn.
+ * \brief GM_Orbit and cell definitions used in cgogn.
  */
 
 namespace cgogn
 {
 
-enum Orbit : uint32
+enum GM_Orbit : uint32
 {
 	DART = 0,
-	PHI1,
-	PHI2,
-	PHI21,
-	PHI1_PHI2,
-	PHI1_PHI3,
-	PHI2_PHI3,
-	PHI21_PHI31,
-	PHI1_PHI2_PHI3
+	BETA0,// 1EDGE 
+	BETA1,// 1VERTEX
+	BETA0_BETA1, // 2FACE = 1CC
+	BETA0_BETA2, // 2EDGE
+	BETA1_BETA2, // 2VERTEX
+	BETA0_BETA1_BETA2, // 3VOLUME = 2CC
+	BETA0_BETA1_BETA3, // 3FACE
+	BETA0_BETA2_BETA3, // 3EDGE
+	BETA1_BETA2_BETA3, // 3VERTEX
+	BETA0_BETA1_BETA2_BETA3 // 3CC
 };
 
-static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
+static const std::size_t NB_GM_ORBITS = GM_Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
 
-inline std::string orbit_name(Orbit orbit)
+inline std::string orbit_name(GM_Orbit orbit)
 {
 	switch (orbit)
 	{
-	case Orbit::DART:
-		return "cgogn::Orbit::DART";
-	case Orbit::PHI1:
-		return "cgogn::Orbit::PHI1";
-	case Orbit::PHI2:
-		return "cgogn::Orbit::PHI2";
-	case Orbit::PHI21:
-		return "cgogn::Orbit::PHI21";
-	case Orbit::PHI1_PHI2:
-		return "cgogn::Orbit::PHI1_PHI2";
-	case Orbit::PHI1_PHI3:
-		return "cgogn::Orbit::PHI1_PHI3";
-	case Orbit::PHI2_PHI3:
-		return "cgogn::Orbit::PHI2_PHI3";
-	case Orbit::PHI21_PHI31:
-		return "cgogn::Orbit::PHI21_PHI31";
-	case Orbit::PHI1_PHI2_PHI3:
-		return "cgogn::Orbit::PHI1_PHI2_PHI3";
+	case GM_Orbit::DART:
+		return "cgogn::GM_Orbit::DART";
+	case GM_Orbit::BETA1:
+		return "cgogn::GM_Orbit::BETA2";
+	case GM_Orbit::BETA2:
+		return "cgogn::GM_Orbit::BETA2";
+	case GM_Orbit::BETA0_BETA0:
+		return "cgogn::GM_Orbit::BETA0_BETA1";
+	case GM_Orbit::BETA0_BETA2:
+		return "cgogn::GM_Orbit::BETA0_BETA2";
+	case GM_Orbit::BETA1_BETA2:
+		return "cgogn::GM_Orbit::BETA1_BETA2";
+		
+	case GM_Orbit::BETA0_BETA1_BETA2:
+		return "cgogn::GM_Orbit::BETA0_BETA1_BETA2";
+	case GM_Orbit::BETA0_BETA1_BETA3:
+		return "cgogn::GM_Orbit::BETA0_BETA1_BETA3";
+	case GM_Orbit::BETA0_BETA2_BETA3:
+		return "cgogn::GM_Orbit::BETA0_BETA2_BETA3";		
+	case GM_Orbit::BETA1_BETA2_BETA3:
+		return "cgogn::GM_Orbit::BETA1_BETA2_BETA3";
+	case GM_Orbit::BETA0_BETA1_BETA2_BETA3:
+		return "cgogn::GM_Orbit::BETA0_BETA1_BETA2_BETA3";
 		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}
 	cgogn_assert_not_reached("This orbit does not exist");
@@ -86,10 +93,11 @@ inline std::string orbit_name(Orbit orbit)
  * \brief Cellular typing
  * \tparam ORBIT The type of the orbit used to create the Cell
  */
-template <Orbit ORBIT_>
+// SAME AS CMAP
+template <GM_Orbit ORBIT_>
 struct Cell
 {
-	static const Orbit ORBIT = ORBIT_;
+	static const GM_Orbit ORBIT = ORBIT_;
 	using Self = Cell<ORBIT>;
 
 	/**
@@ -165,6 +173,8 @@ struct Cell
 	}
 };
 
+}
+
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_CELL_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CELL_H_

@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_CMAP_CMAP_BASE_H_
-#define CGOGN_CORE_CMAP_CMAP_BASE_H_
+#ifndef CGOGN_CORE_GMAP_CMAP_BASE_H_
+#define CGOGN_CORE_GMAP_CMAP_BASE_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
@@ -40,7 +40,7 @@
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT CMapBase
+struct CGOGN_CORE_EXPORT GMapBase
 {
 	// using AttributeContainer = AttributeContainerT<Vector>;
 	using AttributeContainer = AttributeContainerT<ChunkArray>;
@@ -66,7 +66,7 @@ struct CGOGN_CORE_EXPORT CMapBase
 	std::array<std::shared_ptr<Attribute<uint32>>, NB_ORBITS> cells_indices_;
 
 	// shortcut to boundary marker attribute
-	MarkAttribute* boundary_marker_;
+	//MarkAttribute* boundary_marker_;
 
 	/*************************************************************************/
 	// Cells attributes containers
@@ -79,8 +79,8 @@ struct CGOGN_CORE_EXPORT CMapBase
 		DART_MARKING
 	};
 
-	CMapBase();
-	~CMapBase();
+	GMapBase();
+	~GMapBase();
 
 	// Map-wise attributes
 	template <typename T>
@@ -111,4 +111,4 @@ struct CGOGN_CORE_EXPORT CMapBase
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_CMAP_CMAP_BASE_H_
+#endif // CGOGN_CORE_GMAP_CMAP_BASE_H_

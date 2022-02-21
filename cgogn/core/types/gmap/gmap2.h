@@ -21,58 +21,58 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_CMAP2_H_
-#define CGOGN_CORE_TYPES_CMAP_CMAP2_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP2_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP2_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap1.h>
+#include <cgogn/core/types/gmap/gmap1.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT CMap2 : public CMap1
+struct CGOGN_CORE_EXPORT GMap2 : public GMap1
 {
 	static const uint8 dimension = 2;
 
-	using Vertex = Cell<PHI21>;
-	using HalfEdge = Cell<DART>;
-	using Edge = Cell<PHI2>;
-	using Face = Cell<PHI1>;
-	using Volume = Cell<PHI1_PHI2>;
+	using Vertex = Cell<BETA1_BETA2>;
+	using HalfEdge = Cell<BETA0>;
+	using Edge = Cell<BETA0_BETA2>;
+	using Face = Cell<BETA0_BETA1>;
+	using Volume = Cell<BETA0_BETA1_BETA2>;
 	using CC = Volume;
 
 	using Cells = std::tuple<Vertex, HalfEdge, Edge, Face, Volume>;
 
-	std::shared_ptr<Attribute<Dart>> phi2_;
+	std::shared_ptr<Attribute<Dart>> beta2_;
 
-	CMap2() : CMap1()
+	GMap2() : GMap1()
 	{
-		phi2_ = add_relation("phi2");
+		beta2_ = add_relation("beta2");
 	}
 };
 
 template <>
-struct mesh_traits<CMap2>
+struct mesh_traits<GMap2>
 {
-	static constexpr const char* name = "CMap2";
+	static constexpr const char* name = "GMap2";
 	static constexpr const uint8 dimension = 2;
 
-	using Vertex = CMap2::Vertex;
-	using HalfEdge = CMap2::HalfEdge;
-	using Edge = CMap2::Edge;
-	using Face = CMap2::Face;
-	using Volume = CMap2::Volume;
+	using Vertex = GMap2::Vertex;
+	using HalfEdge = GMap2::HalfEdge;
+	using Edge = GMap2::Edge;
+	using Face = GMap2::Face;
+	using Volume = GMap2::Volume;
 
 	using Cells = std::tuple<Vertex, HalfEdge, Edge, Face, Volume>;
 	static constexpr const char* cell_names[] = {"Vertex", "HalfEdge", "Edge", "Face", "Volume"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	using MarkAttribute = GMapBase::MarkAttribute;
 };
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_CMAP2_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP2_H_

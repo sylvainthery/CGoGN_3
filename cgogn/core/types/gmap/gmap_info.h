@@ -21,11 +21,11 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_CMAP_CMAP_INFO_H_
-#define CGOGN_CORE_CMAP_CMAP_INFO_H_
+#ifndef CGOGN_CORE_GMAP_CMAP_INFO_H_
+#define CGOGN_CORE_GMAP_CMAP_INFO_H_
 
-#include <cgogn/core/types/cmap/cmap_base.h>
-#include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/gmap/gmap_base.h>
+#include <cgogn/core/types/gmap/orbit_traversal.h>
 
 #include <iomanip>
 
@@ -42,11 +42,11 @@ namespace cgogn
 /////////////
 // GENERIC //
 /////////////
-
-template <typename CELL, typename CMAP>
-uint32 nb_darts_of_orbit(const CMAP& m, CELL c)
+// SAME_CMAP
+template <typename CELL, typename GMAP>
+uint32 nb_darts_of_orbit(const GMAP& m, CELL c)
 {
-	static_assert(is_in_tuple<CELL, typename CMAP::Cells>::value, "CELL not supported in this CMAP");
+	static_assert(is_in_tuple<CELL, typename GMAP::Cells>::value, "CELL not supported in this CMAP");
 	uint32 result = 0;
 	foreach_dart_of_orbit(m, c, [&](Dart) -> bool {
 		++result;
@@ -62,27 +62,16 @@ uint32 nb_darts_of_orbit(const CMAP& m, CELL c)
 
 /*****************************************************************************/
 
-//////////////
-// CMapBase //
-//////////////
-
-inline bool is_boundary(const CMapBase& m, Dart d)
-{
-	return (*m.boundary_marker_)[d.index] != 0u;
-}
-
-/*****************************************************************************/
-
 // template <typename CMAP>
 // uint32 nb_darts(const CMAP& m)
 
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// GMapBase //
 //////////////
-
-inline uint32 nb_darts(const CMapBase& m)
+// SAME_CMAP
+inline uint32 nb_darts(const GMapBase& m)
 {
 	return m.darts_.nb_elements();
 }
@@ -108,10 +97,9 @@ inline void dump_map_darts(const CMapBase& m)
 		for (auto& ind : m.cells_indices_)
 			if (ind)
 				std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";
-		std::cout << " boundary: " << std::boolalpha << is_boundary(m, d) << std::endl;
 	}
 }
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_CMAP_CMAP_INFO_H_
+#endif // CGOGN_CORE_GMAP_CMAP_INFO_H_

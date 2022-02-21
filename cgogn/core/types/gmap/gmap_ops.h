@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_CMAP_CMAP_OPS_H_
-#define CGOGN_CORE_CMAP_CMAP_OPS_H_
+#ifndef CGOGN_CORE_GMAP_CMAP_OPS_H_
+#define CGOGN_CORE_GMAP_CMAP_OPS_H_
 
 #include <cgogn/core/types/cmap/cmap_base.h>
 #include <cgogn/core/types/cmap/cph3.h>
@@ -162,4 +162,4 @@ auto copy_index(MESH& m, Dart dest, Dart src) -> std::enable_if_t<std::is_conver
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_CMAP_CMAP_OPS_H_
+#endif // CGOGN_CORE_GMAP_CMAP_OPS_H_

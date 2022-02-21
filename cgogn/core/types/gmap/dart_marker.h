@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_DART_MARKER_H_
-#define CGOGN_CORE_TYPES_CMAP_DART_MARKER_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_DART_MARKER_H_
+#define CGOGN_CORE_TYPES_GMAP_DART_MARKER_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 #include <cgogn/core/types/cmap/cmap_base.h>
@@ -170,4 +170,4 @@ public:
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_DART_MARKER_H_
+#endif // CGOGN_CORE_TYPES_GMAP_DART_MARKER_H_

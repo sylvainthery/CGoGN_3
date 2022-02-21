@@ -21,17 +21,17 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_CMAP0_H_
-#define CGOGN_CORE_TYPES_CMAP_CMAP0_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP0_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP0_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap_base.h>
+#include <cgogn/core/types/gmap/gmap_base.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
+struct CGOGN_CORE_EXPORT GMap0 : public GMapBase
 {
 	static const uint8 dimension = 0;
 
@@ -39,28 +39,28 @@ struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 
 	using Cells = std::tuple<Vertex>;
 
-	CMap0()
+	GMap0()
 	{
 	}
 };
 
 template <>
-struct mesh_traits<CMap0>
+struct mesh_traits<GMap0>
 {
-	static constexpr const char* name = "CMap0";
+	static constexpr const char* name = "GMap0";
 	static constexpr const uint8 dimension = 0;
 
-	using Vertex = typename CMap0::Vertex;
+	using Vertex = typename GMap0::Vertex;
 
 	using Cells = std::tuple<Vertex>;
 	static constexpr const char* cell_names[] = {"Vertex"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	using MarkAttribute = GMapBase::MarkAttribute;
 };
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_CMAP0_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP0_H_

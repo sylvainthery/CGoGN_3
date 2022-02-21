@@ -21,55 +21,55 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_CMAP1_H_
-#define CGOGN_CORE_TYPES_CMAP_CMAP1_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP1_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP1_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap0.h>
+#include <cgogn/core/types/gmap/gmap0.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT CMap1 : public CMap0
+struct CGOGN_CORE_EXPORT GMap1 : public GMap0
 {
 	static const uint8 dimension = 1;
 
 	using Vertex = Cell<DART>;
-	using Edge = Cell<DART>;
-	using Face = Cell<PHI1>;
+	using Edge = Cell<BETA0>;
+	using Face = Cell<BETA0_BETA1>;
 
 	using Cells = std::tuple<Vertex, Edge, Face>;
 
-	std::shared_ptr<Attribute<Dart>> phi1_;
-	std::shared_ptr<Attribute<Dart>> phi_1_;
+	std::shared_ptr<Attribute<Dart>> beta0_;
+	std::shared_ptr<Attribute<Dart>> beta1_;
 
-	CMap1() : CMap0()
+	GMap1() : GMap0()
 	{
-		phi1_ = add_relation("phi1");
-		phi_1_ = add_relation("phi_1");
+		beta0_ = add_relation("beta0");
+		beta1_ = add_relation("beta1");
 	}
 };
 
 template <>
-struct mesh_traits<CMap1>
+struct mesh_traits<GMap1>
 {
-	static constexpr const char* name = "CMap1";
+	static constexpr const char* name = "GMap1";
 	static constexpr const uint8 dimension = 1;
 
-	using Vertex = CMap1::Vertex;
-	using Edge = CMap1::Edge;
-	using Face = CMap1::Face;
+	using Vertex = GMap1::Vertex;
+	using Edge = GMap1::Edge;
+	using Face = GMap1::Face;
 
 	using Cells = std::tuple<Vertex, Edge, Face>;
 	static constexpr const char* cell_names[] = {"Vertex", "Edge", "Face"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	using MarkAttribute = GMapBase::MarkAttribute;
 };
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_CMAP1_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP1_H_

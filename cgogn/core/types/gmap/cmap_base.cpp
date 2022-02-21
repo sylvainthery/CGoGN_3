@@ -21,17 +21,16 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/core/types/cmap/cmap_base.h>
+#include <cgogn/core/types/gmap/gmap_base.h>
 
 namespace cgogn
 {
 
-CMapBase::CMapBase()
+GMapBase::GMapBase()
 {
-	boundary_marker_ = darts_.get_mark_attribute();
 }
 
-CMapBase::~CMapBase()
+GMapBase::~GMapBase()
 {
 }
 

@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_PHI_H_
-#define CGOGN_CORE_TYPES_CMAP_PHI_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_PHI_H_
+#define CGOGN_CORE_TYPES_GMAP_PHI_H_
 
 #include <cgogn/core/types/cmap/cmap3.h>
 #include <cgogn/core/types/cmap/cph3.h>
@@ -234,4 +234,4 @@ inline void alpha1_unsew(Graph& m, Dart d)
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_PHI_H_
+#endif // CGOGN_CORE_TYPES_GMAP_PHI_H_

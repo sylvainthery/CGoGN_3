@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_DART_H_
-#define CGOGN_CORE_TYPES_CMAP_DART_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_DART_H_
+#define CGOGN_CORE_TYPES_GMAP_DART_H_
 
 #include <climits>
 #include <iostream>
@@ -148,4 +148,4 @@ struct hash<cgogn::Dart>
 
 } // namespace std
 
-#endif // CGOGN_CORE_TYPES_CMAP_DART_H_
+#endif // CGOGN_CORE_TYPES_GMAP_DART_H_

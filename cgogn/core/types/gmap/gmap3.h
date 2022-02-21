@@ -21,64 +21,64 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_CMAP3_H_
-#define CGOGN_CORE_TYPES_CMAP_CMAP3_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP3_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP3_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/gmap/gmap2.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT CMap3 : public CMap2
+struct CGOGN_CORE_EXPORT GMap3 : public GMap2
 {
 	static const uint8 dimension = 3;
 
-	using Vertex = Cell<PHI21_PHI31>;
-	using Vertex2 = Cell<PHI21>;
-	using HalfEdge = Cell<DART>;
-	using Edge = Cell<PHI2_PHI3>;
-	using Edge2 = Cell<PHI2>;
-	using Face = Cell<PHI1_PHI3>;
-	using Face2 = Cell<PHI1>;
-	using Volume = Cell<PHI1_PHI2>;
-
+	using Vertex = Cell<BETA1_BETA2_BETA_3>;
+	using Vertex2 = Cell<BETA1_BETA2>;
+	using HalfEdge = Cell<BETA0>;
+	using Edge = Cell<BETA0_BETA2_BETA3>;
+	using Edge2 = Cell<BETA0_BETA2>;
+	using Face = Cell<BETA0_BETA_BETA3>;
+	using Face2 = Cell<BETA0_BETA1>;
+	using Volume = Cell<BETA0_BETA1_BETA2>;
+	using CC = Cell<BETA0_BETA1_BETA2_BETA3>;
 	using Cells = std::tuple<Vertex, Vertex2, HalfEdge, Edge, Edge2, Face, Face2, Volume>;
 
-	std::shared_ptr<Attribute<Dart>> phi3_;
+	std::shared_ptr<Attribute<Dart>> beta3_;
 
-	CMap3() : CMap2()
+	GMap3() : GMap2()
 	{
-		phi3_ = add_relation("phi3");
+		phi3_ = add_relation("beta3");
 	}
 };
 
 template <>
-struct mesh_traits<CMap3>
+struct mesh_traits<GMap3>
 {
-	static constexpr const char* name = "CMap3";
+	static constexpr const char* name = "GMap3";
 	static constexpr const uint8 dimension = 3;
 
-	using Vertex = CMap3::Vertex;
-	using Vertex2 = CMap3::Vertex2;
-	using HalfEdge = CMap3::HalfEdge;
-	using Edge = CMap3::Edge;
-	using Edge2 = CMap3::Edge2;
-	using Face = CMap3::Face;
-	using Face2 = CMap3::Face2;
-	using Volume = CMap3::Volume;
+	using Vertex = GMap3::Vertex;
+	using Vertex2 = GMap3::Vertex2;
+	using HalfEdge = GMap3::HalfEdge;
+	using Edge = GMap3::Edge;
+	using Edge2 = GMap3::Edge2;
+	using Face = GMap3::Face;
+	using Face2 = GMap3::Face2;
+	using Volume = GMap3::Volume;
 
 	using Cells = std::tuple<Vertex, Vertex2, HalfEdge, Edge, Edge2, Face, Face2, Volume>;
 	static constexpr const char* cell_names[] = {"Vertex", "Vertex2", "HalfEdge", "Edge",
 												 "Edge2",  "Face",	  "Face2",	  "Volume"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	using MarkAttribute = GMapBase::MarkAttribute;
 };
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_CMAP3_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP3_H_
