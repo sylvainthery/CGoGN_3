@@ -124,7 +124,7 @@ template <typename CELL, typename MESH, typename std::enable_if_t<std::is_conver
 bool check_indexing(MESH& m, bool verbose = true)
 {
 	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 	if (!is_indexed<CELL>(m))
 		return true;
 
@@ -286,6 +286,43 @@ inline bool check_integrity(CMap1& m, bool verbose = true)
 	result &= check_indexing<CMap1::Vertex>(m);
 	result &= check_indexing<CMap1::Edge>(m);
 	result &= check_indexing<CMap1::Face>(m);
+	result &= check_indexing<CMap1::Volume>(m);
+	return result;
+}
+
+
+inline bool check_integrity(GMap1& m, bool verbose = true)
+{
+	bool result = true;
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	{
+		//bool relations = beta
+		//TODO
+		if (verbose && !relations)
+			std::cerr << "Dart " << d << " has bad relations" << std::endl;
+
+		result &= relations;
+	}
+	result &= check_indexing<GMap1::Vertex>(m);
+	result &= check_indexing<GMap1::Edge>(m);
+	result &= check_indexing<GMap1::Face>(m);
+	return result;
+}
+inline bool check_integrity(GMap2& m, bool verbose = true)
+{
+	bool result = true;
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	{
+		//bool relations = beta
+		//TODO
+		if (verbose && !relations)
+			std::cerr << "Dart " << d << " has bad relations" << std::endl;
+
+		result &= relations;
+	}
+	result &= check_indexing<GMap2::Vertex>(m);
+	result &= check_indexing<GMap2::Edge>(m);
+	result &= check_indexing<GMap2::Face>(m);
 	return result;
 }
 
