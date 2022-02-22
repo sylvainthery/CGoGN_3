@@ -40,10 +40,10 @@ namespace cgogn
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// GMapBase (or convertible) //
 ///////////////////////////////
 
-inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase& m)
+inline typename GMapBase::MarkAttribute* get_dart_mark_attribute(const GMapBase& m)
 {
 	return m.darts_.get_mark_attribute();
 }
@@ -56,25 +56,27 @@ inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase&
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// GMapBase (or convertible) //
 ///////////////////////////////
 
-inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
+inline void release_dart_mark_attribute(const GMapBase& m, GMapBase::MarkAttribute* attribute)
 {
 	return m.darts_.release_mark_attribute(attribute);
 }
 
 /*****************************************************************************/
 
-template <typename CMAP>
+//SAME AS CMAP
+
+template <typename GMAP>
 class CGOGN_CORE_EXPORT DartMarker
 {
 private:
-	const CMAP& map_;
-	typename mesh_traits<CMAP>::MarkAttribute* mark_attribute_;
+	const GMAP& map_;
+	typename mesh_traits<GMAP>::MarkAttribute* mark_attribute_;
 
 public:
-	DartMarker(const CMAP& map) : map_(map)
+	DartMarker(const GMAP& map) : map_(map)
 	{
 		mark_attribute_ = get_dart_mark_attribute(map_);
 	}
@@ -107,16 +109,16 @@ public:
 	}
 };
 
-template <typename CMAP>
+template <typename GMAP>
 class CGOGN_CORE_EXPORT DartMarkerStore
 {
 private:
-	const CMAP& map_;
-	typename mesh_traits<CMAP>::MarkAttribute* mark_attribute_;
+	const GMAP& map_;
+	typename mesh_traits<GMAP>::MarkAttribute* mark_attribute_;
 	std::vector<Dart> marked_darts_;
 
 public:
-	DartMarkerStore(const CMAP& map) : map_(map)
+	DartMarkerStore(const GMAP& map) : map_(map)
 	{
 		mark_attribute_ = get_dart_mark_attribute(map_);
 		marked_darts_.reserve(512u);

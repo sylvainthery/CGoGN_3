@@ -24,8 +24,7 @@
 #ifndef CGOGN_CORE_GMAP_CMAP_OPS_H_
 #define CGOGN_CORE_GMAP_CMAP_OPS_H_
 
-#include <cgogn/core/types/cmap/cmap_base.h>
-#include <cgogn/core/types/cmap/cph3.h>
+#include <cgogn/core/types/gmap/gmap_base.h>
 #include <cgogn/core/types/cmap/orbit_traversal.h>
 
 namespace cgogn
@@ -41,8 +40,8 @@ namespace cgogn
 //////////////
 // CMapBase //
 //////////////
-
-inline Dart add_dart(CMapBase& m)
+// SAME_CMAP
+inline Dart add_dart(GMapBase& m)
 {
 	uint32 index = m.darts_.new_index();
 	Dart d(index);
@@ -54,27 +53,6 @@ inline Dart add_dart(CMapBase& m)
 	return d;
 }
 
-//////////
-// CPH3 //
-//////////
-
-inline Dart add_dart(CPH3& m)
-{
-	Dart d = add_dart(static_cast<CPH3::CMAP&>(m));
-	if (uint32(m.nb_darts_per_level_.size()) < m.current_level_)
-		m.nb_darts_per_level_.resize(m.current_level_);
-	m.nb_darts_per_level_[m.current_level_]++;
-	m.set_edge_id(d, 0u);
-	m.set_face_id(d, 0u);
-	m.set_dart_level(d, m.current_level_);
-
-	// update max level if needed
-	if (m.current_level_ > m.maximum_level_)
-		m.maximum_level_ = m.current_level_;
-
-	return d;
-}
-
 /*****************************************************************************/
 
 // template <typename CMAP>
@@ -83,9 +61,9 @@ inline Dart add_dart(CPH3& m)
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// GMapBase //
 //////////////
-
+// SAME_CMAP
 inline void remove_dart(CMapBase& m, Dart d)
 {
 	for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
@@ -102,33 +80,12 @@ inline void remove_dart(CMapBase& m, Dart d)
 
 /*****************************************************************************/
 
-// template <typename CMAP>
-// void set_boundary(const CMAP& m, Dart d, bool b)
-
-/*****************************************************************************/
-
 //////////////
-// CMapBase //
+// GMapBase //
 //////////////
-
-inline void set_boundary(const CMapBase& m, Dart d, bool b)
-{
-	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
-}
-
-/*****************************************************************************/
-
-// template <typename CELL, typename MESH>
-// void set_index(MESH& m, Dart d, uint32 index);
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
+// SAME_CMAP
 template <typename CELL>
-void set_index(CMapBase& m, Dart d, uint32 index)
+void set_index(GMapBase& m, Dart d, uint32 index)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
