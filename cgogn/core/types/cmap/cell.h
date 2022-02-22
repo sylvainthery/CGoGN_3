@@ -74,6 +74,29 @@ inline std::string orbit_name(Orbit orbit)
 		return "cgogn::Orbit::PHI21_PHI31";
 	case Orbit::PHI1_PHI2_PHI3:
 		return "cgogn::Orbit::PHI1_PHI2_PHI3";
+	case Orbit::BETA_1_BETA_2:
+		return "cgogn::Orbit::BETA1_BETA2";
+	case Orbit::BETA_0_BETA_2:
+		return "cgogn::Orbit::BETA0_BETA2";
+	case Orbit::BETA_0_BETA_1:
+		return "cgogn::Orbit::BETA0_BETA1";
+	case Orbit::BETA_1_BETA_2:
+		return "cgogn::Orbit::BETA1_BETA2";
+
+	case Orbit::PHI21_PHI31:
+		return "cgogn::Orbit::PHI21_PHI31";
+	case Orbit::PHI1_PHI2_PHI3:
+		return "cgogn::Orbit::PHI1_PHI2_PHI3";
+	case Orbit::BETA_1_BETA_2:
+		return "cgogn::Orbit::BETA1_BETA2";
+	case Orbit::BETA_0_BETA_2:
+		return "cgogn::Orbit::BETA0_BETA2";
+	case Orbit::BETA_0_BETA_1:
+		return "cgogn::Orbit::BETA0_BETA1";
+	case Orbit::BETA_1_BETA_2:
+		return "cgogn::Orbit::BETA1_BETA2";
+
+
 		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}
 	cgogn_assert_not_reached("This orbit does not exist");
