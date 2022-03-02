@@ -73,6 +73,27 @@ struct mesh_traits<CMap2>
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
 
+
+inline Dart phi2(const CMap2& m, Dart d)
+{
+	return (*(m.phi2_))[d.index];
+}
+
+inline void phi2_sew(CMap2& m, Dart d, Dart e)
+{
+	cgogn_assert(phi2(m, d) == d);
+	cgogn_assert(phi2(m, e) == e);
+	(*(m.phi2_))[d.index] = e;
+	(*(m.phi2_))[e.index] = d;
+}
+
+inline void phi2_unsew(CMap2& m, Dart d)
+{
+	Dart e = phi2(m, d);
+	(*(m.phi2_))[d.index] = d;
+	(*(m.phi2_))[e.index] = e;
+}
+
 CMap2::Vertex CGOGN_CORE_EXPORT cut_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
 
 CMap2::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
@@ -98,6 +119,10 @@ CMap2::Volume CGOGN_CORE_EXPORT add_prism(CMap2& m, uint32 size, bool set_indice
 void CGOGN_CORE_EXPORT remove_volume(CMap2& m, CMap2::Volume v);
 
 bool check_integrity(CMap2& m, bool verbose);
+
+bool edge_can_collapse(const CMap2& m, CMap2::Edge e);
+
+inline bool edge_can_flip(const CMap2& m, CMap2::Edge e);
 
 } // namespace cgogn
 

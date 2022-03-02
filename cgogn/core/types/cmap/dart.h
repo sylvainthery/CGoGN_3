@@ -29,6 +29,7 @@
 
 #include <cgogn/core/utils/numerics.h>
 
+
 namespace cgogn
 {
 

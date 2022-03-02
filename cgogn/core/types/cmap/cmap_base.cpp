@@ -22,6 +22,15 @@
  *******************************************************************************/
 
 #include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/cmap/phi.h>
+#include <cgogn/core/types/cmap/cmap_info.h>
+#include <cgogn/core/functions/mesh_info.h>
+
+// A REGROUPER
+#include <cgogn/core/functions/traversals/vertex.h>
+#include <cgogn/core/functions/traversals/edge.h>
+#include <cgogn/core/functions/traversals/face.h>
+#include <cgogn/core/functions/traversals/volume.h>
 
 namespace cgogn
 {
@@ -97,7 +106,7 @@ bool check_integrity(CMap1& m, bool verbose)
     result &= check_indexing<CMap1::Vertex>(m);
     result &= check_indexing<CMap1::Edge>(m);
     result &= check_indexing<CMap1::Face>(m);
-    result &= check_indexing<CMap1::Volume>(m);
+    //result &= check_indexing<CMap1::Volume>(m);
     return result;
 }
 
@@ -133,6 +142,87 @@ bool check_integrity(CMap2& m, bool verbose)
     return result;
 }
 
+inline bool edge_can_collapse(const CMap2& m, CMap2::Edge e)
+{
+	using Vertex = CMap2::Vertex;
+	using Face = CMap2::Face;
+
+	auto vertices = incident_vertices(m, e);
+
+	if (is_incident_to_boundary(m, vertices[0]) || is_incident_to_boundary(m, vertices[1]))
+		return false;
+
+	uint32 val_v1 = degree(m, vertices[0]);
+	uint32 val_v2 = degree(m, vertices[1]);
+
+	if (val_v1 + val_v2 < 8 || val_v1 + val_v2 > 14)
+		return false;
+
+	Dart e1 = e.dart;
+	Dart e2 = phi2(m, e.dart);
+	if (codegree(m, Face(e1)) == 3)
+	{
+		if (degree(m, Vertex(phi_1(m, e1))) < 4)
+			return false;
+	}
+	if (codegree(m, Face(e2)) == 3)
+	{
+		if (degree(m, Vertex(phi_1(m, e2))) < 4)
+			return false;
+	}
+
+	auto next_edge = [&m](Dart d) { return phi<-1, 2>(m, d); };
+
+	// Check vertex sharing condition
+	std::vector<uint32> vn1;
+	Dart it = next_edge(next_edge(e1));
+	Dart end = phi1(m, e2);
+	do
+	{
+		vn1.push_back(index_of(m, Vertex(phi1(m, it))));
+		it = next_edge(it);
+	} while (it != end);
+	it = next_edge(next_edge(e2));
+	end = phi1(m, e1);
+	do
+	{
+		auto vn1it = std::find(vn1.begin(), vn1.end(), index_of(m, Vertex(phi1(m, it))));
+		if (vn1it != vn1.end())
+			return false;
+		it = next_edge(it);
+	} while (it != end);
+
+	return true;
+}
+
+
+
+inline bool edge_can_flip(const CMap2& m, CMap2::Edge e)
+{
+	if (is_incident_to_boundary(m, e))
+		return false;
+
+	Dart e1 = e.dart;
+	Dart e2 = phi2(m, e1);
+
+	auto next_edge = [&m](Dart d) { return phi<-1, 2>(m, d); };
+
+	if (codegree(m, CMap2::Face(e1)) == 3 && codegree(m, CMap2::Face(e2)) == 3)
+	{
+		uint32 idxv2 = index_of(m, CMap2::Vertex(phi_1(m, e2)));
+		Dart d = phi_1(m, e1);
+		Dart it = d;
+		do
+		{
+			if (index_of(m, CMap2::Vertex(phi1(m, it))) == idxv2)
+				return false;
+			it = next_edge(it);
+		} while (it != d);
+	}
+
+	return true;
+}
+
 
 bool check_integrity(CMap3& m, bool verbose)
 {
@@ -165,6 +255,19 @@ bool check_integrity(CMap3& m, bool verbose)
     return result;
 }
 
+void dump_map_darts(const CMapBase& m)
+{
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	{
+		std::cout << "index: " << std::setw(5) << d.index << " / ";
+		for (auto& r : m.relations_)
+			std::cout << r->name() << ": " << std::setw(5) << (*r)[d.index] << " / ";
+		for (auto& ind : m.cells_indices_)
+			if (ind)
+				std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";
+		std::cout << " boundary: " << std::boolalpha << is_boundary(m, d) << std::endl;
+	}
+}
 
 
 } // namespace cgogn
