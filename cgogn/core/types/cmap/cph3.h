@@ -183,6 +183,29 @@ struct mesh_traits<CPH3> : public mesh_traits<CMap3>
 	static constexpr const char* name = "CPH3";
 };
 
+
+CPH3::CMAP::Vertex CGOGN_CORE_EXPORT cut_edge(CPH3& m, CPH3::CMAP::Edge e, bool set_indices = true);
+
+CPH3::CMAP::Edge CGOGN_CORE_EXPORT cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3::CMAP::Vertex v2,
+                                            bool set_indices = true);
+CPH3::CMAP::Face cut_volume(CPH3& m, const std::vector<Dart>& path, bool set_indices = true);
+
+
+template <typename MRMAP, typename CELL>
+inline auto index_of(const MRMAP& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MRMAP&, CPH3&>, uint32>
+{
+    static const Orbit orbit = CELL::ORBIT;
+
+    if constexpr (orbit == CPH3::CMAP::Edge::ORBIT)
+        c.dart = m.edge_youngest_dart(c.dart);
+    if constexpr (orbit == CPH3::CMAP::Face::ORBIT)
+        c.dart = m.face_youngest_dart(c.dart);
+    if constexpr (orbit == CPH3::CMAP::Volume::ORBIT)
+        c.dart = m.volume_youngest_dart(c.dart);
+
+    return index_of(static_cast<const CPH3::CMAP&>(m), c);
+}
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CPH3_H_

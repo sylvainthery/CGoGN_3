@@ -48,7 +48,7 @@ struct CGOGN_CORE_EXPORT CMap3 : public CMap2
 
 	std::shared_ptr<Attribute<Dart>> phi3_;
 
-	CMap3() : CMap2()
+    inline CMap3() : CMap2()
 	{
 		phi3_ = add_relation("phi3");
 	}
@@ -78,6 +78,18 @@ struct mesh_traits<CMap3>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+CMap3::Vertex CGOGN_CORE_EXPORT cut_edge(CMap3& m, CMap3::Edge e, bool set_indices = true);
+
+CMap3::Edge CGOGN_CORE_EXPORT cut_face(CMap3& m, CMap3::Vertex v1, CMap3::Vertex v2, bool set_indices = true);
+
+CMap3::Face cut_volume(CMap3& m, const std::vector<Dart>& path, bool set_indices = true);
+
+CMap3::Volume close_hole(CMap3& m, Dart d, bool set_indices = true);
+
+uint32 close(CMap3& m, bool set_indices = true);
+
+bool check_integrity(CMap3& m, bool verbose = true);
 
 } // namespace cgogn
 

@@ -165,6 +165,57 @@ struct mesh_traits<IncidenceGraph>
 	using MarkAttribute = IncidenceGraph::MarkAttribute;
 };
 
+IncidenceGraph::Vertex CGOGN_CORE_EXPORT add_vertex(IncidenceGraph& ig);
+
+void CGOGN_CORE_EXPORT remove_vertex(IncidenceGraph& ig, IncidenceGraph::Vertex v);
+
+
+IncidenceGraph::Edge CGOGN_CORE_EXPORT add_edge(IncidenceGraph& ig, IncidenceGraph::Vertex v0,
+                                                IncidenceGraph::Vertex v1);
+
+void CGOGN_CORE_EXPORT remove_edge(IncidenceGraph& ig, IncidenceGraph::Edge e);
+
+IncidenceGraph::Vertex CGOGN_CORE_EXPORT cut_edge(IncidenceGraph& ig, IncidenceGraph::Edge e, bool set_indices = true);
+
+// returns a vector of removed edges (except e) in addition to the resulting vertex
+std::pair<IncidenceGraph::Vertex, std::vector<IncidenceGraph::Edge>> collapse_edge(IncidenceGraph& ig,
+                                                                                   IncidenceGraph::Edge e,
+                                                                                   bool set_indices = true);
+
+
+IncidenceGraph::Face CGOGN_CORE_EXPORT add_face(IncidenceGraph& ig, std::vector<IncidenceGraph::Edge>& edges);
+
+IncidenceGraph::Edge CGOGN_CORE_EXPORT cut_face(IncidenceGraph& m, IncidenceGraph::Vertex v1,
+                                                IncidenceGraph::Vertex v2);
+
+void CGOGN_CORE_EXPORT remove_face(IncidenceGraph& ig, IncidenceGraph::Face f);
+
+void copy(IncidenceGraph& /*dst*/, const IncidenceGraph& /*src*/)
+{
+    // TODO
+}
+
+template <typename CELL>
+bool is_indexed(const IncidenceGraph& /*m*/)
+{
+    return true;
+}
+
+template <typename CELL>
+uint32 new_index(const IncidenceGraph& ig)
+{
+    uint32 id = ig.attribute_containers_[CELL::CELL_INDEX].new_index();
+    // (*ig.cells_indices_[CELL::CELL_INDEX])[id] = id;
+    return id;
+}
+
+template <typename CELL>
+uint32 index_of(const IncidenceGraph& /*m*/, CELL c)
+{
+    return c.index_;
+}
+
 } // namespace cgogn
+
 
 #endif // CGOGN_CORE_INCIDENCE_GRAPH_H_

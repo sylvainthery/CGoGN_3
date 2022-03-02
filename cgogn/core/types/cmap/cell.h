@@ -37,18 +37,21 @@
 namespace cgogn
 {
 
+
 enum Orbit : uint32
 {
-	DART = 0,
-	PHI1,
-	PHI2,
-	PHI21,
-	PHI1_PHI2,
-	PHI1_PHI3,
-	PHI2_PHI3,
-	PHI21_PHI31,
-	PHI1_PHI2_PHI3
+    DART = 0,
+    PHI1,
+    PHI2,
+    PHI21,
+    PHI1_PHI2,
+    PHI1_PHI3,
+    PHI2_PHI3,
+    PHI21_PHI31,
+    PHI1_PHI2_PHI3
 };
+
+
 
 static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
 
@@ -74,29 +77,6 @@ inline std::string orbit_name(Orbit orbit)
 		return "cgogn::Orbit::PHI21_PHI31";
 	case Orbit::PHI1_PHI2_PHI3:
 		return "cgogn::Orbit::PHI1_PHI2_PHI3";
-	case Orbit::BETA_1_BETA_2:
-		return "cgogn::Orbit::BETA1_BETA2";
-	case Orbit::BETA_0_BETA_2:
-		return "cgogn::Orbit::BETA0_BETA2";
-	case Orbit::BETA_0_BETA_1:
-		return "cgogn::Orbit::BETA0_BETA1";
-	case Orbit::BETA_1_BETA_2:
-		return "cgogn::Orbit::BETA1_BETA2";
-
-	case Orbit::PHI21_PHI31:
-		return "cgogn::Orbit::PHI21_PHI31";
-	case Orbit::PHI1_PHI2_PHI3:
-		return "cgogn::Orbit::PHI1_PHI2_PHI3";
-	case Orbit::BETA_1_BETA_2:
-		return "cgogn::Orbit::BETA1_BETA2";
-	case Orbit::BETA_0_BETA_2:
-		return "cgogn::Orbit::BETA0_BETA2";
-	case Orbit::BETA_0_BETA_1:
-		return "cgogn::Orbit::BETA0_BETA1";
-	case Orbit::BETA_1_BETA_2:
-		return "cgogn::Orbit::BETA1_BETA2";
-
-
 		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}
 	cgogn_assert_not_reached("This orbit does not exist");

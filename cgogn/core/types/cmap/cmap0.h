@@ -33,6 +33,7 @@ namespace cgogn
 
 struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 {
+
 	static const uint8 dimension = 0;
 
 	using Vertex = Cell<DART>;

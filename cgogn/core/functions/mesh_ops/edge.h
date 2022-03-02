@@ -25,7 +25,7 @@
 #define CGOGN_CORE_FUNCTIONS_MESH_OPS_EDGE_H_
 
 #include <cgogn/core/cgogn_core_export.h>
-
+#include <cgogn/core/types/gmap/gmap3.h>
 #include <cgogn/core/types/cmap/cmap3.h>
 #include <cgogn/core/types/cmap/cph3.h>
 #include <cgogn/core/types/cmap/graph.h>
@@ -46,8 +46,6 @@ namespace cgogn
 // IncidenceGraph //
 ////////////////////
 
-IncidenceGraph::Edge CGOGN_CORE_EXPORT add_edge(IncidenceGraph& ig, IncidenceGraph::Vertex v0,
-												IncidenceGraph::Vertex v1);
 
 /*****************************************************************************/
 
@@ -61,7 +59,6 @@ IncidenceGraph::Edge CGOGN_CORE_EXPORT add_edge(IncidenceGraph& ig, IncidenceGra
 // IncidenceGraph //
 ////////////////////
 
-void CGOGN_CORE_EXPORT remove_edge(IncidenceGraph& ig, IncidenceGraph::Edge e);
 
 /*****************************************************************************/
 
@@ -75,37 +72,38 @@ void CGOGN_CORE_EXPORT remove_edge(IncidenceGraph& ig, IncidenceGraph::Edge e);
 // IncidenceGraph //
 ////////////////////
 
-IncidenceGraph::Vertex CGOGN_CORE_EXPORT cut_edge(IncidenceGraph& ig, IncidenceGraph::Edge e, bool set_indices = true);
 
 ///////////
 // Graph //
 ///////////
 
-Graph::Vertex CGOGN_CORE_EXPORT cut_edge(Graph& m, Graph::Edge e, bool set_indices = true);
 
 ///////////
 // CMap1 //
 ///////////
 
-CMap1::Vertex CGOGN_CORE_EXPORT cut_edge(CMap1& m, CMap1::Edge e, bool set_indices = true);
 
 ///////////
 // CMap2 //
 ///////////
 
-CMap2::Vertex CGOGN_CORE_EXPORT cut_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
 
 ///////////
 // CMap3 //
+///////////xxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+///////////
+// GMaps //
 ///////////
 
-CMap3::Vertex CGOGN_CORE_EXPORT cut_edge(CMap3& m, CMap3::Edge e, bool set_indices = true);
+
+
 
 //////////
 // CPH3 //
 //////////
 
-CPH3::CMAP::Vertex CGOGN_CORE_EXPORT cut_edge(CPH3& m, CPH3::CMAP::Edge e, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -119,28 +117,20 @@ CPH3::CMAP::Vertex CGOGN_CORE_EXPORT cut_edge(CPH3& m, CPH3::CMAP::Edge e, bool 
 // IncidenceGraph //
 ////////////////////
 
-// returns a vector of removed edges (except e) in addition to the resulting vertex
-std::pair<IncidenceGraph::Vertex, std::vector<IncidenceGraph::Edge>> collapse_edge(IncidenceGraph& ig,
-																				   IncidenceGraph::Edge e,
-																				   bool set_indices = true);
-
 ///////////
 // Graph //
 ///////////
 
-Graph::Vertex collapse_edge(Graph& g, Graph::Edge e, bool set_indices = true);
 
 ///////////
 // CMap1 //
 ///////////
 
-CMap1::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap1& m, CMap1::Edge e, bool set_indices = true);
 
 ///////////
 // CMap2 //
 ///////////
 
-CMap2::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -153,8 +143,6 @@ CMap2::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap2& m, CMap2::Edge e, bool set_
 ///////////
 // CMap2 //
 ///////////
-
-bool CGOGN_CORE_EXPORT flip_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
 
 } // namespace cgogn
 

@@ -46,7 +46,6 @@ namespace cgogn
 // CMap2 //
 ///////////
 
-CMap2::Volume CGOGN_CORE_EXPORT add_pyramid(CMap2& m, uint32 size, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -60,7 +59,6 @@ CMap2::Volume CGOGN_CORE_EXPORT add_pyramid(CMap2& m, uint32 size, bool set_indi
 // CMap2 //
 ///////////
 
-CMap2::Volume CGOGN_CORE_EXPORT add_prism(CMap2& m, uint32 size, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -74,7 +72,6 @@ CMap2::Volume CGOGN_CORE_EXPORT add_prism(CMap2& m, uint32 size, bool set_indice
 // CMap2 //
 ///////////
 
-void CGOGN_CORE_EXPORT remove_volume(CMap2& m, CMap2::Volume v);
 
 /*****************************************************************************/
 
@@ -88,13 +85,11 @@ void CGOGN_CORE_EXPORT remove_volume(CMap2& m, CMap2::Volume v);
 // CMap3 //
 ///////////
 
-CMap3::Face cut_volume(CMap3& m, const std::vector<Dart>& path, bool set_indices = true);
 
 //////////
 // CPH3 //
 //////////
 
-CPH3::CMAP::Face cut_volume(CPH3& m, const std::vector<Dart>& path, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -108,7 +103,6 @@ CPH3::CMAP::Face cut_volume(CPH3& m, const std::vector<Dart>& path, bool set_ind
 // CMap3 //
 ///////////
 
-CMap3::Volume close_hole(CMap3& m, Dart d, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -122,7 +116,6 @@ CMap3::Volume close_hole(CMap3& m, Dart d, bool set_indices = true);
 // CMap3 //
 ///////////
 
-uint32 close(CMap3& m, bool set_indices = true);
 
 } // namespace cgogn
 

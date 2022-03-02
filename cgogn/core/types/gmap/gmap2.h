@@ -73,6 +73,11 @@ struct mesh_traits<GMap2>
 	using MarkAttribute = GMapBase::MarkAttribute;
 };
 
+GMap2::Vertex CGOGN_CORE_EXPORT cut_edge(GMap2& m, GMap2::Edge e, bool set_indices = true);
+
+
+GMap2::Edge CGOGN_CORE_EXPORT cut_face(GMap2& m, GMap2::Vertex v1, GMap2::Vertex v2, bool set_indices = true);
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_GMAP_CMAP2_H_

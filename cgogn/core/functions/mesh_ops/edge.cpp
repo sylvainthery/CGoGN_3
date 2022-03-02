@@ -1,4 +1,4 @@
-/*******************************************************************************
+﻿/*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -23,11 +23,13 @@
 
 #include <cgogn/core/functions/cells.h>
 #include <cgogn/core/functions/mesh_info.h>
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
 
 #include <cgogn/core/types/cmap/cmap_ops.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
+
+#include "cgogn/core/types/cmap/cmap1.h"
+#include "cgogn/core/types/cmap/graph.h"
+
 
 namespace cgogn
 {
@@ -647,5 +649,25 @@ bool flip_edge(CMap2& m, CMap2::Edge e, bool set_indices)
 
 	return true;
 }
+
+
+GMap1::Vertex cut_edge(GMap1& m, GMap1::Edge e, bool set_indices)
+{
+    Dart d = add_dart(m);
+    phi1_sew(m, e.dart, d);
+    CMap1::Vertex v(d);
+
+    if (set_indices)
+    {
+        if (is_indexed<CMap1::Vertex>(m))
+            set_index(m, v, new_index<CMap1::Vertex>(m));
+        // CMap1::Edge is the same orbit as CMap1::Vertex
+        if (is_indexed<CMap1::Face>(m))
+            copy_index<CMap1::Face>(m, d, e.dart);
+    }
+
+    return v;
+}
+
 
 } // namespace cgogn

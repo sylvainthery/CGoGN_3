@@ -1,4 +1,4 @@
-/*******************************************************************************
+qqqqqqqq/*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -31,13 +31,13 @@
 
 /**
  * \file cgogn/core/types/cmap/cell.h
- * \brief GM_Orbit and cell definitions used in cgogn.
+ * \brief Orbit and cell definitions used in cgogn.
  */
 
 namespace cgogn
 {
 
-enum GM_Orbit : uint32
+enum Orbit : uint32
 {
 	DART = 0,
 	BETA0,// 1EDGE 
@@ -52,35 +52,36 @@ enum GM_Orbit : uint32
 	BETA0_BETA1_BETA2_BETA3 // 3CC
 };
 
-static const std::size_t NB_GM_ORBITS = GM_Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
 
-inline std::string orbit_name(GM_Orbit orbit)
+static const std::size_t NB_ORBITS = Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
+
+inline std::string orbit_name(Orbit orbit)
 {
 	switch (orbit)
 	{
-	case GM_Orbit::DART:
-		return "cgogn::GM_Orbit::DART";
-	case GM_Orbit::BETA1:
-		return "cgogn::GM_Orbit::BETA2";
-	case GM_Orbit::BETA2:
-		return "cgogn::GM_Orbit::BETA2";
-	case GM_Orbit::BETA0_BETA0:
-		return "cgogn::GM_Orbit::BETA0_BETA1";
-	case GM_Orbit::BETA0_BETA2:
-		return "cgogn::GM_Orbit::BETA0_BETA2";
-	case GM_Orbit::BETA1_BETA2:
-		return "cgogn::GM_Orbit::BETA1_BETA2";
+    case DART:
+        return "cgogn::Orbit::DART";
+    case BETA1:
+        return "cgogn::Orbit::BETA2";
+    case BETA2:
+        return "cgogn::Orbit::BETA2";
+    case BETA0_BETA1:
+        return "cgogn::Orbit::BETA0_BETA1";
+    case Orbit::BETA0_BETA2:
+        return "cgogn::Orbit::BETA0_BETA2";
+    case Orbit::BETA1_BETA2:
+        return "cgogn::Orbit::BETA1_BETA2";
 		
-	case GM_Orbit::BETA0_BETA1_BETA2:
-		return "cgogn::GM_Orbit::BETA0_BETA1_BETA2";
-	case GM_Orbit::BETA0_BETA1_BETA3:
-		return "cgogn::GM_Orbit::BETA0_BETA1_BETA3";
-	case GM_Orbit::BETA0_BETA2_BETA3:
-		return "cgogn::GM_Orbit::BETA0_BETA2_BETA3";		
-	case GM_Orbit::BETA1_BETA2_BETA3:
-		return "cgogn::GM_Orbit::BETA1_BETA2_BETA3";
-	case GM_Orbit::BETA0_BETA1_BETA2_BETA3:
-		return "cgogn::GM_Orbit::BETA0_BETA1_BETA2_BETA3";
+    case Orbit::BETA0_BETA1_BETA2:
+        return "cgogn::Orbit::BETA0_BETA1_BETA2";
+    case Orbit::BETA0_BETA1_BETA3:
+        return "cgogn::Orbit::BETA0_BETA1_BETA3";
+    case Orbit::BETA0_BETA2_BETA3:
+        return "cgogn::Orbit::BETA0_BETA2_BETA3";
+    case Orbit::BETA1_BETA2_BETA3:
+        return "cgogn::Orbit::BETA1_BETA2_BETA3";
+    case Orbit::BETA0_BETA1_BETA2_BETA3:
+        return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
 		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}
 	cgogn_assert_not_reached("This orbit does not exist");
@@ -94,10 +95,10 @@ inline std::string orbit_name(GM_Orbit orbit)
  * \tparam ORBIT The type of the orbit used to create the Cell
  */
 // SAME AS CMAP
-template <GM_Orbit ORBIT_>
+template <Orbit ORBIT_>
 struct Cell
 {
-	static const GM_Orbit ORBIT = ORBIT_;
+    static const Orbit ORBIT = ORBIT_;
 	using Self = Cell<ORBIT>;
 
 	/**

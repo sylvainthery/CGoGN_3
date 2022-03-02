@@ -46,13 +46,11 @@ namespace cgogn
 // Graph //
 ///////////
 
-Graph::Vertex CGOGN_CORE_EXPORT add_vertex(Graph& g, bool set_indices = true);
 
 ////////////////////
 // IncidenceGraph //
 ////////////////////
 
-IncidenceGraph::Vertex CGOGN_CORE_EXPORT add_vertex(IncidenceGraph& ig);
 
 /*****************************************************************************/
 
@@ -66,13 +64,11 @@ IncidenceGraph::Vertex CGOGN_CORE_EXPORT add_vertex(IncidenceGraph& ig);
 // Graph //
 ///////////
 
-void CGOGN_CORE_EXPORT remove_vertex(Graph& g, Graph::Vertex v, bool set_indices = true);
 
 ////////////////////
 // IncidenceGraph //
 ////////////////////
 
-void CGOGN_CORE_EXPORT remove_vertex(IncidenceGraph& ig, IncidenceGraph::Vertex v);
 
 /*****************************************************************************/
 
@@ -87,7 +83,6 @@ void CGOGN_CORE_EXPORT remove_vertex(IncidenceGraph& ig, IncidenceGraph::Vertex 
 // Graph //
 ///////////
 
-Graph::Edge CGOGN_CORE_EXPORT connect_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -101,7 +96,6 @@ Graph::Edge CGOGN_CORE_EXPORT connect_vertices(Graph& g, Graph::Vertex v1, Graph
 // Graph //
 ///////////
 
-void CGOGN_CORE_EXPORT disconnect_vertices(Graph& g, Graph::Edge e, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -116,7 +110,6 @@ void CGOGN_CORE_EXPORT disconnect_vertices(Graph& g, Graph::Edge e, bool set_ind
 // Graph //
 ///////////
 
-void CGOGN_CORE_EXPORT merge_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
 
 } // namespace cgogn
 

@@ -79,6 +79,9 @@ struct mesh_traits<GMap3>
 	using MarkAttribute = GMapBase::MarkAttribute;
 };
 
+
+GMap3::Vertex CGOGN_CORE_EXPORT cut_edge(GMap3& m, GMap3::Edge e, bool set_indices = true);
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_GMAP_CMAP3_H_

@@ -25,6 +25,7 @@
 #define CGOGN_CORE_TYPES_CMAP_GRAPH_H_
 
 #include <cgogn/core/cgogn_core_export.h>
+#include <cgogn/core/types/cmap/cmap0.h>
 
 #include <cgogn/core/types/cmap/cell.h>
 #include <cgogn/core/types/cmap/cmap_base.h>
@@ -72,6 +73,23 @@ struct mesh_traits<Graph>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+Graph::Edge CGOGN_CORE_EXPORT connect_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT disconnect_vertices(Graph& g, Graph::Edge e, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT merge_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
+
+
+Graph::Vertex CGOGN_CORE_EXPORT add_vertex(Graph& g, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_vertex(Graph& g, Graph::Vertex v, bool set_indices = true);
+
+
+Graph::Vertex CGOGN_CORE_EXPORT cut_edge(Graph& m, Graph::Edge e, bool set_indices = true);
+
+Graph::Vertex collapse_edge(Graph& g, Graph::Edge e, bool set_indices = true);
+
 
 } // namespace cgogn
 
