@@ -24,46 +24,6 @@
 #ifndef CGOGN_CORE_FUNCTIONS_MESH_OPS_GLOBAL_H_
 #define CGOGN_CORE_FUNCTIONS_MESH_OPS_GLOBAL_H_
 
-#include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap_base.h>
-
-namespace cgogn
-{
-
-/*****************************************************************************/
-
-// template <typename MESH>
-// void
-// clear(MESH& m);
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
-
-/*****************************************************************************/
-
-// template <typename MESH>
-// void
-// copy(MESH& dst, const MESH& src);
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
-
-
-////////////////////
-// IncidenceGraph //
-////////////////////
-
-
-
-} // namespace cgogn
 
 #endif // CGOGN_CORE_FUNCTIONS_MESH_OPS_GLOBAL_H_

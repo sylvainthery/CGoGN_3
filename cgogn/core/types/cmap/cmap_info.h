@@ -43,18 +43,6 @@ namespace cgogn
 // GENERIC //
 /////////////
 
-template <typename CELL, typename CMAP>
-uint32 nb_darts_of_orbit(const CMAP& m, CELL c)
-{
-	static_assert(is_in_tuple<CELL, typename CMAP::Cells>::value, "CELL not supported in this CMAP");
-	uint32 result = 0;
-	foreach_dart_of_orbit(m, c, [&](Dart) -> bool {
-		++result;
-		return true;
-	});
-	return result;
-}
-
 
 /*****************************************************************************/
 

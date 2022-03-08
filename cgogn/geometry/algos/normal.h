@@ -1,4 +1,4 @@
-s/*******************************************************************************
+/*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -25,9 +25,7 @@ s/******************************************************************************
 #define CGOGN_GEOMETRY_ALGOS_NORMAL_H_
 
 #include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/functions/traversals/face.h>
 #include <cgogn/core/functions/traversals/global.h>
-#include <cgogn/core/functions/traversals/vertex.h>
 
 #include <cgogn/geometry/algos/area.h>
 #include <cgogn/geometry/functions/normal.h>

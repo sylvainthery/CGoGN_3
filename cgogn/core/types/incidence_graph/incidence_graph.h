@@ -30,6 +30,10 @@
 #include <cgogn/core/types/container/chunk_array.h>
 #include <cgogn/core/types/container/vector.h>
 #include <cgogn/core/types/mesh_traits.h>
+#include <cgogn/core/utils/type_traits.h>
+#include <cgogn/core/utils/tuples.h>
+#include <cgogn/core/utils/thread_pool.h>
+
 
 #include <any>
 #include <array>
@@ -165,6 +169,105 @@ struct mesh_traits<IncidenceGraph>
 	using MarkAttribute = IncidenceGraph::MarkAttribute;
 };
 
+template <typename FUNC>
+auto foreach_cell(const IncidenceGraph& ig, const FUNC& f)
+{
+    using CELL = func_parameter_type<FUNC>;
+    for (uint32 i = ig.attribute_containers_[CELL::CELL_INDEX].first_index(),
+                end = ig.attribute_containers_[CELL::CELL_INDEX].last_index();
+         i != end; i = ig.attribute_containers_[CELL::CELL_INDEX].next_index(i))
+    {
+        CELL c(i);
+        if (/*c.is_valid() && */ !f(c))
+            break;
+    }
+}
+
+
+template <typename FUNC>
+auto parallel_foreach_cell(const IncidenceGraph& m, const FUNC& f)
+{
+    using CELL = func_parameter_type<FUNC>;
+    static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
+                  "CELL not supported in this MESH");
+    static_assert(is_func_parameter_same<FUNC, CELL>::value, "Wrong function cell parameter type");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+
+    ThreadPool* pool = thread_pool();
+    uint32 nb_workers = pool->nb_workers();
+    if (nb_workers == 0)
+        return foreach_cell(m, f);
+
+    using VecCell = std::vector<uint32>;
+    using Future = std::future<void>;
+
+    std::array<std::vector<VecCell*>, 2> cells_buffers;
+    std::array<std::vector<Future>, 2> futures;
+    cells_buffers[0].reserve(nb_workers);
+    cells_buffers[1].reserve(nb_workers);
+    futures[0].reserve(nb_workers);
+    futures[1].reserve(nb_workers);
+
+    Buffers<uint32>* buffers = uint32_buffers();
+
+    uint32 it = m.attribute_containers_[CELL::CELL_INDEX].first_index();
+    uint32 last = m.attribute_containers_[CELL::CELL_INDEX].last_index();
+
+    uint32 i = 0u; // buffer id (0/1)
+    uint32 j = 0u; // thread id (0..nb_workers)
+
+    while (it < last)
+    {
+        // fill buffer
+        cells_buffers[i].push_back(buffers->buffer());
+        VecCell& cells = *cells_buffers[i].back();
+        cells.reserve(PARALLEL_BUFFER_SIZE);
+        for (uint32 k = 0u; k < PARALLEL_BUFFER_SIZE && it < last; ++k)
+        {
+            cells.push_back(it);
+            it = m.attribute_containers_[CELL::CELL_INDEX].next_index(it);
+        }
+        // launch thread
+        futures[i].push_back(pool->enqueue([&cells, &f]() {
+            for (uint32 index : cells)
+                f(CELL(index));
+        }));
+        // next thread
+        if (++j == nb_workers)
+        { // again from 0 & change buffer
+            j = 0u;
+            i = (i + 1u) % 2u;
+            for (auto& fu : futures[i])
+                fu.wait();
+            for (auto& b : cells_buffers[i])
+                buffers->release_buffer(b);
+            futures[i].clear();
+            cells_buffers[i].clear();
+        }
+    }
+
+    // clean all at the end
+    for (auto& fu : futures[0u])
+        fu.wait();
+    for (auto& b : cells_buffers[0u])
+        buffers->release_buffer(b);
+    for (auto& fu : futures[1u])
+        fu.wait();
+    for (auto& b : cells_buffers[1u])
+        buffers->release_buffer(b);
+}
+
+
+
+
+/***********************************************
+ *
+ *      LOW_LEVEL OPERATOR
+ *
+ * **********************************************/
+
+
+
 IncidenceGraph::Vertex CGOGN_CORE_EXPORT add_vertex(IncidenceGraph& ig);
 
 void CGOGN_CORE_EXPORT remove_vertex(IncidenceGraph& ig, IncidenceGraph::Vertex v);
@@ -190,116 +293,135 @@ IncidenceGraph::Edge CGOGN_CORE_EXPORT cut_face(IncidenceGraph& m, IncidenceGrap
 
 void CGOGN_CORE_EXPORT remove_face(IncidenceGraph& ig, IncidenceGraph::Face f);
 
-void copy(IncidenceGraph& /*dst*/, const IncidenceGraph& /*src*/)
+inline void copy(IncidenceGraph& /*dst*/, const IncidenceGraph& /*src*/)
 {
     // TODO
 }
 
+template <typename CELL>
+auto get_mark_attribute(const IncidenceGraph& ig)
+{
+    static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
+                  "CELL not supported in this MESH");
+    return ig.attribute_containers_[CELL::CELL_INDEX].get_mark_attribute();
+}
 
+template <typename CELL>
+void release_mark_attribute(const IncidenceGraph& ig, IncidenceGraph::MarkAttribute* attribute)
+{
+    return ig.attribute_containers_[CELL::CELL_INDEX].release_mark_attribute(attribute);
+}
+
+}
+
+#include<cgogn/core/types/cell_marker.h>
+
+namespace cgogn
+{
 
 template <typename CELL, typename FUNC>
 auto foreach_incident_vertex(const IncidenceGraph& ig, CELL c, const FUNC& func)
 {
-	using Vertex = IncidenceGraph::Vertex;
-	using Edge = IncidenceGraph::Edge;
-	using Face = IncidenceGraph::Face;
+    using Vertex = IncidenceGraph::Vertex;
+    using Edge = IncidenceGraph::Edge;
+    using Face = IncidenceGraph::Face;
 
-	static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value, "CELL not supported in this MESH");
-	static_assert(is_func_parameter_same<FUNC, Vertex>::value, "Wrong function cell parameter type");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+    static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value, "CELL not supported in this MESH");
+    static_assert(is_func_parameter_same<FUNC, Vertex>::value, "Wrong function cell parameter type");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_same_v<CELL, Edge>)
-	{
-		std::pair<Vertex, Vertex>& evs = (*ig.edge_incident_vertices_)[c.index_];
-		if (func(evs.first))
-			func(evs.second);
-	}
-	else if constexpr (std::is_same_v<CELL, Face>)
-	{
-		CellMarkerStore<IncidenceGraph, Vertex> marker(ig);
-		for (auto& ep : (*ig.face_incident_edges_)[c.index_])
-		{
-			std::pair<Vertex, Vertex>& evs = (*ig.edge_incident_vertices_)[ep.index_];
-			bool stop = false;
-			if (!marker.is_marked(evs.first))
-			{
-				marker.mark(evs.first);
-				stop = !func(evs.first);
-			}
-			if (!marker.is_marked(evs.second) && !stop)
-			{
-				marker.mark(evs.second);
-				stop = !func(evs.second);
-			}
-			if (stop)
-				break;
-		}
-	}
+    if constexpr (std::is_same_v<CELL, Edge>)
+    {
+        std::pair<Vertex, Vertex>& evs = (*ig.edge_incident_vertices_)[c.index_];
+        if (func(evs.first))
+            func(evs.second);
+    }
+    else if constexpr (std::is_same_v<CELL, Face>)
+    {
+        CellMarkerStore<IncidenceGraph, Vertex> marker(ig);
+        for (auto& ep : (*ig.face_incident_edges_)[c.index_])
+        {
+            std::pair<Vertex, Vertex>& evs = (*ig.edge_incident_vertices_)[ep.index_];
+            bool stop = false;
+            if (!marker.is_marked(evs.first))
+            {
+                marker.mark(evs.first);
+                stop = !func(evs.first);
+            }
+            if (!marker.is_marked(evs.second) && !stop)
+            {
+                marker.mark(evs.second);
+                stop = !func(evs.second);
+            }
+            if (stop)
+                break;
+        }
+    }
 }
 
 
 template <typename CELL, typename FUNC>
 auto foreach_incident_edge(const IncidenceGraph& ig, CELL c, const FUNC& func)
 {
-	using Edge = mesh_traits<IncidenceGraph>::Edge;
+    using Edge = mesh_traits<IncidenceGraph>::Edge;
 
-	static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
-				  "CELL not supported in this IncidenceGraph");
-	static_assert(is_func_parameter_same<FUNC, Edge>::value, "Wrong function cell parameter type");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+    static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
+                  "CELL not supported in this IncidenceGraph");
+    static_assert(is_func_parameter_same<FUNC, Edge>::value, "Wrong function cell parameter type");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Vertex>)
-	{
-		for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
-		{
-			if (!func(ep))
-				break;
-		}
-	}
-	else if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Face>)
-	{
-		for (auto& ep : (*ig.face_incident_edges_)[c.index_])
-		{
-			if (!func(ep))
-				break;
-		}
-	}
+    if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Vertex>)
+    {
+        for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
+        {
+            if (!func(ep))
+                break;
+        }
+    }
+    else if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Face>)
+    {
+        for (auto& ep : (*ig.face_incident_edges_)[c.index_])
+        {
+            if (!func(ep))
+                break;
+        }
+    }
 }
 
 template <typename CELL, typename FUNC>
 auto foreach_incident_face(const IncidenceGraph& ig, CELL c, const FUNC& func)
 {
-	using Face = mesh_traits<IncidenceGraph>::Face;
+    using Face = mesh_traits<IncidenceGraph>::Face;
 
-	static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
-				  "CELL not supported in this IncidenceGraph");
-	static_assert(is_func_parameter_same<FUNC, Face>::value, "Wrong function cell parameter type");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+    static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
+                  "CELL not supported in this IncidenceGraph");
+    static_assert(is_func_parameter_same<FUNC, Face>::value, "Wrong function cell parameter type");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Vertex>)
-	{
-		CellMarkerStore<IncidenceGraph, Face> marker(ig);
-		for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
-		{
-			bool stop = false;
-			for (auto& fp : (*ig.edge_incident_faces_)[ep.index_])
-			{
-				stop = !func(fp);
-				if (stop)
-					break;
-			}
-			if (stop)
-				break;
-		}
-	}
-	else if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Edge>)
-	{
-		for (auto& fp : (*ig.edge_incident_faces_)[c.index_])
-		{
-			if (!func(fp))
-				break;
-		}
-	}
+    if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Vertex>)
+    {
+        CellMarkerStore<IncidenceGraph, Face> marker(ig);
+        for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
+        {
+            bool stop = false;
+            for (auto& fp : (*ig.edge_incident_faces_)[ep.index_])
+            {
+                stop = !func(fp);
+                if (stop)
+                    break;
+            }
+            if (stop)
+                break;
+        }
+    }
+    else if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Edge>)
+    {
+        for (auto& fp : (*ig.edge_incident_faces_)[c.index_])
+        {
+            if (!func(fp))
+                break;
+        }
+    }
 }
 
 
@@ -325,58 +447,69 @@ uint32 index_of(const IncidenceGraph& /*m*/, CELL c)
 
 
 template <typename T, typename CELL, typename MESH,
-		  typename std::enable_if_t<std::is_convertible_v<MESH&, IncidenceGraph&>>* = nullptr>
+          typename std::enable_if_t<std::is_convertible_v<MESH&, IncidenceGraph&>>* = nullptr>
 std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute(MESH& m, const std::string& name)
 {
-	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
-	IncidenceGraph& mb = static_cast<IncidenceGraph&>(m);
-	return mb.attribute_containers_[CELL::CELL_INDEX].template add_attribute<T>(name);
+    static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
+    IncidenceGraph& mb = static_cast<IncidenceGraph&>(m);
+    return mb.attribute_containers_[CELL::CELL_INDEX].template add_attribute<T>(name);
 }
 
 template <typename T, typename CELL>
 std::shared_ptr<IncidenceGraph::Attribute<T>> get_attribute(const IncidenceGraph& m, const std::string& name)
 {
-	static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
-				  "CELL not supported in this MESH");
-	return m.attribute_containers_[CELL::CELL_INDEX].template get_attribute<T>(name);
+    static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
+                  "CELL not supported in this MESH");
+    return m.attribute_containers_[CELL::CELL_INDEX].template get_attribute<T>(name);
 }
 
 template <typename CELL>
 void remove_attribute(IncidenceGraph& m, const std::shared_ptr<IncidenceGraph::AttributeGen>& attribute)
 {
-	m.attribute_containers_[CELL::CELL_INDEX].remove_attribute(attribute);
+    m.attribute_containers_[CELL::CELL_INDEX].remove_attribute(attribute);
 }
 
 template <typename CELL>
 void remove_attribute(IncidenceGraph& m, IncidenceGraph::AttributeGen* attribute)
 {
-	m.attribute_containers_[CELL::CELL_INDEX].remove_attribute(attribute);
+    m.attribute_containers_[CELL::CELL_INDEX].remove_attribute(attribute);
 }
 
 template <typename CELL, typename FUNC>
 void foreach_attribute(const IncidenceGraph& m, const FUNC& f)
 {
-	using AttributeGen = IncidenceGraph::AttributeGen;
-	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
-				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::CELL_INDEX])
-		f(a);
+    using AttributeGen = IncidenceGraph::AttributeGen;
+    static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
+                  "Wrong function attribute parameter type");
+    for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::CELL_INDEX])
+        f(a);
 }
 
 template <typename T, typename CELL, typename FUNC>
 void foreach_attribute(const IncidenceGraph& m, const FUNC& f)
 {
-	using AttributeT = IncidenceGraph::Attribute<T>;
-	using AttributeGen = IncidenceGraph::AttributeGen;
-	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
-				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::CELL_INDEX])
-	{
-		std::shared_ptr<AttributeT> at = std::dynamic_pointer_cast<AttributeT>(a);
-		if (at)
-			f(at);
-	}
+    using AttributeT = IncidenceGraph::Attribute<T>;
+    using AttributeGen = IncidenceGraph::AttributeGen;
+    static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
+                  "Wrong function attribute parameter type");
+    for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::CELL_INDEX])
+    {
+        std::shared_ptr<AttributeT> at = std::dynamic_pointer_cast<AttributeT>(a);
+        if (at)
+            f(at);
+    }
 }
+
+
+
+
+
+} //end namespace cgogn
+
+
+
+namespace cgogn
+{
 
 } // namespace cgogn
 

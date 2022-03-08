@@ -24,7 +24,7 @@
 #ifndef CGOGN_GEOMETRY_ALGOS_EAR_TRIANGULATION_H_
 #define CGOGN_GEOMETRY_ALGOS_EAR_TRIANGULATION_H_
 
-#include <cgogn/core/functions/mesh_ops/face.h>
+#include <cgogn/core/functions/mesh_ops/global.h>
 
 //#include <cgogn/geometry/types/geometry_traits.h>
 #include <cgogn/geometry/algos/normal.h>

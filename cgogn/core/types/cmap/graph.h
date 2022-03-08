@@ -122,6 +122,32 @@ inline void alpha1_unsew(Graph& m, Dart d)
 	(*m.alpha_1_)[d.index] = d;
 }
 
+template <typename MESH, typename FUNC>
+auto foreach_dart_of_ALPHA0(const MESH& m, Dart d, const FUNC& f)
+    -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+{
+    static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+    if (f(d))
+        f(alpha0(m, d));
+}
+
+template <typename MESH, typename FUNC>
+auto foreach_dart_of_ALPHA1(const MESH& m, Dart d, const FUNC& f)
+    -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+{
+    static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+    Dart it = d;
+    do
+    {
+        if (!f(it))
+            break;
+        it = alpha1(m, it);
+    } while (it != d);
+}
+
+
 template <typename CELL, typename FUNC>
 void foreach_dart_of_orbit(const Graph& m, CELL c, const FUNC& f)
 {

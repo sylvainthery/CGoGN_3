@@ -25,9 +25,7 @@
 #define CGOGN_GEOMETRY_ALGOS_ANGLE_H_
 
 #include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/functions/mesh_info.h>
 #include <cgogn/core/functions/traversals/global.h>
-#include <cgogn/core/functions/traversals/vertex.h>
 
 #include <cgogn/geometry/algos/normal.h>
 #include <cgogn/geometry/functions/angle.h>

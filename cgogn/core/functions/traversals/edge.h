@@ -24,60 +24,6 @@
 #ifndef CGOGN_CORE_FUNCTIONS_TRAVERSALS_EDGE_H_
 #define CGOGN_CORE_FUNCTIONS_TRAVERSALS_EDGE_H_
 
-#include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/utils/tuples.h>
-#include <cgogn/core/utils/type_traits.h>
-
-#include <cgogn/core/types/cell_marker.h>
-
-#include <cgogn/core/types/cmap/cmap_info.h>
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/orbit_traversal.h>
-
-namespace cgogn
-{
-
-/*****************************************************************************/
-
-// template <typename MESH, typename CELL, typename FUNC>
-// void foreach_incident_edge(MESH& m, CELL c, const FUNC& f);
-
-/*****************************************************************************/
-
-///////////////////////////////
-// CMapBase (or convertible) //
-///////////////////////////////
-
-
-//////////////////////
-/// IncidenceGraph ///
-//////////////////////
-
-/*****************************************************************************/
-
-// template <typename MESH, typename CELL>
-// std::vector<typename mesh_traits<MESH>::Edge> incident_edges(MESH& m, CELL c);
-
-/*****************************************************************************/
-
-/////////////
-// GENERIC //
-/////////////
-
-template <typename MESH, typename CELL>
-std::vector<typename mesh_traits<MESH>::Edge> incident_edges(const MESH& m, CELL c)
-{
-	using Edge = typename mesh_traits<MESH>::Edge;
-	std::vector<Edge> edges;
-	edges.reserve(32u);
-	foreach_incident_edge(m, c, [&](Edge e) -> bool {
-		edges.push_back(e);
-		return true;
-	});
-	return edges;
-}
-
-} // namespace cgogn
 
 #endif // CGOGN_CORE_FUNCTIONS_TRAVERSALS_EDGE_H_

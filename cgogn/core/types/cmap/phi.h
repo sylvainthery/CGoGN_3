@@ -26,6 +26,7 @@
 
 #include<cgogn/core/utils/numerics.h>
 #include<cgogn/core/types/cmap/dart.h>
+#include<cgogn/core/types/mesh_traits.h>
 
 namespace cgogn
 {

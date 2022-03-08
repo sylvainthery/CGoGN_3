@@ -210,6 +210,9 @@ inline auto index_of(const MRMAP& m, CELL c) -> std::enable_if_t<std::is_convert
     return index_of(static_cast<const CPH3::CMAP&>(m), c);
 }
 
+Dart add_dart(CPH3& m);
+
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CPH3_H_

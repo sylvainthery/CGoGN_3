@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_CMAP_CMAP_BASE_H_
-#define CGOGN_CORE_CMAP_CMAP_BASE_H_
+#ifndef CGOGN_CORE_CMAP_CMAP_BASE_FUNC_H_
+#define CGOGN_CORE_CMAP_CMAP_BASE_FUNC_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 

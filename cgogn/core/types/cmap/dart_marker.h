@@ -25,46 +25,11 @@
 #define CGOGN_CORE_TYPES_CMAP_DART_MARKER_H_
 
 #include <cgogn/core/cgogn_core_export.h>
-#include <cgogn/core/types/cmap/cmap_base.h>
-#include <cgogn/core/utils/tuples.h>
-#include <cgogn/core/utils/type_traits.h>
+
 
 namespace cgogn
 {
 
-/*****************************************************************************/
-
-// template <typename CELL, typename MESH>
-// typename mesh_traits<MESH>::MarkAttribute* get_dart_mark_attribute(MESH& m);
-
-/*****************************************************************************/
-
-///////////////////////////////
-// CMapBase (or convertible) //
-///////////////////////////////
-
-inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase& m)
-{
-	return m.darts_.get_mark_attribute();
-}
-
-/*****************************************************************************/
-
-// template <typename CELL, typename MESH>
-// void release_dart_mark_attribute(const MESH& m, typename mesh_traits<MESH>::MarkAttribute* attribute);
-
-/*****************************************************************************/
-
-///////////////////////////////
-// CMapBase (or convertible) //
-///////////////////////////////
-
-inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
-{
-	return m.darts_.release_mark_attribute(attribute);
-}
-
-/*****************************************************************************/
 
 template <typename CMAP>
 class CGOGN_CORE_EXPORT DartMarker

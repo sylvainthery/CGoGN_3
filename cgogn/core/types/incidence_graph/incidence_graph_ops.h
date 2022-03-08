@@ -25,6 +25,10 @@
 #define CGOGN_CORE_INCIDENCE_GRAPH_OPS_H_
 
 #include <cgogn/core/types/incidence_graph/incidence_graph.h>
+#include <cgogn/core/utils/type_traits.h>
+#include <cgogn/core/utils/tuples.h>
+#include <cgogn/core/utils/numerics.h>
+#include <cgogn/core/types/cell_marker.h>
 
 namespace cgogn
 {
@@ -176,6 +180,7 @@ inline std::vector<IncidenceGraph::Vertex> sorted_face_vertices(IncidenceGraph& 
 	sorted_vertices.pop_back();
 	return sorted_vertices;
 }
+
 
 } // namespace cgogn
 

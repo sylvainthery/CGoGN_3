@@ -27,7 +27,7 @@
 #include <cgogn/core/functions/mesh_info.h>
 #include <cgogn/core/functions/mesh_ops/volume.h>
 
-#include <cgogn/core/types/cmap/cmap_ops.h>
+#include <cgogn/core/types/cmap/phi.h>
 
 #include <vector>
 

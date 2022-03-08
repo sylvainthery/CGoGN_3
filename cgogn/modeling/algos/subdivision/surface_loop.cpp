@@ -20,13 +20,9 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-
+#include <cgogn/core/types/cmap/cmap2.h>
 #include <cgogn/modeling/algos/subdivision/surface_loop.h>
-
 #include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/functions/mesh_info.h>
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
 #include <cgogn/core/functions/traversals/global.h>
 #include <cgogn/core/types/mesh_views/cell_cache.h>
 

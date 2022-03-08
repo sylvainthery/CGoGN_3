@@ -113,6 +113,25 @@ void CGOGN_CORE_EXPORT remove_face(CMap1& m, CMap1::Face f, bool set_indices = t
 
 bool check_integrity(CMap1& m, bool verbose = true);
 
+/*****************************************************************************/
+// orbits traversals
+/*****************************************************************************/
+
+template <typename MESH, typename FUNC>
+auto foreach_dart_of_PHI1(const MESH& m, Dart d, const FUNC& f)
+    -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+{
+    static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+    Dart it = d;
+    do
+    {
+        if (!f(it))
+            break;
+        it = phi1(m, it);
+    } while (it != d);
+}
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CMAP1_H_

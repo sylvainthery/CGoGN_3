@@ -28,8 +28,17 @@
 
 #include <cgogn/core/types/mesh_traits.h>
 #include <cgogn/core/utils/tuples.h>
+#include <cgogn/core/utils/buffers.h>
+#include <cgogn/core/utils/thread.h>
+#include <cgogn/core/utils/thread_pool.h>
+#include <cgogn/core/utils/tuples.h>
+#include <cgogn/core/utils/type_traits.h>
+
+#include <cgogn/core/types/cell_marker.h>
+
 
 #include <functional>
+
 
 namespace cgogn
 {
@@ -97,6 +106,41 @@ template <typename MESH>
 struct mesh_traits<CellFilter<MESH>> : public mesh_traits<MESH>
 {
 };
+
+template <typename MESH, typename FUNC>
+void foreach_cell(const CellFilter<MESH>& cf, const FUNC& f)
+{
+    using CELL = func_parameter_type<FUNC>;
+    static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
+    static_assert(is_func_parameter_same<FUNC, CELL>::value, "Wrong function cell parameter type");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+
+    const MESH& m = static_cast<const MESH&>(cf);
+    foreach_cell(m, [&](CELL c) -> bool {
+        if (cf.filter(c))
+            return f(c);
+        return true;
+    });
+}
+
+
+
+template <typename MESH, typename FUNC>
+void parallel_foreach_cell(const CellFilter<MESH>& cf, const FUNC& f)
+{
+    using CELL = func_parameter_type<FUNC>;
+    static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
+    static_assert(is_func_parameter_same<FUNC, CELL>::value, "Wrong function cell parameter type");
+    static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+
+    const MESH& m = static_cast<const MESH&>(cf);
+    parallel_foreach_cell(m, [&](CELL c) -> bool {
+        if (cf.filter(c))
+            return f(c);
+        return true;
+    });
+}
+
 
 } // namespace cgogn
 
