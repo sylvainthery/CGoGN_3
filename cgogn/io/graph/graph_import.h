@@ -25,13 +25,14 @@
 #define CGOGN_IO_GRAPH_IMPORT_H_
 
 #include <cgogn/io/cgogn_io_export.h>
-
-#include <cgogn/core/types/cmap/graph.h>
+#include <cgogn/core/utils/numerics.h>
 
 #include <vector>
 
 namespace cgogn
 {
+
+struct Graph;
 
 namespace io
 {

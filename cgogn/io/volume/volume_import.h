@@ -25,16 +25,15 @@
 #define CGOGN_IO_VOLUME_IMPORT_H_
 
 #include <cgogn/io/cgogn_io_export.h>
-
-#include <cgogn/core/types/cmap/cmap3.h>
-
+#include <cgogn/core/utils/numerics.h>
 #include <cgogn/geometry/types/vector_traits.h>
 
 #include <vector>
 
 namespace cgogn
 {
-
+//forward
+struct CMap3;
 namespace io
 {
 

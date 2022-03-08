@@ -37,6 +37,11 @@
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/utils/string.h>
 
+#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/cmap/graph.h>
+#include <cgogn/core/types/incidence_graph/incidence_graph.h>
+
+
 using Graph = cgogn::Graph;
 using NonManifold = cgogn::IncidenceGraph;
 using Surface = cgogn::CMap2;

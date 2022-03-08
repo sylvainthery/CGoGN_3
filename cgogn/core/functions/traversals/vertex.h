@@ -53,11 +53,11 @@ template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
-	foreach_incident_vertex(m, c, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_incident_vertex(m, c, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, CMapBase::TraversalPolicy traversal_policy)
+auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, CMapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
@@ -98,7 +98,7 @@ auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, CMapBase::
 	}
 	else
 	{
-		if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<Vertex>(m))
+		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Vertex>(m))
 		{
 			CellMarkerStore<MESH, Vertex> marker(m);
 			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
@@ -190,12 +190,12 @@ template <typename MESH, typename FUNC>
 auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
-	foreach_adjacent_vertex_through_edge(m, v, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_adjacent_vertex_through_edge(m, v, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
 auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func,
-										  CMapBase::TraversalPolicy traversal_policy)
+										  CMapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
@@ -213,7 +213,7 @@ auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<ME
 	}
 	else if constexpr (mesh_traits<MESH>::is_CMap3 && mesh_traits<MESH>::dimension == 3)
 	{
-		if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<Vertex>(m))
+		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Vertex>(m))
 		{
 			CellMarkerStore<MESH, Vertex> marker(m);
 			foreach_dart_of_orbit(m, v, [&](Dart d) -> bool {

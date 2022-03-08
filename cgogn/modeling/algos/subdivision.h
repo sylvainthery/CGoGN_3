@@ -33,6 +33,10 @@
 
 #include <cgogn/geometry/algos/angle.h>
 
+// WARNING marche uniquement avec CMap3
+// TODO A CHANGER
+#include <cgogn/core/types/cmap/cmap3.h>
+
 namespace cgogn
 {
 
@@ -980,8 +984,10 @@ auto subdivideListEdges(MESH& m, std::vector<Dart>& edges, std::queue<Vec3>& edg
 	}
 }
 
-inline void subdivideListEdges(CPH3& m, std::vector<Dart>& edges, std::queue<Vec3>& edge_points,
-							   typename mesh_traits<CPH3>::template Attribute<Vec3>* attribute)
+template <typename MESH>
+auto subdivideListEdges(MESH& m, std::vector<Dart>& edges, std::queue<Vec3>& edge_points,
+							   typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
+	-> std::enable_if_t<mesh_traits<MESH>::is_CPH3>
 {
 	CPH3 m2(m);
 	for (Dart d : edges)
@@ -1004,8 +1010,10 @@ auto subdivideListFaces(MESH& m, std::vector<Dart>& faces, std::queue<Vec3>& fac
 	}
 }
 
-inline void subdivideListFaces(CPH3& m, std::vector<Dart>& faces, std::queue<Vec3>& face_points,
-							   typename mesh_traits<CPH3>::template Attribute<Vec3>* attribute)
+template <typename MESH>
+auto subdivideListFaces(MESH& m, std::vector<Dart>& faces, std::queue<Vec3>& face_points,
+							   typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
+	->std::enable_if_t<mesh_traits<MESH>::is_CPH3>
 {
 	CPH3 m2(m);
 	for (Dart d : faces)
@@ -1028,8 +1036,10 @@ auto subdivideListVolumes(MESH& m, std::vector<Dart>& volumes, std::queue<Vec3>&
 	}
 }
 
-inline void subdivideListVolumes(CPH3& m, std::vector<Dart>& volumes, std::queue<Vec3>& volume_points,
-								 typename mesh_traits<CPH3>::template Attribute<Vec3>* attribute)
+template <typename MESH>
+auto subdivideListVolumes(MESH& m, std::vector<Dart>& volumes, std::queue<Vec3>& volume_points,
+								 typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
+	-> std::enable_if_t<mesh_traits<MESH>::is_CPH3>
 {
 	CPH3 m2(m);
 	for (Dart d : volumes)

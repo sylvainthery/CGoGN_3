@@ -28,7 +28,11 @@
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
 
+#include <cgogn/core/types/mesh_traits.h>
+#include <cgogn/core/types/cmap/graph.h>
+
 #include <cgogn/core/ui_modules/mesh_provider.h>
+
 #include <cgogn/rendering/ui_modules/graph_render.h>
 
 using Mesh = cgogn::Graph;

@@ -26,9 +26,6 @@
 
 #include <cgogn/core/utils/numerics.h>
 
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
-#include <cgogn/core/functions/mesh_ops/volume.h>
 #include <cgogn/core/functions/traversals/face.h>
 #include <cgogn/core/functions/traversals/vertex.h>
 
@@ -39,6 +36,10 @@
 
 #include <array>
 #include <vector>
+
+// WARNING NE MARCHE QUE POUR CMAP2 
+// TO GENERALISER
+#include <cgogn/core/types/cmap/cmap2.h>
 
 namespace cgogn
 {

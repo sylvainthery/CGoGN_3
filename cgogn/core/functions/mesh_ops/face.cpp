@@ -67,7 +67,7 @@ CMap1::Face add_face(CMap1& m, uint32 size, bool set_indices)
 					set_index(m, v, new_index<CMap1::Vertex>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		// CMap1::Edge is the same orbit as CMap1::Vertex
 		if (is_indexed<CMap1::Face>(m))
@@ -103,7 +103,7 @@ CMap2::Face add_face(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, v, new_index<CMap2::Vertex>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::HalfEdge>(m))
 		{
@@ -113,7 +113,7 @@ CMap2::Face add_face(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, CMap2::HalfEdge(e.dart), new_index<CMap2::HalfEdge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Edge>(m))
 		{
@@ -123,7 +123,7 @@ CMap2::Face add_face(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, e, new_index<CMap2::Edge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Face>(m))
 			set_index(m, f, new_index<CMap2::Face>(m));

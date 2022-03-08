@@ -29,6 +29,7 @@
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/geometry/ui_modules/registration.h>
 #include <cgogn/rendering/ui_modules/surface_render.h>
+#include <cgogn/core/types/cmap/cmap2.h>
 
 #define DEFAULT_MESH_PATH CGOGN_STR(CGOGN_DATA_PATH) "/meshes/"
 

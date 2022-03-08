@@ -28,6 +28,7 @@
 
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/rendering/ui_modules/surface_render.h>
+#include <cgogn/core/types/incidence_graph/incidence_graph.h>
 
 using Mesh = cgogn::IncidenceGraph;
 

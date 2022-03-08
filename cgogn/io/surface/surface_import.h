@@ -26,15 +26,16 @@
 
 #include <cgogn/io/cgogn_io_export.h>
 
-#include <cgogn/core/types/cmap/cmap2.h>
-#include <cgogn/core/types/incidence_graph/incidence_graph.h>
-
 #include <cgogn/geometry/types/vector_traits.h>
+#include <cgogn/core/utils/numerics.h>
 
 #include <vector>
 
 namespace cgogn
 {
+// forward
+struct CMap2;
+struct IncidenceGraph;
 
 namespace io
 {

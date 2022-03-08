@@ -159,7 +159,7 @@ bool check_indexing(MESH& m, bool verbose = true)
 			result &= valid_index && all_darts_same_index;
 			return true;
 		},
-		CMapBase::TraversalPolicy::DART_MARKING);
+		CMapBase_TraversalPolicy::DART_MARKING);
 
 	// check that all lines of the attribute container are used
 	for (uint32 i = m.attribute_containers_[CELL::ORBIT].first_index(),

@@ -26,14 +26,15 @@
 
 #include <cgogn/io/cgogn_io_export.h>
 
-#include <cgogn/core/types/incidence_graph/incidence_graph.h>
-
+#include <cgogn/core/utils/numerics.h>
 #include <cgogn/geometry/types/vector_traits.h>
 
 #include <vector>
 
 namespace cgogn
 {
+//forward
+struct IncidenceGraph;
 
 namespace io
 {

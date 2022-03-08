@@ -38,9 +38,10 @@ namespace cgogn
 
 namespace geometry
 {
-
-inline std::vector<Scalar> opposite_angles(const CMap2& m, typename CMap2::Edge e,
-										   const typename mesh_traits<CMap2>::template Attribute<Vec3>* vertex_position)
+template <typename MESH>
+auto opposite_angles(const MESH& m, typename mesh_traits<MESH>:: Edge e,
+					 const typename mesh_traits<MESH>::template Attribute<Vec3>* vertex_position)
+		-> std::enable_if_t < mesh_traits<MESH>::is_CMap2,std::vector<Scalar>>
 {
 	if (!is_incident_to_boundary(m, e))
 	{

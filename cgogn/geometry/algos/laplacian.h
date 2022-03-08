@@ -31,6 +31,7 @@
 #include <cgogn/geometry/algos/area.h>
 #include <cgogn/geometry/algos/length.h>
 #include <cgogn/geometry/types/vector_traits.h>
+#include <cgogn/core/types/mesh_traits.h>
 
 #include <Eigen/Sparse>
 
@@ -44,7 +45,10 @@ namespace geometry
 // CMap2 //
 ///////////
 
-Scalar edge_cotan_weight(const CMap2& m, CMap2::Edge e, const CMap2::Attribute<Vec3>* vertex_position)
+template <typename MESH>
+auto edge_cotan_weight( const MESH& m,typename mesh_traits<MESH>::Edge e,
+						const typename mesh_traits<MESH>::template Attribute<Vec3>* vertex_position) 
+	-> std::enable_if_t < mesh_traits<MESH>::is_CMap2,Scalar>
 {
 	Scalar result = 0.0;
 

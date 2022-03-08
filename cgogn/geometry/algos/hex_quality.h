@@ -30,6 +30,10 @@
 
 #include <cgogn/geometry/types/vector_traits.h>
 
+// WARNING marche uniquement avec CMap3
+// TODO A CHANGER
+#include <cgogn/core/types/cmap/cmap3.h>
+
 namespace cgogn
 {
 

@@ -54,11 +54,11 @@ namespace cgogn
 template <typename MESH, typename FUNC>
 auto foreach_cell(const MESH& m, const FUNC& func) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
-	foreach_cell(m, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_cell(m, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_cell(const MESH& m, const FUNC& f, CMapBase::TraversalPolicy traversal_policy)
+auto foreach_cell(const MESH& m, const FUNC& f, CMapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using CELL = func_parameter_type<FUNC>;
@@ -66,7 +66,7 @@ auto foreach_cell(const MESH& m, const FUNC& f, CMapBase::TraversalPolicy traver
 	static_assert(is_func_parameter_same<FUNC, CELL>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<CELL>(m))
+	if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<CELL>(m))
 	{
 		CellMarker<MESH, CELL> cm(m);
 		for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))

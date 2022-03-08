@@ -74,6 +74,37 @@ struct mesh_traits<CMap1> : public mesh_traits_defalut_false
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
 
+inline Dart phi1(const CMap1& m, Dart d)
+{
+	return (*(m.phi1_))[d.index];
+}
+
+inline Dart phi_1(const CMap1& m, Dart d)
+{
+	return (*(m.phi_1_))[d.index];
+}
+
+inline void phi1_sew(CMap1& m, Dart d, Dart e)
+{
+	Dart f = phi1(m, d);
+	Dart g = phi1(m, e);
+	(*(m.phi1_))[d.index] = g;
+	(*(m.phi1_))[e.index] = f;
+	(*(m.phi_1_))[g.index] = d;
+	(*(m.phi_1_))[f.index] = e;
+}
+
+inline void phi1_unsew(CMap1& m, Dart d)
+{
+	Dart e = phi1(m, d);
+	Dart f = phi1(m, e);
+	(*(m.phi1_))[d.index] = f;
+	(*(m.phi1_))[e.index] = e;
+	(*(m.phi_1_))[f.index] = d;
+	(*(m.phi_1_))[e.index] = e;
+}
+
+
 bool CGOGN_CORE_EXPORT check_integrity(CMap1& m, bool verbose = true);
 
 CMap1::Face CGOGN_CORE_EXPORT add_face(CMap1& m, uint32 size, bool set_indices = true);

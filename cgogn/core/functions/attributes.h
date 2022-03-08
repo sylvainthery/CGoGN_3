@@ -84,7 +84,9 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 
 template <typename T, typename CELL, typename MESH,
 		  typename std::enable_if_t<mesh_traits<MESH>::is_CMapBase>* = nullptr>
-std::shared_ptr<CMapBase::Attribute<T>> get_attribute(const MESH& m, const std::string& name)
+//std::shared_ptr<CMapBase::Attribute<T>> get_attribute(const MESH& m, const std::string& name)
+std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> get_attribute(MESH& m, const std::string& name)
+
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	return m.attribute_containers_[CELL::ORBIT].template get_attribute<T>(name);

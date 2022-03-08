@@ -73,11 +73,11 @@ struct CGOGN_CORE_EXPORT CMapBase
 	/*************************************************************************/
 	mutable std::array<AttributeContainer, NB_ORBITS> attribute_containers_;
 
-	enum TraversalPolicy
-	{
-		AUTO,
-		DART_MARKING
-	};
+	//enum TraversalPolicy
+	//{
+	//	AUTO,
+	//	DART_MARKING
+	//};
 
 	CMapBase();
 	~CMapBase();

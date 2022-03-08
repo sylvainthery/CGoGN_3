@@ -53,11 +53,11 @@ template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_face(const MESH& m, CELL c, const FUNC& func)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
-	foreach_incident_face(m, c, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_incident_face(m, c, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_face(const MESH& m, CELL c, const FUNC& func, CMapBase::TraversalPolicy traversal_policy)
+auto foreach_incident_face(const MESH& m, CELL c, const FUNC& func, CMapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Face = typename mesh_traits<MESH>::Face;
@@ -90,7 +90,7 @@ auto foreach_incident_face(const MESH& m, CELL c, const FUNC& func, CMapBase::Tr
 	}
 	else
 	{
-		if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<Face>(m))
+		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Face>(m))
 		{
 			CellMarkerStore<MESH, Face> marker(m);
 			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
@@ -163,12 +163,12 @@ template <typename MESH, typename FUNC>
 auto foreach_adjacent_face_through_edge(const MESH& m, typename mesh_traits<MESH>::Face f, const FUNC& func)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
-	foreach_adjacent_face_through_edge(m, f, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_adjacent_face_through_edge(m, f, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
 auto foreach_adjacent_face_through_edge(const MESH& m, typename mesh_traits<MESH>::Face f, const FUNC& func,
-										CMapBase::TraversalPolicy traversal_policy)
+										CMapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Face = typename mesh_traits<MESH>::Face;
@@ -189,7 +189,7 @@ auto foreach_adjacent_face_through_edge(const MESH& m, typename mesh_traits<MESH
 		using Face2 = typename mesh_traits<MESH>::Face2;
 		using Edge = typename mesh_traits<MESH>::Edge;
 
-		if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<Face>(m))
+		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Face>(m))
 		{
 			CellMarkerStore<MESH, Face> marker(m);
 			marker.mark(f);

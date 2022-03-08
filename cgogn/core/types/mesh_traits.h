@@ -79,6 +79,13 @@ constexpr bool is_dimension_of(const MESH&, uint8 dim)
 	return mesh_traits<MESH>::dimension == dim;
 }
 
+enum CMapBase_TraversalPolicy
+{
+	AUTO,
+	DART_MARKING
+};
+
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_MESH_TRAITS_H_

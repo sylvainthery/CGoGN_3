@@ -38,7 +38,8 @@
 
 #include <cgogn/rendering/ebo.h>
 #include <cgogn/rendering/vbo.h>
-
+#include <vector>
+#include <array>
 #include <memory>
 
 namespace cgogn

@@ -200,6 +200,12 @@ inline Dart add_dart(CPH3& m)
 	return d;
 }
 
+Dart phi1(const CPH3& m, Dart d);
+Dart phi_1(const CPH3& m, Dart d);
+Dart phi2(const CPH3& m, Dart d);
+Dart phi3(const CPH3& m, Dart d);
+
+
 CPH3::CMAP::Edge CGOGN_CORE_EXPORT cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3::CMAP::Vertex v2,
 											bool set_indices = true);
 

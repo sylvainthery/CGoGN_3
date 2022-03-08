@@ -53,11 +53,11 @@ template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
-	foreach_incident_volume(m, c, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_incident_volume(m, c, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::TraversalPolicy traversal_policy)
+auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Volume = typename mesh_traits<MESH>::Volume;
@@ -97,7 +97,7 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::
 	}
 	else
 	{
-		if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<Volume>(m))
+		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Volume>(m))
 		{
 			CellMarkerStore<MESH, Volume> marker(m);
 			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
