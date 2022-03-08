@@ -55,8 +55,11 @@ struct CGOGN_CORE_EXPORT Graph : public CMapBase
 };
 
 template <>
-struct mesh_traits<Graph>
+struct mesh_traits<Graph> : public mesh_traits_defalut_false
 {
+	static constexpr const bool is_CMapBase = true;
+	static constexpr const bool is_Graph = true;
+	
 	static constexpr const char* name = "Graph";
 	static constexpr const uint8 dimension = 1;
 
@@ -72,6 +75,21 @@ struct mesh_traits<Graph>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+Graph::Vertex CGOGN_CORE_EXPORT add_vertex(Graph& g, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_vertex(Graph& g, Graph::Vertex v, bool set_indices = true);
+
+Graph::Edge CGOGN_CORE_EXPORT connect_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT disconnect_vertices(Graph& g, Graph::Edge e, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT merge_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
+
+Graph::Vertex CGOGN_CORE_EXPORT cut_edge(Graph& m, Graph::Edge e, bool set_indices = true);
+
+Graph::Vertex collapse_edge(Graph& g, Graph::Edge e, bool set_indices = true);
+
 
 } // namespace cgogn
 

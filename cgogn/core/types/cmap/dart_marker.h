@@ -39,30 +39,7 @@ namespace cgogn
 
 /*****************************************************************************/
 
-///////////////////////////////
-// CMapBase (or convertible) //
-///////////////////////////////
 
-inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase& m)
-{
-	return m.darts_.get_mark_attribute();
-}
-
-/*****************************************************************************/
-
-// template <typename CELL, typename MESH>
-// void release_dart_mark_attribute(const MESH& m, typename mesh_traits<MESH>::MarkAttribute* attribute);
-
-/*****************************************************************************/
-
-///////////////////////////////
-// CMapBase (or convertible) //
-///////////////////////////////
-
-inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
-{
-	return m.darts_.release_mark_attribute(attribute);
-}
 
 /*****************************************************************************/
 

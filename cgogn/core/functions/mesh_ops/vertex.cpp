@@ -25,9 +25,12 @@
 #include <cgogn/core/functions/mesh_ops/edge.h>
 #include <cgogn/core/functions/mesh_ops/vertex.h>
 
-#include <cgogn/core/types/cmap/cmap_info.h>
+//#include <cgogn/core/types/cmap/cmap_info.h>
 #include <cgogn/core/types/cmap/cmap_ops.h>
+#include <cgogn/core/types/cmap/phi.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
+//#include <cgogn/core/types/cmap/cph3.h>
+#include <cgogn/core/types/cmap/graph.h>
 
 namespace cgogn
 {

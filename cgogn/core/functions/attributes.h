@@ -27,8 +27,6 @@
 #include <cgogn/core/functions/cells.h>
 #include <cgogn/core/functions/traversals/global.h>
 
-#include <cgogn/core/types/cmap/cmap_base.h>
-#include <cgogn/core/types/incidence_graph/incidence_graph.h>
 
 #include <cgogn/core/utils/tuples.h>
 
@@ -49,7 +47,7 @@ namespace cgogn
 //////////////
 
 template <typename T, typename CELL, typename MESH,
-		  typename std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>* = nullptr>
+		  typename std::enable_if_t<mesh_traits<MESH>::is_CMapBase>* = nullptr>
 std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute(MESH& m, const std::string& name)
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -64,7 +62,7 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 ////////////////////
 
 template <typename T, typename CELL, typename MESH,
-		  typename std::enable_if_t<std::is_convertible_v<MESH&, IncidenceGraph&>>* = nullptr>
+		  typename std::enable_if_t<mesh_traits<MESH>::is_IncidenceGraph>* = nullptr>
 std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute(MESH& m, const std::string& name)
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -85,7 +83,7 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 //////////////
 
 template <typename T, typename CELL, typename MESH,
-		  typename std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>* = nullptr>
+		  typename std::enable_if_t<mesh_traits<MESH>::is_CMapBase>* = nullptr>
 std::shared_ptr<CMapBase::Attribute<T>> get_attribute(const MESH& m, const std::string& name)
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -96,13 +94,7 @@ std::shared_ptr<CMapBase::Attribute<T>> get_attribute(const MESH& m, const std::
 // IncidenceGraph //
 ////////////////////
 
-template <typename T, typename CELL>
-std::shared_ptr<IncidenceGraph::Attribute<T>> get_attribute(const IncidenceGraph& m, const std::string& name)
-{
-	static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
-				  "CELL not supported in this MESH");
-	return m.attribute_containers_[CELL::CELL_INDEX].template get_attribute<T>(name);
-}
+
 
 /*****************************************************************************/
 
@@ -141,33 +133,11 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> get_or_add_at
 // CMapBase //
 //////////////
 
-template <typename CELL>
-void remove_attribute(CMapBase& m, const std::shared_ptr<CMapBase::AttributeGen>& attribute)
-{
-	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
-}
-
-template <typename CELL>
-void remove_attribute(CMapBase& m, CMapBase::AttributeGen* attribute)
-{
-	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
-}
 
 ////////////////////
 // IncidenceGraph //
 ////////////////////
 
-template <typename CELL>
-void remove_attribute(IncidenceGraph& m, const std::shared_ptr<IncidenceGraph::AttributeGen>& attribute)
-{
-	m.attribute_containers_[CELL::CELL_INDEX].remove_attribute(attribute);
-}
-
-template <typename CELL>
-void remove_attribute(IncidenceGraph& m, IncidenceGraph::AttributeGen* attribute)
-{
-	m.attribute_containers_[CELL::CELL_INDEX].remove_attribute(attribute);
-}
 
 /*****************************************************************************/
 
@@ -180,29 +150,12 @@ void remove_attribute(IncidenceGraph& m, IncidenceGraph::AttributeGen* attribute
 // CMapBase //
 //////////////
 
-template <typename CELL, typename FUNC>
-void foreach_attribute(const CMapBase& m, const FUNC& f)
-{
-	using AttributeGen = CMapBase::AttributeGen;
-	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
-				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
-		f(a);
-}
+
 
 ////////////////////
 // IncidenceGraph //
 ////////////////////
 
-template <typename CELL, typename FUNC>
-void foreach_attribute(const IncidenceGraph& m, const FUNC& f)
-{
-	using AttributeGen = IncidenceGraph::AttributeGen;
-	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
-				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::CELL_INDEX])
-		f(a);
-}
 
 /*****************************************************************************/
 
@@ -215,39 +168,11 @@ void foreach_attribute(const IncidenceGraph& m, const FUNC& f)
 // CMapBase //
 //////////////
 
-template <typename T, typename CELL, typename FUNC>
-void foreach_attribute(const CMapBase& m, const FUNC& f)
-{
-	using AttributeT = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
-				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
-	{
-		std::shared_ptr<AttributeT> at = std::dynamic_pointer_cast<AttributeT>(a);
-		if (at)
-			f(at);
-	}
-}
 
 ////////////////////
 // IncidenceGraph //
 ////////////////////
 
-template <typename T, typename CELL, typename FUNC>
-void foreach_attribute(const IncidenceGraph& m, const FUNC& f)
-{
-	using AttributeT = IncidenceGraph::Attribute<T>;
-	using AttributeGen = IncidenceGraph::AttributeGen;
-	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
-				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::CELL_INDEX])
-	{
-		std::shared_ptr<AttributeT> at = std::dynamic_pointer_cast<AttributeT>(a);
-		if (at)
-			f(at);
-	}
-}
 
 /*****************************************************************************/
 
@@ -293,11 +218,7 @@ inline const T& value(const MESH& m, const typename mesh_traits<MESH>::template 
 // CMapBase //
 //////////////
 
-template <typename T>
-T& get_attribute(CMapBase& m, const std::string& name)
-{
-	return m.get_attribute<T>(name);
-}
+
 
 } // namespace cgogn
 

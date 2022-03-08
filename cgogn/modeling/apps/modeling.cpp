@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
 	std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
 	std::shared_ptr<Attribute<Vec3>> vertex_normal = cgogn::add_attribute<Vec3, Vertex>(*m, "normal");
-
+	//std::shared_ptr<Attribute<Vec3>> vertex_pipo = cgogn::add_attribute<Vec3, Vertex>(*m, "pipo");
 	mp.set_mesh_bb_vertex_position(*m, vertex_position);
 
 	sdp.compute_normal(*m, vertex_position.get(), vertex_normal.get());

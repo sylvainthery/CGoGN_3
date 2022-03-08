@@ -52,8 +52,12 @@ struct CGOGN_CORE_EXPORT CMap1 : public CMap0
 };
 
 template <>
-struct mesh_traits<CMap1>
+struct mesh_traits<CMap1> : public mesh_traits_defalut_false
 {
+	static constexpr const bool is_CMapBase = true;
+	static constexpr const bool is_CMap = true;
+	static constexpr const bool is_CMap1 = true;
+
 	static constexpr const char* name = "CMap1";
 	static constexpr const uint8 dimension = 1;
 
@@ -69,6 +73,16 @@ struct mesh_traits<CMap1>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+bool CGOGN_CORE_EXPORT check_integrity(CMap1& m, bool verbose = true);
+
+CMap1::Face CGOGN_CORE_EXPORT add_face(CMap1& m, uint32 size, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_face(CMap1& m, CMap1::Face f, bool set_indices = true);
+
+CMap1::Vertex CGOGN_CORE_EXPORT cut_edge(CMap1& m, CMap1::Edge e, bool set_indices = true);
+
+CMap1::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap1& m, CMap1::Edge e, bool set_indices = true);
 
 } // namespace cgogn
 

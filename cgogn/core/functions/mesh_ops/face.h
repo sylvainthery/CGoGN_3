@@ -46,13 +46,11 @@ namespace cgogn
 // CMap1 //
 ///////////
 
-CMap1::Face CGOGN_CORE_EXPORT add_face(CMap1& m, uint32 size, bool set_indices = true);
 
 ///////////
 // CMap2 //
 ///////////
 
-CMap2::Face CGOGN_CORE_EXPORT add_face(CMap2& m, uint32 size, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -66,7 +64,6 @@ CMap2::Face CGOGN_CORE_EXPORT add_face(CMap2& m, uint32 size, bool set_indices =
 // IncidenceGraph //
 ////////////////////
 
-IncidenceGraph::Face CGOGN_CORE_EXPORT add_face(IncidenceGraph& ig, std::vector<IncidenceGraph::Edge>& edges);
 
 /*****************************************************************************/
 
@@ -80,13 +77,11 @@ IncidenceGraph::Face CGOGN_CORE_EXPORT add_face(IncidenceGraph& ig, std::vector<
 // IncidenceGraph //
 ////////////////////
 
-void CGOGN_CORE_EXPORT remove_face(IncidenceGraph& ig, IncidenceGraph::Face f);
 
 ///////////
 // CMap1 //
 ///////////
 
-void CGOGN_CORE_EXPORT remove_face(CMap1& m, CMap1::Face f, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -100,7 +95,6 @@ void CGOGN_CORE_EXPORT remove_face(CMap1& m, CMap1::Face f, bool set_indices = t
 // CMap2 //
 ///////////
 
-void CGOGN_CORE_EXPORT merge_incident_faces(CMap2& m, CMap2::Edge e, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -115,27 +109,21 @@ void CGOGN_CORE_EXPORT merge_incident_faces(CMap2& m, CMap2::Edge e, bool set_in
 // IncidenceGraph //
 ////////////////////
 
-IncidenceGraph::Edge CGOGN_CORE_EXPORT cut_face(IncidenceGraph& m, IncidenceGraph::Vertex v1,
-												IncidenceGraph::Vertex v2);
 
 ///////////
 // CMap2 //
 ///////////
 
-CMap2::Edge CGOGN_CORE_EXPORT cut_face(CMap2& m, CMap2::Vertex v1, CMap2::Vertex v2, bool set_indices = true);
 
 ///////////
 // CMap3 //
 ///////////
 
-CMap3::Edge CGOGN_CORE_EXPORT cut_face(CMap3& m, CMap3::Vertex v1, CMap3::Vertex v2, bool set_indices = true);
 
 //////////
 // CPH3 //
 //////////
 
-CPH3::CMAP::Edge CGOGN_CORE_EXPORT cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3::CMAP::Vertex v2,
-											bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -149,7 +137,6 @@ CPH3::CMAP::Edge CGOGN_CORE_EXPORT cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3
 // CMap2 //
 ///////////
 
-CMap2::Face close_hole(CMap2& m, Dart d, bool set_indices = true);
 
 /*****************************************************************************/
 
@@ -162,22 +149,6 @@ CMap2::Face close_hole(CMap2& m, Dart d, bool set_indices = true);
 ///////////
 // CMap2 //
 ///////////
-
-uint32 close(CMap2& m, bool set_indices = true);
-
-/*****************************************************************************/
-
-// template <typename MESH>
-// void
-// reverse_orientation(MESH& m);
-
-/*****************************************************************************/
-
-///////////
-// CMap2 //
-///////////
-
-void reverse_orientation(CMap2& m);
 
 } // namespace cgogn
 

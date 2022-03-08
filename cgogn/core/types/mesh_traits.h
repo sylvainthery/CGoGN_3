@@ -55,6 +55,18 @@ struct mesh_traits
 	// using MarkAttribute;
 };
 
+struct mesh_traits_defalut_false
+{
+	static constexpr const bool is_CMapBase = false;
+	static constexpr const bool is_CMap = false;
+	static constexpr const bool is_CMap0 = false;
+	static constexpr const bool is_CMap1 = false;
+	static constexpr const bool is_CMap2 = false;
+	static constexpr const bool is_CMap3 = false;
+	static constexpr const bool is_Graph = false;
+	static constexpr const bool is_IncidenceGraph = false;
+};
+
 template <typename MESH>
 constexpr uint8 dimension_of(const MESH&)
 {

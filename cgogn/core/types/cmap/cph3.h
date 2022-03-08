@@ -183,6 +183,30 @@ struct mesh_traits<CPH3> : public mesh_traits<CMap3>
 	static constexpr const char* name = "CPH3";
 };
 
+inline Dart add_dart(CPH3& m)
+{
+	Dart d = add_dart(static_cast<CPH3::CMAP&>(m));
+	if (uint32(m.nb_darts_per_level_.size()) < m.current_level_)
+		m.nb_darts_per_level_.resize(m.current_level_);
+	m.nb_darts_per_level_[m.current_level_]++;
+	m.set_edge_id(d, 0u);
+	m.set_face_id(d, 0u);
+	m.set_dart_level(d, m.current_level_);
+
+	// update max level if needed
+	if (m.current_level_ > m.maximum_level_)
+		m.maximum_level_ = m.current_level_;
+
+	return d;
+}
+
+CPH3::CMAP::Edge CGOGN_CORE_EXPORT cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3::CMAP::Vertex v2,
+											bool set_indices = true);
+
+CPH3::CMAP::Vertex CGOGN_CORE_EXPORT cut_edge(CPH3& m, CPH3::CMAP::Edge e, bool set_indices = true);
+
+CPH3::CMAP::Face cut_volume(CPH3& m, const std::vector<Dart>& path, bool set_indices = true);
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CPH3_H_

@@ -23,13 +23,13 @@
 
 #include <cgogn/core/functions/cells.h>
 #include <cgogn/core/functions/mesh_info.h>
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
 #include <cgogn/core/functions/traversals/edge.h>
 #include <cgogn/core/functions/traversals/vertex.h>
 
-#include <cgogn/core/types/cmap/cmap_ops.h>
 #include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/cmap/cph3.h>
+#include <cgogn/core/types/cmap/graph.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
 
 namespace cgogn

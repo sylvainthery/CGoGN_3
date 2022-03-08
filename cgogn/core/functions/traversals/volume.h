@@ -31,7 +31,7 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-#include <cgogn/core/types/cmap/cmap_info.h>
+//#include <cgogn/core/types/cmap/cmap_info.h>
 #include <cgogn/core/types/cmap/dart_marker.h>
 #include <cgogn/core/types/cmap/orbit_traversal.h>
 
@@ -51,14 +51,14 @@ namespace cgogn
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	foreach_incident_volume(m, c, func, CMapBase::TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Volume = typename mesh_traits<MESH>::Volume;
 
@@ -66,11 +66,11 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::
 	static_assert(is_func_parameter_same<FUNC, Volume>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_convertible_v<MESH&, CMap2&> && mesh_traits<MESH>::dimension == 2)
+	if constexpr (mesh_traits<MESH>::is_CMap2 && mesh_traits<MESH>::dimension == 2)
 	{
 		func(Volume(c.dart));
 	}
-	else if constexpr (std::is_convertible_v<MESH&, CMap3&> && mesh_traits<MESH>::dimension == 3 &&
+	else if constexpr (mesh_traits<MESH>::is_CMap3 && mesh_traits<MESH>::dimension == 3 &&
 					   std::is_same_v<CELL, typename mesh_traits<MESH>::Edge>)
 	{
 		Dart d = c.dart;
@@ -84,7 +84,7 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::
 			d = phi3(m, phi2(m, d));
 		} while (d != c.dart);
 	}
-	else if constexpr (std::is_convertible_v<MESH&, CMap3&> && mesh_traits<MESH>::dimension == 3 &&
+	else if constexpr (mesh_traits<MESH>::is_CMap3 && mesh_traits<MESH>::dimension == 3 &&
 					   std::is_same_v<CELL, typename mesh_traits<MESH>::Face>)
 	{
 		Dart d = c.dart;

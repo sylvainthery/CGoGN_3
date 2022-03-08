@@ -45,8 +45,12 @@ struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 };
 
 template <>
-struct mesh_traits<CMap0>
+struct mesh_traits<CMap0> : public mesh_traits_defalut_false
 {
+	static constexpr const bool is_CMapBase = true;
+	static constexpr const bool is_CMap = true;
+	static constexpr const bool is_CMap0 = true;
+
 	static constexpr const char* name = "CMap0";
 	static constexpr const uint8 dimension = 0;
 

@@ -55,8 +55,12 @@ struct CGOGN_CORE_EXPORT CMap3 : public CMap2
 };
 
 template <>
-struct mesh_traits<CMap3>
+struct mesh_traits<CMap3> : public mesh_traits_defalut_false
 {
+	static constexpr const bool is_CMapBase = true;
+	static constexpr const bool is_CMap = true;
+	static constexpr const bool is_CMap3 = true;
+
 	static constexpr const char* name = "CMap3";
 	static constexpr const uint8 dimension = 3;
 
@@ -78,6 +82,18 @@ struct mesh_traits<CMap3>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+bool CGOGN_CORE_EXPORT check_integrity(CMap3& m, bool verbose = true);
+
+CMap3::Edge CGOGN_CORE_EXPORT cut_face(CMap3& m, CMap3::Vertex v1, CMap3::Vertex v2, bool set_indices = true);
+
+CMap3::Vertex CGOGN_CORE_EXPORT cut_edge(CMap3& m, CMap3::Edge e, bool set_indices = true);
+
+CMap3::Face CGOGN_CORE_EXPORT cut_volume(CMap3& m, const std::vector<Dart>& path, bool set_indices = true);
+
+CMap3::Volume CGOGN_CORE_EXPORT close_hole(CMap3& m, Dart d, bool set_indices = true);
+
+uint32 CGOGN_CORE_EXPORT close(CMap3& m, bool set_indices = true);
 
 } // namespace cgogn
 

@@ -497,7 +497,7 @@ auto primal_cut_all_volumes(MESH& m, const FUNC1& on_edge_cut, const FUNC2& on_f
 // et le vecteur de q-points est vide après l'appel
 template <typename MESH>
 auto volumePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vector<Dart>& q_point)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	// p-points : ajouter les sommets de Face(d) + Face(phi<2, 1, 1, 2>(m,d))
 	Dart b = d;
@@ -550,7 +550,7 @@ auto volumePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vec
 template <typename MESH>
 auto facePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vector<Dart>& q_point,
 				   std::vector<Dart>& r_point, std::vector<Dart>& s_point, std::vector<Dart>& t_point)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	// p-points : ajouter les sommets de Face(d)
 	Dart t = d;
@@ -664,7 +664,7 @@ auto facePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vecto
 template <typename MESH>
 auto edgePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vector<Dart>& q_point,
 				   std::vector<Dart>& r_point, std::vector<Dart>& s_point)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	if (is_incident_to_boundary(m, typename MESH::Edge(d)))
 	{
@@ -756,7 +756,7 @@ auto edgePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vecto
 /* ------------------------- BUTTERFLY SURFACE MASKS ------------------------- */
 
 template <typename MESH>
-auto surfaceAdjacentFace(const MESH& m, Dart d) -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Dart>
+auto surfaceAdjacentFace(const MESH& m, Dart d) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Dart>
 {
 	if (!is_boundary(m, phi3(m, d)))
 	{
@@ -773,7 +773,7 @@ auto surfaceAdjacentFace(const MESH& m, Dart d) -> std::enable_if_t<std::is_conv
 
 template <typename MESH>
 auto surfaceFacePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vector<Dart>& q_point)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	Dart t = d;
 	do
@@ -788,7 +788,7 @@ auto surfaceFacePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std
 
 template <typename MESH>
 auto surfaceEdgePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std::vector<Dart>& q_point,
-						  std::vector<Dart>& r_point) -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+						  std::vector<Dart>& r_point) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	p_point.push_back(d);
 	p_point.push_back(phi1(m, d));
@@ -813,7 +813,7 @@ auto surfaceEdgePointMask(const MESH& m, Dart d, std::vector<Dart>& p_point, std
 
 template <typename MESH, typename T>
 auto sum(const MESH& m, const std::vector<Dart>& v, typename mesh_traits<MESH>::template Attribute<T>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Vec3>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Vec3>
 {
 	Vec3 s = Vec3(0.f, 0.f, 0.f);
 	for (Dart i : v)
@@ -824,7 +824,7 @@ auto sum(const MESH& m, const std::vector<Dart>& v, typename mesh_traits<MESH>::
 template <typename T, typename MESH>
 auto volumePointRule(const MESH& m, const std::vector<Dart>& p_point, const std::vector<Dart>& q_point,
 					 typename mesh_traits<MESH>::template Attribute<T>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Vec3>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Vec3>
 {
 	static const float _W_ = 1.f / 16;
 	if (q_point.size() == 0)
@@ -841,7 +841,7 @@ template <typename T, typename MESH>
 auto facePointRule(const MESH& m, const std::vector<Dart>& p_point, const std::vector<Dart>& q_point,
 				   const std::vector<Dart>& r_point, const std::vector<Dart>& s_point, const std::vector<Dart>& t_point,
 				   typename mesh_traits<MESH>::template Attribute<T>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Vec3>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Vec3>
 {
 	static const float _W_ = 1.f / 16;
 	if (q_point.size() == 0)
@@ -861,7 +861,7 @@ template <typename T, typename MESH>
 auto edgePointRule(const MESH& m, const std::vector<Dart>& p_point, const std::vector<Dart>& q_point,
 				   const std::vector<Dart>& r_point, const std::vector<Dart>& s_point,
 				   typename mesh_traits<MESH>::template Attribute<T>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Vec3>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Vec3>
 {
 	static const float _W_ = 1.f / 16;
 	int32 N = uint32(q_point.size()) / 2;
@@ -881,7 +881,7 @@ auto edgePointRule(const MESH& m, const std::vector<Dart>& p_point, const std::v
 template <typename T, typename MESH>
 auto surfaceFacePointRule(const MESH& m, const std::vector<Dart>& p_point, const std::vector<Dart>& q_point,
 						  typename mesh_traits<MESH>::template Attribute<T>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Vec3>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Vec3>
 {
 	static const float _W_ = 1.f / 16;
 	Vec3 sum_p = sum<MESH>(m, p_point, attribute), sum_q = sum<MESH>(m, q_point, attribute);
@@ -893,7 +893,7 @@ template <typename T, typename MESH>
 auto surfaceEdgePointRule(const MESH& m, const std::vector<Dart>& p_point, const std::vector<Dart>& q_point,
 						  const std::vector<Dart>& r_point,
 						  typename mesh_traits<MESH>::template Attribute<T>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Vec3>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Vec3>
 {
 	static const float _W_ = 1.f / 16;
 	Vec3 sum_p = sum<MESH>(m, p_point, attribute), sum_q = sum<MESH>(m, q_point, attribute),
@@ -904,7 +904,7 @@ auto surfaceEdgePointRule(const MESH& m, const std::vector<Dart>& p_point, const
 
 template <typename MESH>
 auto subdivideEdge(MESH& m, Dart d, Vec3& p, typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	cut_edge(m, typename MESH::Edge(d));
 	value<Vec3>(m, attribute, typename MESH::Vertex(phi1(m, d))) = p;
@@ -913,7 +913,7 @@ auto subdivideEdge(MESH& m, Dart d, Vec3& p, typename mesh_traits<MESH>::templat
 // /!\ The edges of the face are already cut
 template <typename MESH>
 auto subdivideFace(MESH& m, Dart d, Vec3& p, typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, Dart>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, Dart>
 {
 	using Vertex = typename MESH::Vertex;
 	Dart e = phi1(m, d);
@@ -932,7 +932,7 @@ auto subdivideFace(MESH& m, Dart d, Vec3& p, typename mesh_traits<MESH>::templat
 // /!\ The faces of the volume are already cut
 template <typename MESH>
 auto subdivideVolume(MESH& m, Dart d, Vec3& p, typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Vertex = typename MESH::Vertex;
 	Dart first_cut_dir = phi1(m, d);
@@ -971,7 +971,7 @@ auto subdivideVolume(MESH& m, Dart d, Vec3& p, typename mesh_traits<MESH>::templ
 template <typename MESH>
 auto subdivideListEdges(MESH& m, std::vector<Dart>& edges, std::queue<Vec3>& edge_points,
 						typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	for (Dart d : edges)
 	{
@@ -995,7 +995,7 @@ inline void subdivideListEdges(CPH3& m, std::vector<Dart>& edges, std::queue<Vec
 template <typename MESH>
 auto subdivideListFaces(MESH& m, std::vector<Dart>& faces, std::queue<Vec3>& face_points,
 						typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	for (Dart d : faces)
 	{
@@ -1019,7 +1019,7 @@ inline void subdivideListFaces(CPH3& m, std::vector<Dart>& faces, std::queue<Vec
 template <typename MESH>
 auto subdivideListVolumes(MESH& m, std::vector<Dart>& volumes, std::queue<Vec3>& volume_points,
 						  typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	for (Dart d : volumes)
 	{
@@ -1043,7 +1043,7 @@ inline void subdivideListVolumes(CPH3& m, std::vector<Dart>& volumes, std::queue
 template <typename MESH>
 auto butterflySubdivisionVolumeAdaptative(MESH& m, double angle_threshold,
 										  typename mesh_traits<MESH>::template Attribute<Vec3>* attribute)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using Volume = typename MESH::Volume;
 	using Face = typename MESH::Face;

@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_MARKER_H_
-#define CGOGN_CORE_TYPES_MARKER_H_
+#ifndef CGOGN_CORE_TYPES_CELL_MARKER_H_
+#define CGOGN_CORE_TYPES_CELL_MARKER_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
@@ -45,7 +45,7 @@ namespace cgogn
 
 template <typename CELL, typename MESH>
 auto get_mark_attribute(const MESH& m)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, typename mesh_traits<MESH>::MarkAttribute*>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, typename mesh_traits<MESH>::MarkAttribute*>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	if (!is_indexed<CELL>(m))
@@ -57,42 +57,6 @@ auto get_mark_attribute(const MESH& m)
 ////////////////////
 // IncidenceGraph //
 ////////////////////
-template <typename CELL>
-auto get_mark_attribute(const IncidenceGraph& ig)
-{
-	static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
-				  "CELL not supported in this MESH");
-	return ig.attribute_containers_[CELL::CELL_INDEX].get_mark_attribute();
-}
-
-/*****************************************************************************/
-
-// template <typename CELL, typename MESH>
-// void release_mark_attribute(const MESH& m, typename mesh_traits<MESH>::MarkAttribute* attribute);
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
-template <typename CELL>
-void release_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
-{
-	return m.attribute_containers_[CELL::ORBIT].release_mark_attribute(attribute);
-}
-
-////////////////////
-// IncidenceGraph //
-////////////////////
-
-template <typename CELL>
-void release_mark_attribute(const IncidenceGraph& ig, IncidenceGraph::MarkAttribute* attribute)
-{
-	return ig.attribute_containers_[CELL::CELL_INDEX].release_mark_attribute(attribute);
-}
-
-/*****************************************************************************/
 
 template <typename MESH, typename CELL>
 class CellMarker
@@ -200,4 +164,4 @@ public:
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_MARKER_H_
+#endif // CGOGN_CORE_TYPES_CELL_MARKER_H_

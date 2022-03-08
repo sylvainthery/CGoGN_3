@@ -32,7 +32,7 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-#include <cgogn/core/types/cmap/cmap_base.h>
+//#include <cgogn/core/types/cmap/cmap_base.h>
 #include <cgogn/core/types/cmap/cmap_info.h>
 #include <cgogn/core/types/cmap/dart_marker.h>
 #include <cgogn/core/types/cmap/orbit_traversal.h>
@@ -52,14 +52,14 @@ namespace cgogn
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
-auto foreach_cell(const MESH& m, const FUNC& func) -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+auto foreach_cell(const MESH& m, const FUNC& func) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	foreach_cell(m, func, CMapBase::TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
 auto foreach_cell(const MESH& m, const FUNC& f, CMapBase::TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using CELL = func_parameter_type<FUNC>;
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -146,19 +146,6 @@ void foreach_cell(const CellFilter<MESH>& cf, const FUNC& f)
 // IncidenceGraph //
 ////////////////////
 
-template <typename FUNC>
-auto foreach_cell(const IncidenceGraph& ig, const FUNC& f)
-{
-	using CELL = func_parameter_type<FUNC>;
-	for (uint32 i = ig.attribute_containers_[CELL::CELL_INDEX].first_index(),
-				end = ig.attribute_containers_[CELL::CELL_INDEX].last_index();
-		 i != end; i = ig.attribute_containers_[CELL::CELL_INDEX].next_index(i))
-	{
-		CELL c(i);
-		if (/*c.is_valid() && */ !f(c))
-			break;
-	}
-}
 
 /*****************************************************************************/
 
@@ -172,7 +159,7 @@ auto foreach_cell(const IncidenceGraph& ig, const FUNC& f)
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
-auto parallel_foreach_cell(const MESH& m, const FUNC& f) -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+auto parallel_foreach_cell(const MESH& m, const FUNC& f) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
 {
 	using CELL = func_parameter_type<FUNC>;
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -299,8 +286,8 @@ auto parallel_foreach_cell(const MESH& m, const FUNC& f) -> std::enable_if_t<std
 // IncidenceGraph (or convertible) //
 /////////////////////////////////////
 
-template <typename FUNC>
-auto parallel_foreach_cell(const IncidenceGraph& m, const FUNC& f)
+template <typename MESH, typename FUNC>
+auto parallel_foreach_cell(const MESH& m, const FUNC& f) -> std::enable_if_t<mesh_traits<MESH>::is_IncidenceGraph>
 {
 	using CELL = func_parameter_type<FUNC>;
 	static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
