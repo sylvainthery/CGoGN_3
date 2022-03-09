@@ -338,7 +338,7 @@ auto index_cells(MESH& m) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
     if (!is_indexed<CELL>(m))
         init_cells_indexing<CELL>(m);
 
-    typename mesh_traits<MESH>::MapBase& base = static_cast<typename mesh_traits<MESH>::MapBase&>(m);
+    typename mesh_traits<MESH>::Base& base = static_cast<typename mesh_traits<MESH>::Base&>(m);
     DartMarker dm(m);
     for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
     {

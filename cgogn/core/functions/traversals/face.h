@@ -246,7 +246,7 @@ auto foreach_incident_face(const MESH& ig, CELL c, const FUNC& func) -> std::ena
     static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value,
 				  "CELL not supported in this IncidenceGraph");
 
-    if constexpr (std::is_same_v<CELL, mesh_traits<MESH>::Vertex>)
+    if constexpr (std::is_same_v<CELL, typename mesh_traits<MESH>::Vertex>)
 	{
         CellMarkerStore<MESH, Face> marker(ig);
 		for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
@@ -262,7 +262,7 @@ auto foreach_incident_face(const MESH& ig, CELL c, const FUNC& func) -> std::ena
 				break;
 		}
 	}
-    else if constexpr (std::is_same_v<CELL, mesh_traits<MESH>::Edge>)
+	else if constexpr (std::is_same_v<CELL, typename mesh_traits<MESH>::Edge>)
 	{
 		for (auto& fp : (*ig.edge_incident_faces_)[c.index_])
 		{

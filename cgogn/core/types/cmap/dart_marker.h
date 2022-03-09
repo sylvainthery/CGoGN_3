@@ -25,9 +25,9 @@
 #define CGOGN_CORE_TYPES_CMAP_DART_MARKER_H_
 
 #include <cgogn/core/cgogn_core_export.h>
+#include <cgogn/core/types/mesh_traits.h>
 #include <cgogn/core/utils/tuples.h>
 #include <cgogn/core/utils/type_traits.h>
-#include <cgogn/core/types/mesh_traits.h>
 #include <cgogn/core/types/cmap/dart.h>
 
 namespace cgogn

@@ -24,6 +24,10 @@
 #ifndef CGOGN_MODELING_ALGOS_CONVEX_HULL_H_
 #define CGOGN_MODELING_ALGOS_CONVEX_HULL_H_
 
+ // WARNING NE MARCHE QUE POUR CMAP2 
+// TODO GENERALISER
+#include <cgogn/core/types/cmap/cmap2.h>
+
 #include <cgogn/core/utils/numerics.h>
 
 #include <cgogn/core/functions/traversals/face.h>
@@ -37,9 +41,6 @@
 #include <array>
 #include <vector>
 
-// WARNING NE MARCHE QUE POUR CMAP2 
-// TO GENERALISER
-#include <cgogn/core/types/cmap/cmap2.h>
 
 namespace cgogn
 {

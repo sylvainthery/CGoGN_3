@@ -96,7 +96,9 @@ option(CGOGN_WITH_GCOV "Builds the project for coverage analysis with gcov" OFF)
 option(CGOGN_WITH_PPROF "Profile the project using gprof" OFF)
 option(CGOGN_WITH_ASAN "Builds the project with Google's AddressSanitizer" OFF)
 option(CGOGN_WITH_TSAN "Builds the project with Google's ThreadSanitizer" OFF)
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+
+MESSAGE (WARNING "CMAKE_CXX_COMPILER_ID = ${CMAKE_CXX_COMPILER_ID}" )
+if((${CMAKE_CXX_COMPILER_ID} STREQUAL "AppleClang") OR (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
 	option(CGOGN_WITH_CLANGSA "Builds the project for performance analysis with clang static analyser" OFF)
 endif()
 

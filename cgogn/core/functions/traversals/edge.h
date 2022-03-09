@@ -151,14 +151,14 @@ template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_edge(const MESH& ig, CELL c, const FUNC& func)
 		-> std::enable_if_t<mesh_traits<MESH>::is_IncidenceGraph>
 {
-	using Edge = mesh_traits<IncidenceGraph>::Edge;
+	using Edge = typename mesh_traits<MESH>::Edge;
 
-	static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
+	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value,
 				  "CELL not supported in this IncidenceGraph");
 	static_assert(is_func_parameter_same<FUNC, Edge>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Vertex>)
+	if constexpr (std::is_same_v<CELL, typename mesh_traits<MESH>::Vertex>)
 	{
 		for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
 		{
@@ -166,7 +166,7 @@ auto foreach_incident_edge(const MESH& ig, CELL c, const FUNC& func)
 				break;
 		}
 	}
-	else if constexpr (std::is_same_v<CELL, mesh_traits<IncidenceGraph>::Face>)
+	else if constexpr (std::is_same_v<CELL, typename mesh_traits<MESH>::Face>)
 	{
 		for (auto& ep : (*ig.face_incident_edges_)[c.index_])
 		{

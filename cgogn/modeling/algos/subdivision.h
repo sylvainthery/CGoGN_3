@@ -24,6 +24,10 @@
 #ifndef CGOGN_MODELING_ALGOS_SUBDIVISION_H_
 #define CGOGN_MODELING_ALGOS_SUBDIVISION_H_
 
+ // WARNING marche uniquement avec CMap3
+// TODO A CHANGER
+#include <cgogn/core/types/cmap/cmap3.h>
+
 #include <cgogn/core/functions/mesh_ops/face.h>
 #include <cgogn/core/functions/mesh_ops/volume.h>
 #include <cgogn/core/functions/traversals/global.h>
@@ -33,9 +37,7 @@
 
 #include <cgogn/geometry/algos/angle.h>
 
-// WARNING marche uniquement avec CMap3
-// TODO A CHANGER
-#include <cgogn/core/types/cmap/cmap3.h>
+
 
 namespace cgogn
 {

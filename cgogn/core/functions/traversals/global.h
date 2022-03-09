@@ -32,7 +32,6 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-//#include <cgogn/core/types/cmap/cmap_base.h>
 #include <cgogn/core/types/cmap/cmap_info.h>
 #include <cgogn/core/types/cmap/dart_marker.h>
 #include <cgogn/core/types/cmap/orbit_traversal.h>
@@ -290,7 +289,7 @@ template <typename MESH, typename FUNC>
 auto parallel_foreach_cell(const MESH& m, const FUNC& f) -> std::enable_if_t<mesh_traits<MESH>::is_IncidenceGraph>
 {
 	using CELL = func_parameter_type<FUNC>;
-	static_assert(is_in_tuple<CELL, typename mesh_traits<IncidenceGraph>::Cells>::value,
+	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value,
 				  "CELL not supported in this MESH");
 	static_assert(is_func_parameter_same<FUNC, CELL>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");

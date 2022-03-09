@@ -30,6 +30,9 @@
 #include <cgogn/core/types/container/chunk_array.h>
 #include <cgogn/core/types/container/vector.h>
 #include <cgogn/core/types/mesh_traits.h>
+#include <cgogn/core/utils/numerics.h>
+#include <cgogn/core/utils/type_traits.h>
+#include <cgogn/core/utils/tuples.h>
 
 #include <any>
 #include <array>
@@ -149,7 +152,10 @@ struct CGOGN_CORE_EXPORT IncidenceGraph
 template <>
 struct mesh_traits<IncidenceGraph> : public mesh_traits_default_values
 {
+	using Base = IncidenceGraph;
+    using Type = IncidenceGraph;
 	static constexpr const bool is_IncidenceGraph = true;
+	static constexpr const bool is_CMapBase = false;
 
 	static constexpr const char* name = "IncidenceGraph";
 	static constexpr const uint8 dimension = 2;

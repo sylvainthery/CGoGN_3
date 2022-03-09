@@ -53,7 +53,7 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	if (!is_indexed<CELL>(m))
 		index_cells<CELL>(m);
-	CMapBase& mb = static_cast<CMapBase&>(m);
+	typename mesh_traits<MESH>::Base& mb = static_cast<typename mesh_traits<MESH>::Base&>(m);
 	return mb.attribute_containers_[CELL::ORBIT].template add_attribute<T>(name);
 }
 
@@ -66,7 +66,7 @@ template <typename T, typename CELL, typename MESH,
 std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute(MESH& m, const std::string& name)
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
-	IncidenceGraph& mb = static_cast<IncidenceGraph&>(m);
+	typename mesh_traits<MESH>::Base& mb = static_cast<typename mesh_traits<MESH>::Base&>(m);
 	return mb.attribute_containers_[CELL::CELL_INDEX].template add_attribute<T>(name);
 }
 

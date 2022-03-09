@@ -48,6 +48,7 @@ auto get_mark_attribute(const MESH& m)
 	-> std::enable_if_t<mesh_traits<MESH>::is_CMapBase, typename mesh_traits<MESH>::MarkAttribute*>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
+	static_assert(mesh_traits<MESH>::is_IncidenceGraph == false, "PUTAINNNNNNN DE M.....");
 	if (!is_indexed<CELL>(m))
 		index_cells<CELL>(const_cast<MESH&>(m));
     const typename mesh_traits<MESH>::Base& mb = static_cast<const typename mesh_traits<MESH>::Base&>(m);

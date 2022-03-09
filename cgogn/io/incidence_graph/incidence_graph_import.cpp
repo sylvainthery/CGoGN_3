@@ -20,11 +20,11 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
+#include <cgogn/core/types/incidence_graph/incidence_graph.h>
 
 #include <cgogn/io/incidence_graph/incidence_graph_import.h>
 
-#include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/types/incidence_graph/incidence_graph.h>
+
 
 #include <vector>
 

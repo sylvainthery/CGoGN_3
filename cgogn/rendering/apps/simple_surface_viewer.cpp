@@ -21,6 +21,7 @@
  *                                                                              *
  *******************************************************************************/
 
+#include <cgogn/core/types/cmap/cmap2.h>
 #include <cgogn/geometry/types/vector_traits.h>
 
 #include <cgogn/ui/app.h>
@@ -29,7 +30,6 @@
 #include <cgogn/core/ui_modules/mesh_provider.h>
 // #include <cgogn/geometry/ui_modules/surface_differential_properties.h>
 #include <cgogn/rendering/ui_modules/surface_render.h>
-#include <cgogn/core/types/cmap/cmap2.h>
 // #include <cgogn/rendering/ui_modules/vector_per_vertex_render.h>
 
 #define DEFAULT_MESH_PATH CGOGN_STR(CGOGN_DATA_PATH) "/meshes/"

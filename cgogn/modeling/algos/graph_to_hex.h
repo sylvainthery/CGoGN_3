@@ -24,10 +24,14 @@
 #ifndef CGOGN_MODELING_ALGOS_GRAPH_TO_HEX_H_
 #define CGOGN_MODELING_ALGOS_GRAPH_TO_HEX_H_
 
+#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/cmap/graph.h>
+
 #include <cgogn/core/types/cells_set.h>
 #include <cgogn/geometry/types/vector_traits.h>
 #include <cgogn/io/surface/surface_import.h>
 #include <cgogn/modeling/algos/graph_utils.h>
+
 
 namespace cgogn
 {

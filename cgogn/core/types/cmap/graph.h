@@ -25,9 +25,9 @@
 #define CGOGN_CORE_TYPES_CMAP_GRAPH_H_
 
 #include <cgogn/core/cgogn_core_export.h>
-
-#include <cgogn/core/types/cmap/cell.h>
 #include <cgogn/core/types/cmap/cmap_base.h>
+#include <cgogn/core/types/cmap/cell.h>
+
 
 namespace cgogn
 {

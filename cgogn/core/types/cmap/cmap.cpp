@@ -21,9 +21,11 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/core/functions/attributes.h>
+
 #include <cgogn/core/types/cmap/cmap3.h>
+
 #include <cgogn/core/functions/mesh_info.h>
+#include <cgogn/core/functions/attributes.h>
 
 namespace cgogn
 {

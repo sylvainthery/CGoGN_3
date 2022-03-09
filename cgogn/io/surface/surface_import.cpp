@@ -21,13 +21,15 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/io/surface/surface_import.h>
-
-#include <cgogn/core/functions/attributes.h>
 
 #include <cgogn/core/types/cmap/cmap2.h>
 #include <cgogn/core/types/cmap/cmap_ops.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph.h>
+
+#include <cgogn/io/surface/surface_import.h>
+
+#include <cgogn/core/functions/attributes.h>
+
 
 
 #include <algorithm>

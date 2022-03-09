@@ -1,6 +1,8 @@
+#include <cgogn/core/types/cmap/cmap2.h>
+
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/functions/traversals/global.h>
-#include <cgogn/core/types/cmap/cmap2.h>
+
 
 
 #include <cgogn/io/surface/off.h>
