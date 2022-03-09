@@ -180,6 +180,14 @@ struct CPH3
 template <>
 struct mesh_traits<CPH3> : public mesh_traits<CMap3>
 {
+    using Base = CMapBase;
+    using Type = CMap3;
+    using Parent = CMap2;
+
+    static constexpr const bool is_CMapBase = true;
+    static constexpr const bool is_CMap = true;
+    static constexpr const bool is_CMap3 = true;
+
 	static constexpr const char* name = "CPH3";
 };
 

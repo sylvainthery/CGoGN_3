@@ -50,7 +50,7 @@ auto get_mark_attribute(const MESH& m)
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	if (!is_indexed<CELL>(m))
 		index_cells<CELL>(const_cast<MESH&>(m));
-	const CMapBase& mb = static_cast<const CMapBase&>(m);
+    const typename mesh_traits<MESH>::Base& mb = static_cast<const typename mesh_traits<MESH>::Base&>(m);
 	return mb.attribute_containers_[CELL::ORBIT].get_mark_attribute();
 }
 

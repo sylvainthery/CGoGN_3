@@ -55,8 +55,12 @@ struct CGOGN_CORE_EXPORT Graph : public CMapBase
 };
 
 template <>
-struct mesh_traits<Graph> : public mesh_traits_defalut_false
+struct mesh_traits<Graph> : public mesh_traits_default_values
 {
+    using Base = CMapBase;
+    using Type = Graph;
+    using Parent = CMapBase;
+
 	static constexpr const bool is_CMapBase = true;
 	static constexpr const bool is_Graph = true;
 	

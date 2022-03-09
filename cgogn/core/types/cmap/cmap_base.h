@@ -30,13 +30,16 @@
 #include <cgogn/core/types/container/chunk_array.h>
 #include <cgogn/core/types/container/vector.h>
 #include <cgogn/core/types/mesh_traits.h>
-
+#include <cgogn/core/utils/type_traits.h>
 #include <cgogn/core/types/cmap/cell.h>
+#include <cgogn/core/types/cmap/dart_marker.h>
 
 #include <any>
 #include <array>
 #include <unordered_map>
 #include <sstream>
+
+
 namespace cgogn
 {
 
@@ -326,6 +329,33 @@ void release_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribut
 void clear(CMapBase& m, bool keep_attributes = true);
 
 void copy(CMapBase& dst, const CMapBase& src);
+
+
+template <typename CELL, typename MESH>
+auto index_cells(MESH& m) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
+{
+    static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
+    if (!is_indexed<CELL>(m))
+        init_cells_indexing<CELL>(m);
+
+    typename mesh_traits<MESH>::MapBase& base = static_cast<typename mesh_traits<MESH>::MapBase&>(m);
+    DartMarker dm(m);
+    for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
+    {
+        if (!is_boundary(m, d) && !dm.is_marked(d))
+        {
+            const CELL c(d);
+            foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
+                dm.mark(d);
+                return true;
+            });
+
+            if (index_of(m, c) == INVALID_INDEX)
+                set_index(m, c, new_index<CELL>(m));
+        }
+    }
+}
+
 
 } // namespace cgogn
 

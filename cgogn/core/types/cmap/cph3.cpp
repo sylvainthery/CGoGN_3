@@ -20,11 +20,13 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-
+#include <cgogn/core/types/cmap/cmap3.h>
 #include <cgogn/core/types/cmap/cph3.h>
 #include <cgogn/core/types/cmap/phi.h>
-
 #include <cgogn/core/functions/traversals/face.h>
+
+
+
 
 namespace cgogn
 {

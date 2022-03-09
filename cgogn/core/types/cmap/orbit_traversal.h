@@ -102,7 +102,7 @@ auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f)
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f) -> std::enable_if_t<mesh_traits<MESH>::is_Graph>
 {
-	static_assert(is_in_tuple<CELL, typename Graph::Cells>::value, "Cell not supported in a Graph");
+    static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "Cell not supported in a Graph");
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 	static const Orbit orbit = CELL::ORBIT;

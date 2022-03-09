@@ -55,8 +55,11 @@ struct mesh_traits
 	// using MarkAttribute;
 };
 
-struct mesh_traits_defalut_false
+struct mesh_traits_default_values
 {
+    using Base = void;
+    using Type = void;
+    using Parent = void;
 	static constexpr const bool is_CMapBase = false;
 	static constexpr const bool is_CMap = false;
 	static constexpr const bool is_CMap0 = false;

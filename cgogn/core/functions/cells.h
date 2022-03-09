@@ -45,14 +45,14 @@ inline auto index_of(const MRMAP& m, CELL c) -> std::enable_if_t<mesh_traits<MRM
 {
 	static const Orbit orbit = CELL::ORBIT;
 
-	if constexpr (orbit == CPH3::CMAP::Edge::ORBIT)
+    if constexpr (orbit == MRMAP::CMAP::Edge::ORBIT)
 		c.dart = m.edge_youngest_dart(c.dart);
-	if constexpr (orbit == CPH3::CMAP::Face::ORBIT)
+    if constexpr (orbit == MRMAP::CMAP::Face::ORBIT)
 		c.dart = m.face_youngest_dart(c.dart);
-	if constexpr (orbit == CPH3::CMAP::Volume::ORBIT)
+    if constexpr (orbit == MRMAP::CMAP::Volume::ORBIT)
 		c.dart = m.volume_youngest_dart(c.dart);
 
-	return index_of(static_cast<const CPH3::CMAP&>(m), c);
+    return index_of(static_cast<const typename MRMAP::CMAP&>(m), c);
 }
 
 
@@ -100,30 +100,6 @@ auto set_index(MESH& m, CELL c, uint32 index) -> std::enable_if_t<mesh_traits<ME
 // CMapBase //
 //////////////
 
-template <typename CELL, typename MESH>
-auto index_cells(MESH& m) -> std::enable_if_t<mesh_traits<MESH>::is_CMapBase>
-{
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	if (!is_indexed<CELL>(m))
-		init_cells_indexing<CELL>(m);
-
-	CMapBase& base = static_cast<CMapBase&>(m);
-	DartMarker dm(m);
-	for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
-	{
-		if (!is_boundary(m, d) && !dm.is_marked(d))
-		{
-			const CELL c(d);
-			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-				dm.mark(d);
-				return true;
-			});
-
-			if (index_of(m, c) == INVALID_INDEX)
-				set_index(m, c, new_index<CELL>(m));
-		}
-	}
-}
 
 /////////////
 // GENERIC //

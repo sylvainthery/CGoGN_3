@@ -147,7 +147,7 @@ struct CGOGN_CORE_EXPORT IncidenceGraph
 };
 
 template <>
-struct mesh_traits<IncidenceGraph> : public mesh_traits_defalut_false
+struct mesh_traits<IncidenceGraph> : public mesh_traits_default_values
 {
 	static constexpr const bool is_IncidenceGraph = true;
 

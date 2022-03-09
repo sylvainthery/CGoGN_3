@@ -53,8 +53,12 @@ struct CGOGN_CORE_EXPORT CMap2 : public CMap1
 };
 
 template <>
-struct mesh_traits<CMap2> : public mesh_traits_defalut_false
+struct mesh_traits<CMap2> : public mesh_traits_default_values
 {
+    using Base = CMapBase;
+    using Type = CMap2;
+    using Parent = CMap1;
+
 	static constexpr const bool is_CMapBase = true;
 	static constexpr const bool is_CMap = true;
 	static constexpr const bool is_CMap2 = true;
