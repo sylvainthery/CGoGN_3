@@ -32,11 +32,6 @@
 #include <cgogn/core/functions/traversals/halfedge.h>
 #include <cgogn/core/functions/traversals/vertex.h>
 
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
-#include <cgogn/core/functions/mesh_ops/vertex.h>
-#include <cgogn/core/functions/mesh_ops/volume.h>
-
 #include <cgogn/core/functions/mesh_info.h>
 
 #include <cgogn/core/types/cmap/cmap_ops.h>

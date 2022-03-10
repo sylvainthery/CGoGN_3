@@ -25,7 +25,6 @@
 #define CGOGN_CORE_FUNCTIONS_MESH_INFO_H_
 
 #include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/types/cmap/cmap3.h>
 
 #include <cgogn/core/functions/traversals/edge.h>
 #include <cgogn/core/functions/traversals/face.h>
@@ -120,7 +119,7 @@ bool is_simplicial(const MESH& m)
 // CMapBase //
 //////////////
 
-template <typename CELL, typename MESH, typename std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>* = nullptr>
+template <typename CELL, typename MESH, typename std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>* = nullptr>
 bool check_indexing(MESH& m, bool verbose = true)
 {
 	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
@@ -160,7 +159,7 @@ bool check_indexing(MESH& m, bool verbose = true)
 			result &= valid_index && all_darts_same_index;
 			return true;
 		},
-		CMapBase::TraversalPolicy::DART_MARKING);
+		CMapBase_TraversalPolicy::DART_MARKING);
 
 	// check that all lines of the attribute container are used
 	for (uint32 i = m.attribute_containers_[CELL::ORBIT].first_index(),
@@ -187,105 +186,6 @@ bool check_indexing(MESH& m, bool verbose = true)
 
 	remove_attribute<CELL>(m, counter);
 
-	return result;
-}
-
-/*****************************************************************************/
-
-// template <typename MESH>
-// void check_integrity(MESH& m);
-
-/*****************************************************************************/
-
-///////////
-// CMap3 //
-///////////
-
-inline bool check_integrity(CMap3& m, bool verbose = true)
-{
-	bool result = true;
-	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
-	{
-		bool relations = true;
-		relations &= phi3(m, d) != d && phi<3, 3>(m, d) == d && phi<3, 1, 3, 1>(m, d) == d;
-		relations &= phi2(m, d) != d && phi<2, 2>(m, d) == d;
-		relations &= phi<-1, 1>(m, d) == d && phi<1, -1>(m, d) == d;
-		if (verbose && !relations)
-			std::cerr << "Dart " << d << " has bad relations" << std::endl;
-
-		bool boundary = is_boundary(m, d) == is_boundary(m, phi1(m, d)) &&
-						is_boundary(m, d) == is_boundary(m, phi2(m, d)) &&
-						(!is_boundary(m, d) || !is_boundary(m, phi3(m, d)));
-		if (verbose && !boundary)
-			std::cerr << "Dart " << d << " has bad boundary" << std::endl;
-
-		result &= relations && boundary;
-	}
-	result &= check_indexing<CMap3::Vertex>(m);
-	result &= check_indexing<CMap3::Vertex2>(m);
-	result &= check_indexing<CMap3::HalfEdge>(m);
-	result &= check_indexing<CMap3::Edge>(m);
-	result &= check_indexing<CMap3::Edge2>(m);
-	result &= check_indexing<CMap3::Face>(m);
-	result &= check_indexing<CMap3::Face2>(m);
-	result &= check_indexing<CMap3::Volume>(m);
-	return result;
-}
-
-///////////
-// CMap2 //
-///////////
-
-inline bool check_integrity(CMap2& m, bool verbose = true)
-{
-	bool result = true;
-	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
-	{
-		bool relations = true;
-		relations &= phi2(m, d) != d && phi<2, 2>(m, d) == d;
-		relations &= phi<-1, 1>(m, d) == d && phi<1, -1>(m, d) == d;
-		if (verbose && !relations)
-		{
-			std::cerr << "Dart " << d << " has bad relations" << std::endl;
-			if (phi2(m, d) == d)
-				std::cerr << "  phi2 fixed point" << std::endl;
-			if (phi<2, 2>(m, d) != d)
-				std::cerr << "  phi2 not involution" << std::endl;
-		}
-
-		bool boundary =
-			is_boundary(m, d) == is_boundary(m, phi1(m, d)) && (!is_boundary(m, d) || !is_boundary(m, phi2(m, d)));
-		if (verbose && !boundary)
-			std::cerr << "Dart " << d << " has bad boundary" << std::endl;
-
-		result &= relations && boundary;
-	}
-	result &= check_indexing<CMap2::Vertex>(m);
-	result &= check_indexing<CMap2::HalfEdge>(m);
-	result &= check_indexing<CMap2::Edge>(m);
-	result &= check_indexing<CMap2::Face>(m);
-	result &= check_indexing<CMap2::Volume>(m);
-	return result;
-}
-
-///////////
-// CMap1 //
-///////////
-
-inline bool check_integrity(CMap1& m, bool verbose = true)
-{
-	bool result = true;
-	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
-	{
-		bool relations = phi<-1, 1>(m, d) == d && phi<1, -1>(m, d) == d;
-		if (verbose && !relations)
-			std::cerr << "Dart " << d << " has bad relations" << std::endl;
-
-		result &= relations;
-	}
-	result &= check_indexing<CMap1::Vertex>(m);
-	result &= check_indexing<CMap1::Edge>(m);
-	result &= check_indexing<CMap1::Face>(m);
 	return result;
 }
 
@@ -389,7 +289,7 @@ uint32 codegree(const MESH& m, typename mesh_traits<MESH>::Volume v)
 //////////////
 
 template <typename MESH, typename CELL>
-auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>, bool>
+auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>, bool>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	bool result = false;
@@ -415,95 +315,6 @@ auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_
 // CMap2 //
 ///////////
 
-inline bool edge_can_collapse(const CMap2& m, CMap2::Edge e)
-{
-	using Vertex = CMap2::Vertex;
-	using Face = CMap2::Face;
-
-	auto vertices = incident_vertices(m, e);
-
-	if (is_incident_to_boundary(m, vertices[0]) || is_incident_to_boundary(m, vertices[1]))
-		return false;
-
-	uint32 val_v1 = degree(m, vertices[0]);
-	uint32 val_v2 = degree(m, vertices[1]);
-
-	if (val_v1 + val_v2 < 8 || val_v1 + val_v2 > 14)
-		return false;
-
-	Dart e1 = e.dart;
-	Dart e2 = phi2(m, e.dart);
-	if (codegree(m, Face(e1)) == 3)
-	{
-		if (degree(m, Vertex(phi_1(m, e1))) < 4)
-			return false;
-	}
-	if (codegree(m, Face(e2)) == 3)
-	{
-		if (degree(m, Vertex(phi_1(m, e2))) < 4)
-			return false;
-	}
-
-	auto next_edge = [&m](Dart d) { return phi<-1, 2>(m, d); };
-
-	// Check vertex sharing condition
-	std::vector<uint32> vn1;
-	Dart it = next_edge(next_edge(e1));
-	Dart end = phi1(m, e2);
-	do
-	{
-		vn1.push_back(index_of(m, Vertex(phi1(m, it))));
-		it = next_edge(it);
-	} while (it != end);
-	it = next_edge(next_edge(e2));
-	end = phi1(m, e1);
-	do
-	{
-		auto vn1it = std::find(vn1.begin(), vn1.end(), index_of(m, Vertex(phi1(m, it))));
-		if (vn1it != vn1.end())
-			return false;
-		it = next_edge(it);
-	} while (it != end);
-
-	return true;
-}
-
-/*****************************************************************************/
-
-// template <typename MESH>
-// bool edge_can_flip(const MESH& m, typename mesh_traits<MESH>::Edge e);
-
-/*****************************************************************************/
-
-///////////
-// CMap2 //
-///////////
-
-inline bool edge_can_flip(const CMap2& m, CMap2::Edge e)
-{
-	if (is_incident_to_boundary(m, e))
-		return false;
-
-	Dart e1 = e.dart;
-	Dart e2 = phi2(m, e1);
-
-	auto next_edge = [&m](Dart d) { return phi<-1, 2>(m, d); };
-
-	if (codegree(m, CMap2::Face(e1)) == 3 && codegree(m, CMap2::Face(e2)) == 3)
-	{
-		uint32 idxv2 = index_of(m, CMap2::Vertex(phi_1(m, e2)));
-		Dart d = phi_1(m, e1);
-		Dart it = d;
-		do
-		{
-			if (index_of(m, CMap2::Vertex(phi1(m, it))) == idxv2)
-				return false;
-			it = next_edge(it);
-		} while (it != d);
-	}
-
-	return true;
-}
 
 } // namespace cgogn
 

@@ -69,4 +69,11 @@ constexpr bool is_dimension_of(const MESH&, uint8 dim)
 
 } // namespace cgogn
 
+// TODO find a better place ?
+enum CMapBase_TraversalPolicy
+{
+	AUTO,
+	DART_MARKING
+};
+
 #endif // CGOGN_CORE_TYPES_MESH_TRAITS_H_

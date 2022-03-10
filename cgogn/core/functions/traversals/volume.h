@@ -51,14 +51,14 @@ namespace cgogn
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
-	foreach_incident_volume(m, c, func, CMapBase::TraversalPolicy::AUTO);
+	foreach_incident_volume(m, c, func, CMapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase_TraversalPolicy traversal_policy)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	using Volume = typename mesh_traits<MESH>::Volume;
 
@@ -66,11 +66,11 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::
 	static_assert(is_func_parameter_same<FUNC, Volume>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_convertible_v<MESH&, CMap2&> && mesh_traits<MESH>::dimension == 2)
+	if constexpr (std::is_convertible_v<MESH&, struct CMap2&> && mesh_traits<MESH>::dimension == 2)
 	{
 		func(Volume(c.dart));
 	}
-	else if constexpr (std::is_convertible_v<MESH&, CMap3&> && mesh_traits<MESH>::dimension == 3 &&
+	else if constexpr (std::is_convertible_v<MESH&, struct CMap3&> && mesh_traits<MESH>::dimension == 3 &&
 					   std::is_same_v<CELL, typename mesh_traits<MESH>::Edge>)
 	{
 		Dart d = c.dart;
@@ -84,7 +84,7 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::
 			d = phi3(m, phi2(m, d));
 		} while (d != c.dart);
 	}
-	else if constexpr (std::is_convertible_v<MESH&, CMap3&> && mesh_traits<MESH>::dimension == 3 &&
+	else if constexpr (std::is_convertible_v<MESH&, struct CMap3&> && mesh_traits<MESH>::dimension == 3 &&
 					   std::is_same_v<CELL, typename mesh_traits<MESH>::Face>)
 	{
 		Dart d = c.dart;
@@ -97,7 +97,7 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase::
 	}
 	else
 	{
-		if (traversal_policy == CMapBase::TraversalPolicy::AUTO && is_indexed<Volume>(m))
+		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Volume>(m))
 		{
 			CellMarkerStore<MESH, Volume> marker(m);
 			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
@@ -171,7 +171,7 @@ std::vector<typename mesh_traits<MESH>::Volume> incident_volumes(const MESH& m, 
 {
 	using Volume = typename mesh_traits<MESH>::Volume;
 	if constexpr (mesh_traits<MESH>::dimension == 2)
-		return {Volume(c.dart)};
+		return {Volumes(c.dart)};
 	else
 	{
 		std::vector<Volume> volumes;

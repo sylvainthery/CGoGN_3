@@ -1210,13 +1210,13 @@ protected:
 			if (ImGui::Button("Project on surface"))
 				project_on_surface();
 			static float regularize_fit_to_data = 5.0f;
-			ImGui::SliderFloat("Regularize surface - Fit to data", &regularize_fit_to_data, 0.0, 20.0);
+			ImGui::SliderFloat("Regularize surface - Fit to data", &regularize_fit_to_data, 0.0f, 20.0f);
 			if (ImGui::Button("Regularize surface vertices"))
 				regularize_surface_vertices(regularize_fit_to_data);
 			if (ImGui::Button("Relocate interior vertices"))
 				relocate_interior_vertices();
 			static float optimize_fit_to_surface = 1.0f;
-			if (ImGui::SliderFloat("Optimize volume - Fit to surface", &optimize_fit_to_surface, 0.1, 10.0))
+			if (ImGui::SliderFloat("Optimize volume - Fit to surface", &optimize_fit_to_surface, 0.1f, 10.0f))
 				refresh_solver_matrix_values_only_ = true;
 			ImGui::Checkbox("Refresh edge target length", &refresh_edge_target_length_);
 			if (ImGui::Button("Optimize volume vertices"))

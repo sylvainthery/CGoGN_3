@@ -57,6 +57,7 @@ struct CGOGN_CORE_EXPORT CMap3 : public CMap2
 template <>
 struct mesh_traits<CMap3>
 {
+	using BaseType = CMapBase;
 	static constexpr const char* name = "CMap3";
 	static constexpr const uint8 dimension = 3;
 
@@ -79,6 +80,39 @@ struct mesh_traits<CMap3>
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
 
+// PHI
+
+inline Dart phi3(const CMap3& m, Dart d)
+{
+	return (*(m.phi3_))[d.index];
+}
+
+inline void phi3_sew(CMap3& m, Dart d, Dart e)
+{
+	cgogn_assert(phi3(m, d) == d);
+	cgogn_assert(phi3(m, e) == e);
+	(*(m.phi3_))[d.index] = e;
+	(*(m.phi3_))[e.index] = d;
+}
+
+inline void phi3_unsew(CMap3& m, Dart d)
+{
+	Dart e = phi3(m, d);
+	(*(m.phi3_))[d.index] = d;
+	(*(m.phi3_))[e.index] = e;
+}
+
+CMap3::Vertex CGOGN_CORE_EXPORT cut_edge(CMap3& m, CMap3::Edge e, bool set_indices = true);
+
+CMap3::Face CGOGN_CORE_EXPORT cut_volume(CMap3& m, const std::vector<Dart>& path, bool set_indices = true);
+
+CMap3::Volume CGOGN_CORE_EXPORT close_hole(CMap3& m, Dart d, bool set_indices = true);
+
+uint32 CGOGN_CORE_EXPORT close(CMap3& m, bool set_indices = true);
+
+CMap3::Edge CGOGN_CORE_EXPORT cut_face(CMap3& m, CMap3::Vertex v1, CMap3::Vertex v2, bool set_indices = true);
+
+bool CGOGN_CORE_EXPORT check_integrity(CMap3& m, bool verbose = true);
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CMAP3_H_

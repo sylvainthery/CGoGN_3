@@ -57,6 +57,7 @@ struct CGOGN_CORE_EXPORT Graph : public CMapBase
 template <>
 struct mesh_traits<Graph>
 {
+	using BaseType = CMapBase;
 	static constexpr const char* name = "Graph";
 	static constexpr const uint8 dimension = 1;
 
@@ -72,6 +73,71 @@ struct mesh_traits<Graph>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+// ALPHA
+
+inline Dart alpha0(const Graph& m, Dart d)
+{
+	return (*m.alpha0_)[d.index];
+}
+
+inline Dart alpha1(const Graph& m, Dart d)
+{
+	return (*m.alpha1_)[d.index];
+}
+
+inline Dart alpha_1(const Graph& m, Dart d)
+{
+	return (*m.alpha_1_)[d.index];
+}
+
+inline void alpha0_sew(Graph& m, Dart d, Dart e)
+{
+	(*m.alpha0_)[d.index] = e;
+	(*m.alpha0_)[e.index] = d;
+}
+
+inline void alpha0_unsew(Graph& m, Dart d)
+{
+	Dart e = alpha0(m, d);
+	(*m.alpha0_)[d.index] = d;
+	(*m.alpha0_)[e.index] = e;
+}
+
+inline void alpha1_sew(Graph& m, Dart d, Dart e)
+{
+	Dart f = alpha1(m, d);
+	Dart g = alpha1(m, e);
+	(*m.alpha1_)[d.index] = g;
+	(*m.alpha1_)[e.index] = f;
+	(*m.alpha_1_)[g.index] = d;
+	(*m.alpha_1_)[f.index] = e;
+}
+
+inline void alpha1_unsew(Graph& m, Dart d)
+{
+	Dart e = alpha1(m, d);
+	Dart f = alpha_1(m, d);
+	(*m.alpha1_)[f.index] = e;
+	(*m.alpha1_)[d.index] = d;
+	(*m.alpha_1_)[e.index] = f;
+	(*m.alpha_1_)[d.index] = d;
+}
+
+// OPERATIONS
+Graph::Vertex CGOGN_CORE_EXPORT add_vertex(Graph& g, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_vertex(Graph& g, Graph::Vertex v, bool set_indices = true);
+
+Graph::Vertex CGOGN_CORE_EXPORT cut_edge(Graph& m, Graph::Edge e, bool set_indices = true);
+
+Graph::Vertex CGOGN_CORE_EXPORT collapse_edge(Graph& g, Graph::Edge e, bool set_indices = true);
+
+void disconnect_vertices(Graph& g, Graph::Edge e, bool set_indices = true);
+
+void merge_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
+
+Graph::Edge CGOGN_CORE_EXPORT connect_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices = true);
 
 } // namespace cgogn
 

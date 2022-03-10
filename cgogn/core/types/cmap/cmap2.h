@@ -55,6 +55,7 @@ struct CGOGN_CORE_EXPORT CMap2 : public CMap1
 template <>
 struct mesh_traits<CMap2>
 {
+	using BaseType = CMapBase;
 	static constexpr const char* name = "CMap2";
 	static constexpr const uint8 dimension = 2;
 
@@ -72,6 +73,68 @@ struct mesh_traits<CMap2>
 	using AttributeGen = CMapBase::AttributeGen;
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
+
+// PHI
+
+inline Dart phi2(const CMap2& m, Dart d)
+{
+	return (*(m.phi2_))[d.index];
+}
+
+inline void phi2_sew(CMap2& m, Dart d, Dart e)
+{
+	cgogn_assert(phi2(m, d) == d);
+	cgogn_assert(phi2(m, e) == e);
+	(*(m.phi2_))[d.index] = e;
+	(*(m.phi2_))[e.index] = d;
+}
+
+inline void phi2_unsew(CMap2& m, Dart d)
+{
+	Dart e = phi2(m, d);
+	(*(m.phi2_))[d.index] = d;
+	(*(m.phi2_))[e.index] = e;
+}
+
+CMap2::Vertex CGOGN_CORE_EXPORT cut_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
+
+CMap2::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
+
+bool CGOGN_CORE_EXPORT flip_edge(CMap2& m, CMap2::Edge e, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT merge_incident_faces(CMap2& m, CMap2::Edge e, bool set_indices = true);
+
+CMap2::Face CGOGN_CORE_EXPORT add_face(CMap2& m, uint32 size, bool set_indices = true);
+
+CMap2::Edge CGOGN_CORE_EXPORT cut_face(CMap2& m, CMap2::Vertex v1, CMap2::Vertex v2, bool set_indices = true);
+
+CMap2::Face close_hole(CMap2& m, Dart d, bool set_indices = true);
+
+uint32 close(CMap2& m, bool set_indices = true);
+
+CMap2::Volume CGOGN_CORE_EXPORT add_pyramid(CMap2& m, uint32 size, bool set_indices = true);
+
+inline CMap2::Volume CGOGN_CORE_EXPORT add_tetrahedron(CMap2& m, bool set_indices = true)
+{
+	return add_pyramid(m, 3, set_indices);
+}
+
+CMap2::Volume CGOGN_CORE_EXPORT add_prism(CMap2& m, uint32 size, bool set_indices = true);
+
+inline CMap2::Volume CGOGN_CORE_EXPORT add_hexahedron(CMap2& m, bool set_indices = true)
+{
+	return add_prism(m, 4, set_indices);
+}
+
+void CGOGN_CORE_EXPORT remove_volume(CMap2& m, CMap2::Volume v);
+
+void CGOGN_CORE_EXPORT reverse_orientation(CMap2& m);
+
+bool CGOGN_CORE_EXPORT edge_can_collapse(const CMap2& m, CMap2::Edge e);
+
+bool CGOGN_CORE_EXPORT edge_can_flip(const CMap2& m, CMap2::Edge e);
+
+bool CGOGN_CORE_EXPORT check_integrity(CMap2& m, bool verbose = true);
 
 } // namespace cgogn
 

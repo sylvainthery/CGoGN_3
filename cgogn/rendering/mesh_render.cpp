@@ -20,7 +20,7 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-
+#define _RENDERING_ONLY_CPP_
 #include <cgogn/rendering/mesh_render.h>
 
 namespace cgogn
@@ -29,7 +29,7 @@ namespace cgogn
 namespace rendering
 {
 
-MeshRender::MeshRender()
+MeshRenderBase::MeshRenderBase()
 {
 	for (uint32 i = 0u; i < SIZE_BUFFER; ++i)
 	{
@@ -38,11 +38,11 @@ MeshRender::MeshRender()
 	}
 }
 
-MeshRender::~MeshRender()
+MeshRenderBase::~MeshRenderBase()
 {
 }
 
-void MeshRender::draw(DrawingType prim)
+void MeshRenderBase::draw(DrawingType prim)
 {
 	uint32 prim_buffer = prim % SIZE_BUFFER;
 	int32 nb_indices = int32(indices_buffers_[prim_buffer]->size());

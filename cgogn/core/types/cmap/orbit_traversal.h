@@ -40,7 +40,7 @@ namespace cgogn
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMap0&>>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
@@ -100,10 +100,11 @@ auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f)
 // Graph //
 ///////////
 
-template <typename CELL, typename FUNC>
-void foreach_dart_of_orbit(const Graph& m, CELL c, const FUNC& f)
+template <typename MESH, typename CELL, typename FUNC>
+auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f)
+	->std::enable_if_t<std::is_same_v<MESH&, struct Graph&>>
 {
-	static_assert(is_in_tuple<CELL, typename Graph::Cells>::value, "Cell not supported in a Graph");
+	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "Cell not supported in a Graph");
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 	static const Orbit orbit = CELL::ORBIT;
@@ -133,7 +134,7 @@ void foreach_dart_of_orbit(const Graph& m, CELL c, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI1(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -148,7 +149,7 @@ auto foreach_dart_of_PHI1(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI2(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -158,7 +159,7 @@ auto foreach_dart_of_PHI2(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI21(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -173,7 +174,7 @@ auto foreach_dart_of_PHI21(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI1_PHI2(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -208,7 +209,7 @@ auto foreach_dart_of_PHI1_PHI2(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI1_PHI3(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -221,7 +222,7 @@ auto foreach_dart_of_PHI1_PHI3(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI2_PHI3(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -239,7 +240,7 @@ auto foreach_dart_of_PHI2_PHI3(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI21_PHI31(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -268,7 +269,7 @@ auto foreach_dart_of_PHI21_PHI31(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_PHI1_PHI2_PHI3(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -305,7 +306,7 @@ auto foreach_dart_of_PHI1_PHI2_PHI3(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_ALPHA0(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -315,7 +316,7 @@ auto foreach_dart_of_ALPHA0(const MESH& m, Dart d, const FUNC& f)
 
 template <typename MESH, typename FUNC>
 auto foreach_dart_of_ALPHA1(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");

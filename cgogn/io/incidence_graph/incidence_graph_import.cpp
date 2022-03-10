@@ -23,10 +23,11 @@
 
 #include <cgogn/io/incidence_graph/incidence_graph_import.h>
 
+#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/cmap/graph.h>
+#include <cgogn/core/types/incidence_graph/incidence_graph.h>
+
 #include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
-#include <cgogn/core/functions/mesh_ops/vertex.h>
 
 #include <vector>
 

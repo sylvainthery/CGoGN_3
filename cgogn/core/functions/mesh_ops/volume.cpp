@@ -21,6 +21,10 @@
  *                                                                              *
  *******************************************************************************/
 
+#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/cmap/cph3.h>
+
 #include <cgogn/core/functions/cells.h>
 #include <cgogn/core/functions/mesh_info.h>
 #include <cgogn/core/functions/mesh_ops/face.h>
@@ -72,7 +76,7 @@ CMap2::Volume add_pyramid(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, v, new_index<CMap2::Vertex>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::HalfEdge>(m))
 		{
@@ -83,7 +87,7 @@ CMap2::Volume add_pyramid(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, CMap2::HalfEdge(phi2(m, e.dart)), new_index<CMap2::HalfEdge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Edge>(m))
 		{
@@ -93,7 +97,7 @@ CMap2::Volume add_pyramid(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, e, new_index<CMap2::Edge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Face>(m))
 		{
@@ -103,7 +107,7 @@ CMap2::Volume add_pyramid(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, f, new_index<CMap2::Face>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Volume>(m))
 			set_index(m, vol, new_index<CMap2::Volume>(m));
@@ -150,7 +154,7 @@ CMap2::Volume add_prism(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, v, new_index<CMap2::Vertex>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::HalfEdge>(m))
 		{
@@ -161,7 +165,7 @@ CMap2::Volume add_prism(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, CMap2::HalfEdge(phi2(m, e.dart)), new_index<CMap2::HalfEdge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Edge>(m))
 		{
@@ -171,7 +175,7 @@ CMap2::Volume add_prism(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, e, new_index<CMap2::Edge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Face>(m))
 		{
@@ -181,7 +185,7 @@ CMap2::Volume add_prism(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, f, new_index<CMap2::Face>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Volume>(m))
 			set_index(m, vol, new_index<CMap2::Volume>(m));

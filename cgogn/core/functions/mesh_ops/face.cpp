@@ -21,16 +21,16 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/core/functions/cells.h>
-#include <cgogn/core/functions/mesh_info.h>
-#include <cgogn/core/functions/mesh_ops/edge.h>
-#include <cgogn/core/functions/mesh_ops/face.h>
-#include <cgogn/core/functions/traversals/edge.h>
-#include <cgogn/core/functions/traversals/vertex.h>
+#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/cmap/cph3.h>
+#include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
 
 #include <cgogn/core/types/cmap/cmap_ops.h>
 #include <cgogn/core/types/cmap/orbit_traversal.h>
-#include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
+#include <cgogn/core/functions/cells.h>
+#include <cgogn/core/functions/mesh_info.h>
+#include <cgogn/core/functions/traversals/edge.h>
+#include <cgogn/core/functions/traversals/vertex.h>
 
 namespace cgogn
 {
@@ -67,7 +67,7 @@ CMap1::Face add_face(CMap1& m, uint32 size, bool set_indices)
 					set_index(m, v, new_index<CMap1::Vertex>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		// CMap1::Edge is the same orbit as CMap1::Vertex
 		if (is_indexed<CMap1::Face>(m))
@@ -103,7 +103,7 @@ CMap2::Face add_face(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, v, new_index<CMap2::Vertex>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::HalfEdge>(m))
 		{
@@ -113,7 +113,7 @@ CMap2::Face add_face(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, CMap2::HalfEdge(e.dart), new_index<CMap2::HalfEdge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Edge>(m))
 		{
@@ -123,7 +123,7 @@ CMap2::Face add_face(CMap2& m, uint32 size, bool set_indices)
 					set_index(m, e, new_index<CMap2::Edge>(m));
 					return true;
 				},
-				CMapBase::TraversalPolicy::DART_MARKING);
+				CMapBase_TraversalPolicy::DART_MARKING);
 		}
 		if (is_indexed<CMap2::Face>(m))
 			set_index(m, f, new_index<CMap2::Face>(m));

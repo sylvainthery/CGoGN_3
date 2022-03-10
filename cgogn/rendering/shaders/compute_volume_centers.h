@@ -96,7 +96,7 @@ public:
 	ComputeVolumeCenterEngine();
 	~ComputeVolumeCenterEngine();
 
-	void compute(VBO* vertex_position, MeshRender* renderer, VBO* volume_center);
+	void compute(VBO* vertex_position, MeshRenderBase* renderer, VBO* volume_center);
 };
 
 } // namespace rendering

@@ -23,6 +23,8 @@
 
 #include <cgogn/geometry/types/vector_traits.h>
 
+#include <cgogn/core/types/cmap/cmap2.h>
+
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
 

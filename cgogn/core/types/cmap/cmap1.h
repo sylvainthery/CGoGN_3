@@ -54,6 +54,7 @@ struct CGOGN_CORE_EXPORT CMap1 : public CMap0
 template <>
 struct mesh_traits<CMap1>
 {
+	using BaseType = CMapBase;
 	static constexpr const char* name = "CMap1";
 	static constexpr const uint8 dimension = 1;
 
@@ -70,6 +71,49 @@ struct mesh_traits<CMap1>
 	using MarkAttribute = CMapBase::MarkAttribute;
 };
 
+//
+// FUNCTIONS
+//
+
+inline Dart phi1(const CMap1& m, Dart d)
+{
+	return (*(m.phi1_))[d.index];
+}
+
+inline Dart phi_1(const CMap1& m, Dart d)
+{
+	return (*(m.phi_1_))[d.index];
+}
+
+inline void phi1_sew(CMap1& m, Dart d, Dart e)
+{
+	Dart f = phi1(m, d);
+	Dart g = phi1(m, e);
+	(*(m.phi1_))[d.index] = g;
+	(*(m.phi1_))[e.index] = f;
+	(*(m.phi_1_))[g.index] = d;
+	(*(m.phi_1_))[f.index] = e;
+}
+
+inline void phi1_unsew(CMap1& m, Dart d)
+{
+	Dart e = phi1(m, d);
+	Dart f = phi1(m, e);
+	(*(m.phi1_))[d.index] = f;
+	(*(m.phi1_))[e.index] = e;
+	(*(m.phi_1_))[f.index] = d;
+	(*(m.phi_1_))[e.index] = e;
+}
+
+CMap1::Vertex CGOGN_CORE_EXPORT cut_edge(CMap1& m, CMap1::Edge e, bool set_indices = true);
+
+CMap1::Vertex CGOGN_CORE_EXPORT collapse_edge(CMap1& m, CMap1::Edge e, bool set_indices = true);
+
+CMap1::Face CGOGN_CORE_EXPORT add_face(CMap1& m, uint32 size, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_face(CMap1& m, CMap1::Face f, bool set_indices = true);
+
+bool CGOGN_CORE_EXPORT check_integrity(CMap1& m, bool verbose = true);
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CMAP1_H_
