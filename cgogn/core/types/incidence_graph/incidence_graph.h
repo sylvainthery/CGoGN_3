@@ -267,6 +267,11 @@ uint32 index_of(const IncidenceGraph& /*m*/, CELL c)
 	return c.index_;
 }
 
+// Just to avoid compile PB
+// TODO Implement ?
+template <typename CELL>
+void init_cells_indexing(const IncidenceGraph& /*m*/);
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_INCIDENCE_GRAPH_H_
