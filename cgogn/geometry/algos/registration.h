@@ -236,7 +236,7 @@ void non_rigid_register_mesh(
 	Scalar fit_to_target, bool relax)
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
-	using Face = typename mesh_traits<MESH>::Face;
+//	using Face = typename mesh_traits<MESH>::Face;
 
 	// static map to store helpers associated to meshes
 	// allows to store context without polluting outer context and function api

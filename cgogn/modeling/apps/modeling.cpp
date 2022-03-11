@@ -50,11 +50,11 @@ using Attribute = typename cgogn::mesh_traits<Mesh>::Attribute<T>;
 int main(int argc, char** argv)
 {
 	using Vertex = typename cgogn::mesh_traits<Mesh>::Vertex;
-	using Edge = typename cgogn::mesh_traits<Mesh>::Edge;
-	using Face = typename cgogn::mesh_traits<Mesh>::Face;
+//	using Edge = typename cgogn::mesh_traits<Mesh>::Edge;
+//	using Face = typename cgogn::mesh_traits<Mesh>::Face;
 
-	using Vec3 = cgogn::geometry::Vec3;
-	using Scalar = cgogn::geometry::Scalar;
+    using Vec3 = cgogn::geometry::Vec3;
+//	using Scalar = cgogn::geometry::Scalar;
 
 	std::string filename;
 	if (argc < 2)
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 	// 		foreach_adjacent_vertex_through_edge(*m, v, [&](Vertex av) -> bool {
 	// 			center += cgogn::value<Vec3>(*m, vertex_position, av);
 	// 			++count;
-	// 			return true;
+    // 			return true;
 	// 		});
 	// 		center /= Scalar(count);
 	// 		cgogn::value<Vec3>(*m, vertex_position, v) = center;

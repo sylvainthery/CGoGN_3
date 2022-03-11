@@ -105,7 +105,7 @@ Vec3 normal(const MESH& m, typename mesh_traits<MESH>::Vertex v,
 {
 	static_assert(mesh_traits<MESH>::dimension >= 2, "MESH dimension should be >= 2");
 
-	using Vertex = typename mesh_traits<MESH>::Vertex;
+//	using Vertex = typename mesh_traits<MESH>::Vertex;
 	using Face = typename mesh_traits<MESH>::Face;
 	Vec3 n{0.0, 0.0, 0.0};
 	foreach_incident_face(m, v, [&](Face f) -> bool {

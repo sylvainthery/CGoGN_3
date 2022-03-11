@@ -73,7 +73,7 @@ void import_incidence_graph_data(IncidenceGraph& ig, IncidenceGraphImportData& i
 		face.reserve(nbe);
 		for (uint32 j = 0; j < nbe; ++j)
 			face.push_back(edges[incidence_graph_data.faces_edge_indices_[faces_edge_index++]]);
-		Face f = add_face(ig, face);
+        /*Face f = */add_face(ig, face);
 	}
 }
 

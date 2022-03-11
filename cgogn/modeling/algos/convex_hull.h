@@ -153,7 +153,7 @@ template <typename MESH>
 void convex_hull(const std::vector<Vec3>& points, MESH& m,
 				 typename mesh_traits<MESH>::template Attribute<Vec3>* vertex_position)
 {
-	using HalfEdge = typename mesh_traits<MESH>::HalfEdge;
+//	using HalfEdge = typename mesh_traits<MESH>::HalfEdge;
 	using Vertex = typename mesh_traits<MESH>::Vertex;
 	using Edge = typename mesh_traits<MESH>::Edge;
 	using Face = typename mesh_traits<MESH>::Face;

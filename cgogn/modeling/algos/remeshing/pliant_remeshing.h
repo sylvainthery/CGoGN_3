@@ -217,7 +217,7 @@ void pliant_remeshing(MESH& m, std::shared_ptr<typename mesh_traits<MESH>::templ
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
 	using Edge = typename mesh_traits<MESH>::Edge;
-	using Face = typename mesh_traits<MESH>::Face;
+//	using Face = typename mesh_traits<MESH>::Face;
 
 	// static map to store helpers associated to meshes
 	// allows to store context without polluting outer context and function api

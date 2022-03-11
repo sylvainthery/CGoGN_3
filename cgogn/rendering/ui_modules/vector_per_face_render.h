@@ -146,7 +146,7 @@ public:
 		p.vertex_position_ = vertex_position;
 		if (p.vertex_position_)
 		{
-			MeshData<MESH>& md = mesh_provider_->mesh_data(m);
+            MeshData<MESH>& md = mesh_provider_->mesh_data(m);
 			p.vector_base_size_ = float32(geometry::mean_edge_length(m, vertex_position.get()) / 2.0);
 			if (p.vector_base_size_ == 0.0)
 				p.vector_base_size_ = 1.0;

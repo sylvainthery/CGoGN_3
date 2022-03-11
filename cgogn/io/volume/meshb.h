@@ -52,7 +52,7 @@ bool import_MESHB(MESH& m, const std::string& filename)
 {
 	static_assert(mesh_traits<MESH>::dimension == 3, "MESH dimension should be 3");
 
-	using Vertex = typename MESH::Vertex;
+//	using Vertex = typename MESH::Vertex;
 
 	Scoped_C_Locale loc;
 

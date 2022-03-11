@@ -150,7 +150,7 @@ void import_surface_data(IncidenceGraph& ig, SurfaceImportData& surface_data)
 {
 	using Vertex = IncidenceGraph::Vertex;
 	using Edge = IncidenceGraph::Edge;
-	using Face = IncidenceGraph::Face;
+//	using Face = IncidenceGraph::Face;
 
 	auto position = get_attribute<geometry::Vec3, Vertex>(ig, surface_data.vertex_position_attribute_name_);
 	if (!position)

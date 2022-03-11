@@ -76,7 +76,7 @@ IncidenceGraph::Edge add_edge(IncidenceGraph& ig, IncidenceGraph::Vertex v0, Inc
 
 void remove_edge(IncidenceGraph& ig, IncidenceGraph::Edge e)
 {
-	using Vertex = IncidenceGraph::Vertex;
+//	using Vertex = IncidenceGraph::Vertex;
 	using Edge = IncidenceGraph::Edge;
 
 	while ((*ig.edge_incident_faces_)[e.index_].size() > 0)

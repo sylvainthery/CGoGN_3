@@ -141,7 +141,7 @@ public:
 
 	void extend_graph_extremities()
 	{
-		using SelectedFace = std::tuple<SurfaceFace, Vec3, Scalar>;
+//		using SelectedFace = std::tuple<SurfaceFace, Vec3, Scalar>;
 		CellCache<Graph> cache(*graph_);
 		cache.template build<GraphVertex>();
 		foreach_cell(cache, [&](GraphVertex v) -> bool {

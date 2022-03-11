@@ -71,7 +71,7 @@ class SkeletonExtractor : public Module
 	using SurfaceFace = typename mesh_traits<SURFACE>::Face;
 
 	using Vec3 = geometry::Vec3;
-	using Scalar = geometry::Scalar;
+    using Scalar = geometry::Scalar;
 	using Mat3 = geometry::Mat3;
 
 public:

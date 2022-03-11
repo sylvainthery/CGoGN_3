@@ -89,7 +89,10 @@ struct CGOGN_CORE_EXPORT CMapBase
 	{
 		return relations_.emplace_back(darts_.add_attribute<Dart>(name));
 	}
-
+        ///
+        /// \brief begin
+        /// \return
+        ///
 	inline Dart begin() const
 	{
 		return Dart(darts_.first_index());
@@ -104,27 +107,66 @@ struct CGOGN_CORE_EXPORT CMapBase
 	}
 };
 
+///
+/// \brief is_boundary
+/// \param m const ref CMapBase inherited class
+/// \param d dart to check
+/// \return does this dart belong to the boundary
+///
+
 inline bool is_boundary(const CMapBase& m, Dart d)
 {
 	return (*m.boundary_marker_)[d.index] != 0u;
 }
 
+///
+/// \brief set_boundary
+/// \param m ref CMapBase inherited class
+/// \param d
+/// \param b
+///
+inline void set_boundary(const CMapBase& m, Dart d, bool b) //TODO: const ??
+{
+	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
+}
+
+///
+/// \brief nb_darts
+/// \param m
+/// \return number of darts of the map, O(0).
+///
 inline uint32 nb_darts(const CMapBase& m)
 {
 	return m.darts_.nb_elements();
 }
 
+///
+/// \brief dump_map_darts low level dump for debugging
+/// \param m
+///
 void dump_map_darts(const CMapBase& m);
 
+///
+/// \brief add_dart [LOW LEVEL] Add a dart to a map. A dart is only an encapsulated index
+/// \param m
+/// \return itself
+///
 Dart add_dart(CMapBase& m);
 
+///
+/// \brief remove_dart [LOW LEVEL] Remove a dart from the map
+/// \param m
+/// \param d
+///
 void remove_dart(CMapBase& m, Dart d);
 
-inline void set_boundary(const CMapBase& m, Dart d, bool b)
-{
-	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
-}
 
+///
+/// \brief set_index  [LOW LEVEL] Set index of CELL embedding (in table of embedding) of a dart
+/// \param m
+/// \param d
+/// \param index
+///
 template <typename CELL>
 void set_index(CMapBase& m, Dart d, uint32 index)
 {
@@ -139,26 +181,16 @@ void set_index(CMapBase& m, Dart d, uint32 index)
 	(*m.cells_indices_[orbit])[d.index] = index;		 // affect the index to the dart
 }
 
-inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase& m)
-{
-	return m.darts_.get_mark_attribute();
-}
-
-inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
-{
-	return m.darts_.release_mark_attribute(attribute);
-}
-
-template <typename CELL>
-void release_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
-{
-	return m.attribute_containers_[CELL::ORBIT].release_mark_attribute(attribute);
-}
 
 void clear(CMapBase& m, bool keep_attributes = true);
 
 void copy(CMapBase& dst, const CMapBase& src);
 
+///
+/// \brief is_indexed Is this kind of CELL of map p embedded ?
+/// \param m
+/// \return
+///
 template <typename CELL>
 bool is_indexed(const CMapBase& m)
 {
@@ -167,6 +199,12 @@ bool is_indexed(const CMapBase& m)
 	return m.cells_indices_[orbit] != nullptr;
 }
 
+///
+/// \brief is_indexed Is this orbit of map p embedded ?
+/// \param m
+/// \param orbit
+/// \return
+///
 inline bool is_indexed(const CMapBase& m, Orbit orbit)
 {
 	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -182,6 +220,12 @@ uint32 maximum_index(const CMapBase& m)
 	return m.attribute_containers_[CELL::ORBIT].maximum_index();
 }
 
+///
+/// \brief index_of return index of a cell o a map
+/// \param m
+/// \param c
+/// \return
+///
 template <typename CELL>
 uint32 index_of(const CMapBase& m, CELL c)
 {
@@ -191,6 +235,12 @@ uint32 index_of(const CMapBase& m, CELL c)
 	return (*m.cells_indices_[orbit])[c.dart.index];
 }
 
+///
+/// \brief of_index Get the cell of type CELL of a given index
+/// \param m
+/// \param i
+/// \return
+///
 template <typename CELL>
 CELL of_index(const CMapBase& m, uint32 i)
 {
@@ -209,13 +259,21 @@ CELL of_index(const CMapBase& m, uint32 i)
 	return CELL();
 }
 
+///
+/// \brief new_index Reserve a new line in CELL attribute container
+/// \param m
+/// \return
+///
 template <typename CELL>
 uint32 new_index(const CMapBase& m)
 {
 	return m.attribute_containers_[CELL::ORBIT].new_index();
 }
 
-
+///
+/// \brief init_cells_indexing Add an index atttribute on dart for CELL embedding
+/// \param m
+///
 template <typename CELL>
 void init_cells_indexing(CMapBase& m)
 {
@@ -230,6 +288,11 @@ void init_cells_indexing(CMapBase& m)
 	}
 }
 
+///
+/// \brief init_cells_indexing Add an index attribute on dart for orbit embedding
+/// \param m
+/// \param orbit
+///
 inline void init_cells_indexing(CMapBase& m, Orbit orbit)
 {
 	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -253,6 +316,38 @@ template <typename CELL>
 void remove_attribute(CMapBase& m, CMapBase::AttributeGen* attribute)
 {
 	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
+}
+
+
+///
+/// \brief get_dart_mark_attribute [LOW LEVEL]
+/// \param m
+/// \return a pointer on Attribute reserved for DartMarkers
+///
+inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase& m)
+{
+	return m.darts_.get_mark_attribute();
+}
+
+///
+/// \brief release_dart_mark_attribute [LOW LEVEL] ro release a marker on dart attribute reserved by get_dart_mark_attribute
+/// \param m
+/// \param attribute pointer on the reserved attribute
+///
+inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
+{
+	return m.darts_.release_mark_attribute(attribute);
+}
+
+///
+/// \brief release_mark_attribute
+/// \param m
+/// \param attribute
+///
+template <typename CELL>
+void release_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
+{
+	return m.attribute_containers_[CELL::ORBIT].release_mark_attribute(attribute);
 }
 
 

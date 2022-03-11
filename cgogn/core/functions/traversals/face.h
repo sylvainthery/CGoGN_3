@@ -48,10 +48,14 @@ namespace cgogn
 ///////////////////////////////
 // CMapBase (or convertible) //
 ///////////////////////////////
+///
+template <typename T>
+using SFINAE_CMapBase_Convertible = std::enable_if_t<std::is_convertible_v<T&, struct CMapBase&>>;
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_face(const MESH& m, CELL c, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+	-> SFINAE_CMapBase_Convertible<MESH>
+//	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
 {
 	foreach_incident_face(m, c, func, CMapBase_TraversalPolicy::AUTO);
 }
