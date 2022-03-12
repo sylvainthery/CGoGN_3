@@ -26,6 +26,13 @@
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 
+#include <cgogn/core/functions/attributes.h>
+#include <cgogn/core/functions/traversals/edge.h>
+#include <cgogn/core/functions/traversals/face.h>
+#include <cgogn/core/functions/traversals/global.h>
+#include <cgogn/core/functions/traversals/vertex.h>
+
+#include <cgogn/geometry/algos/ear_triangulation.h>
 #include <cgogn/core/utils/numerics.h>
 #include <cgogn/rendering/ebo.h>
 #include <cgogn/rendering/vbo.h>
@@ -88,51 +95,18 @@ static std::vector<std::string> primitives_names = {
 	"LINES_TB",			"TRIANGLES_TB",	  "VOLUMES_FACES_TB", "VOLUMES_EDGES_TB", "VOLUMES_VERTICES_TB",
 	"INDEX_EDGES_TB",	"INDEX_FACES_TB", "INDEX_VOLUMES_TB"};
 
-class CGOGN_RENDERING_EXPORT MeshRenderBase
+class CGOGN_RENDERING_EXPORT MeshRender
 {
 protected:
 	std::array<std::unique_ptr<EBO>, SIZE_BUFFER> indices_buffers_;
 	std::array<bool, SIZE_BUFFER> indices_buffers_uptodate_;
 
 public:
-	MeshRenderBase();
-	~MeshRenderBase();
-	CGOGN_NOT_COPYABLE_NOR_MOVABLE(MeshRenderBase);
+	MeshRender();
+	~MeshRender();
+	CGOGN_NOT_COPYABLE_NOR_MOVABLE(MeshRender);
 
 	void draw(DrawingType prim);
-};
-
-} // namespace rendering
-
-} // namespace cgogn
-
-#ifndef _RENDERING_ONLY_CPP_
-
-#include <cgogn/core/functions/attributes.h>
-#include <cgogn/core/functions/traversals/edge.h>
-#include <cgogn/core/functions/traversals/face.h>
-#include <cgogn/core/functions/traversals/global.h>
-#include <cgogn/core/functions/traversals/vertex.h>
-
-#include <cgogn/geometry/algos/ear_triangulation.h>
-
-namespace cgogn
-{
-
-namespace rendering
-{
-
-
-class CGOGN_RENDERING_EXPORT MeshRender :public MeshRenderBase
-{
-protected:
-	std::array<std::unique_ptr<EBO>, SIZE_BUFFER> indices_buffers_;
-	std::array<bool, SIZE_BUFFER> indices_buffers_uptodate_;
-
-public:
-	MeshRender()= default;
-	~MeshRender() = default;
-	CGOGN_NOT_COPYABLE_NOR_MOVABLE(MeshRender);
 
 	inline bool is_primitive_uptodate(DrawingType prim)
 	{
@@ -547,5 +521,6 @@ public:
 
 } // namespace cgogn
 
- #endif // CPP
+
+
 #endif // CGOGN_RENDERING_MESH_RENDER_H_

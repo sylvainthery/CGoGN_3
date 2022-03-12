@@ -20,7 +20,10 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#define _RENDERING_ONLY_CPP_
+
+ // JUST TO AVOID COMPILATION PROBLEMS
+#include <cgogn/core/types/cmap/cmap3.h>
+
 #include <cgogn/rendering/shaders/compute_volume_centers.h>
 
 namespace cgogn
@@ -144,7 +147,7 @@ ComputeVolumeCenterEngine::~ComputeVolumeCenterEngine()
 	delete param2_->tex_;
 }
 
-void ComputeVolumeCenterEngine::compute(VBO* vertex_position, MeshRenderBase* renderer, VBO* volume_center)
+void ComputeVolumeCenterEngine::compute(VBO* vertex_position, MeshRender* renderer, VBO* volume_center)
 {
 	int32 h = (volume_center->size() + 1023) / 1024;
 	fbo_->resize(1024, h);

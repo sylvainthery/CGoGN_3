@@ -199,6 +199,22 @@ CPH3::CMAP::Vertex CGOGN_CORE_EXPORT cut_edge(CPH3& m, CPH3::CMAP::Edge e, bool 
 CPH3::CMAP::Edge CGOGN_CORE_EXPORT cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3::CMAP::Vertex v2,
 											bool set_indices = true);
 
+
+template < typename CELL>
+uint32 index_of(const CPH3& m, CELL c)
+{
+	static const Orbit orbit = CELL::ORBIT;
+
+	if constexpr (orbit == CPH3::CMAP::Edge::ORBIT)
+		c.dart = m.edge_youngest_dart(c.dart);
+	if constexpr (orbit == CPH3::CMAP::Face::ORBIT)
+		c.dart = m.face_youngest_dart(c.dart);
+	if constexpr (orbit == CPH3::CMAP::Volume::ORBIT)
+		c.dart = m.volume_youngest_dart(c.dart);
+
+	return index_of(static_cast<const typename CPH3::CMAP&>(m), c);
+}
+
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_CMAP_CPH3_H_

@@ -37,22 +37,6 @@ namespace cgogn
 // CPH3 //
 //////////
 
-template <typename MRMAP, typename CELL>
-auto index_of(const MRMAP& m, CELL c)
--> std::enable_if_t<std::is_convertible_v<MRMAP&, struct CPH3&>, uint32>
-{
-	static const Orbit orbit = CELL::ORBIT;
-
-	if constexpr (orbit == MRMAP::CMAP::Edge::ORBIT)
-		c.dart = m.edge_youngest_dart(c.dart);
-	if constexpr (orbit == MRMAP::CMAP::Face::ORBIT)
-		c.dart = m.face_youngest_dart(c.dart);
-	if constexpr (orbit == MRMAP::CMAP::Volume::ORBIT)
-		c.dart = m.volume_youngest_dart(c.dart);
-
-	return index_of(static_cast<const typename MRMAP::CMAP&>(m), c);
-}
-
 //////////////
 // CMapBase //
 //////////////

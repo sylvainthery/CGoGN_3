@@ -267,7 +267,7 @@ uint32 index_of(const IncidenceGraph& /*m*/, CELL c)
 	return c.index_;
 }
 
-// Just to avoid compile PB
+// Just to avoid SFINA compile PB
 // TODO Implement ?
 template <typename CELL>
 void init_cells_indexing(const IncidenceGraph& /*m*/);

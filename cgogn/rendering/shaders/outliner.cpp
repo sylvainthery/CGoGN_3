@@ -20,7 +20,10 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#define _RENDERING_ONLY_CPP_
+
+// JUST TO AVOID COMPILATION PROBLEMS
+#include <cgogn/core/types/cmap/cmap3.h>
+
 #include <cgogn/rendering/shaders/outliner.h>
 
 namespace cgogn
@@ -255,7 +258,7 @@ Outliner::~Outliner()
 	delete fbo_blur2_;
 }
 
-void Outliner::draw(VBO* position, MeshRenderBase* renderer, const rendering::GLMat4& projection_matrix,
+void Outliner::draw(VBO* position, MeshRender* renderer, const rendering::GLMat4& projection_matrix,
 					const rendering::GLMat4& view_matrix, const GLColor& color)
 {
 	GLint prev_viewport[4];
