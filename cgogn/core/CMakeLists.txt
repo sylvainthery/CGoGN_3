@@ -5,17 +5,15 @@ project(cgogn_core
 # Hide symbols by default
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)                               
+
 
 find_package(Eigen3 3.2)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_library(${PROJECT_NAME} STATIC "")
-add_library(cgogn::core ALIAS ${PROJECT_NAME})
-
-target_sources(${PROJECT_NAME}
-	PRIVATE
+set ( cgogn_src_core_types 
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_traits.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cell_marker.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cells_set.h"
@@ -33,43 +31,42 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap1.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap2.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cph3.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cph3.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/dart_marker.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/dart.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/graph.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/graph.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/orbit_traversal.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/phi.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/phi.h"
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph_ops.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/attribute_container.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/attribute_container.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/chunk_array.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/vector.h"
+)
 
+set ( cgogn_src_core_functions 
 		"${CMAKE_CURRENT_LIST_DIR}/functions/attributes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/cells.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/convert.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_info.h"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/global.h"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/vertex.h"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/vertex.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/edge.h"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/edge.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/face.h"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/face.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/volume.h"
-		"${CMAKE_CURRENT_LIST_DIR}/functions/mesh_ops/volume.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/global.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/vertex.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/halfedge.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/edge.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/face.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/volume.h"
-		
+)
+
+set ( cgogn_src_core_utils 
+
 		"${CMAKE_CURRENT_LIST_DIR}/utils/assert.h"
 		"${CMAKE_CURRENT_LIST_DIR}/utils/assert.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/utils/buffers.h"
@@ -87,6 +84,16 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/mesh_provider.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/mesh_data.h"
 )
+
+source_group(PREFIX "" FILES ${cgogn_src_core_types} ${cgogn_src_core_functions}  ${cgogn_src_core_utils} TREE ${CMAKE_CURRENT_LIST_DIR})
+
+add_library(${PROJECT_NAME} STATIC "")
+add_library(cgogn::core ALIAS ${PROJECT_NAME})
+
+target_sources(${PROJECT_NAME}
+	PRIVATE ${cgogn_src_core_types} ${cgogn_src_core_functions} ${cgogn_src_core_utils} )
+
+
 
 # use of target_compile_options to have transitive flags
 if(CGOGN_USE_SIMD)
@@ -168,6 +175,7 @@ if(${CGOGN_USE_CXX11_ABI})
 #else()
 #	target_compile_definitions(${PROJECT_NAME} PUBLIC $<$<CXX_COMPILER_ID:GNU>:_GLIBCXX_USE_CXX11_ABI=0>)
 endif()
+
 
 # see https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_macros.html
 if(${CGOGN_USE_GLIBCXX_DEBUG})
