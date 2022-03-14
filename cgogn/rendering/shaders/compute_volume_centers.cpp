@@ -20,8 +20,7 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-
- // JUST TO AVOID COMPILATION PROBLEMS
+// To avoid compile problems
 #include <cgogn/core/types/cmap/cmap3.h>
 
 #include <cgogn/rendering/shaders/compute_volume_centers.h>

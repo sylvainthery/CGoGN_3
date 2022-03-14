@@ -43,7 +43,7 @@ namespace cgogn
 /////////////
 
 template <typename CELL, typename CMAP>
-auto nb_darts_of_orbit(const CMAP& m, CELL c)
+uint32 nb_darts_of_orbit(const CMAP& m, CELL c)
 {
 	static_assert(is_in_tuple<CELL, typename CMAP::Cells>::value, "CELL not supported in this CMAP");
 	uint32 result = 0;
@@ -54,38 +54,6 @@ auto nb_darts_of_orbit(const CMAP& m, CELL c)
 	return result;
 }
 
-/*****************************************************************************/
-
-// template <typename CMAP>
-// void is_boundary(const CMAP& m, Dart d)
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
-/*****************************************************************************/
-
-// template <typename CMAP>
-// uint32 nb_darts(const CMAP& m)
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
-/*****************************************************************************/
-
-// template <typename CMAP>
-// void dump_map(const CMAP& m);
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
 
 } // namespace cgogn
 

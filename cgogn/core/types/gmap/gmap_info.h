@@ -21,65 +21,11 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_FUNCTIONS_CELLS_H_
-#define CGOGN_CORE_FUNCTIONS_CELLS_H_
+#ifndef CGOGN_CORE_GMAP_CMAP_INFO_H_
+#define CGOGN_CORE_GMAP_CMAP_INFO_H_
 
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/cmap_info.h>
+#include <cgogn/core/types/gmap/gmap_base.h>
+#include <cgogn/core/types/gmap/orbit_traversal.h>
 
-#include <sstream>
-
-namespace cgogn
-{
-
-template <typename CELL, typename MESH>
-auto set_index(MESH& m, CELL c, uint32 index) 
--> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
-{
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
-	foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-		set_index<CELL>(m, d, index);
-		return true;
-	});
-}
-
-/*****************************************************************************/
-
-// template <typename CELL, typename MESH>
-// void index_cells(MESH& m);
-
-/*****************************************************************************/
-
-//////////////
-// CMapBase //
-//////////////
-
-template <typename CELL, typename MESH>
-auto index_cells(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
-{
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	if (!is_indexed<CELL>(m))
-		init_cells_indexing<CELL>(m);
-
-	typename mesh_traits<MESH>::BaseType& base = static_cast<typename mesh_traits<MESH>::BaseType&>(m);
-	DartMarker dm(m);
-	for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
-	{
-		if (!is_boundary(m, d) && !dm.is_marked(d))
-		{
-			const CELL c(d);
-			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-				dm.mark(d);
-				return true;
-			});
-
-			if (index_of(m, c) == INVALID_INDEX)
-				set_index(m, c, new_index<CELL>(m));
-		}
-	}
-}
-
-} // namespace cgogn
-
-#endif // CGOGN_CORE_FUNCTIONS_CELLS_H_
+// TODO REMOVE
+#endif // CGOGN_CORE_GMAP_CMAP_INFO_H_

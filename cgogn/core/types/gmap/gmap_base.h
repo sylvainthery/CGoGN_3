@@ -21,65 +21,42 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_FUNCTIONS_CELLS_H_
-#define CGOGN_CORE_FUNCTIONS_CELLS_H_
+#ifndef CGOGN_CORE_GMAP_CMAP_BASE_H_
+#define CGOGN_CORE_GMAP_CMAP_BASE_H_
 
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/cmap_info.h>
+#include <cgogn/core/cgogn_core_export.h>
+#include <cgogn/core/types/cmap/cmap_base.h>
 
-#include <sstream>
 
 namespace cgogn
 {
 
-template <typename CELL, typename MESH>
-auto set_index(MESH& m, CELL c, uint32 index) 
--> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+struct CGOGN_CORE_EXPORT GMapBase: public CMapBase
 {
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
-	foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-		set_index<CELL>(m, d, index);
-		return true;
-	});
-}
 
-/*****************************************************************************/
+	// using AttributeContainer = AttributeContainerT<Vector>;
+	using AttributeContainer = AttributeContainerT<ChunkArray>;
+	
+	inline GMapBase() {	}
 
-// template <typename CELL, typename MESH>
-// void index_cells(MESH& m);
+	inline ~GMapBase() { }
 
-/*****************************************************************************/
 
-//////////////
-// CMapBase //
-//////////////
-
-template <typename CELL, typename MESH>
-auto index_cells(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
-{
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	if (!is_indexed<CELL>(m))
-		init_cells_indexing<CELL>(m);
-
-	typename mesh_traits<MESH>::BaseType& base = static_cast<typename mesh_traits<MESH>::BaseType&>(m);
-	DartMarker dm(m);
-	for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
+	// Map-wise attributes
+	template <typename T>
+	T& get_attribute(const std::string& name)
 	{
-		if (!is_boundary(m, d) && !dm.is_marked(d))
-		{
-			const CELL c(d);
-			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-				dm.mark(d);
-				return true;
-			});
-
-			if (index_of(m, c) == INVALID_INDEX)
-				set_index(m, c, new_index<CELL>(m));
-		}
+		auto [it, inserted] = attributes_.try_emplace(name, T());
+		return std::any_cast<T&>(it->second);
 	}
-}
+
+	inline std::shared_ptr<Attribute<Dart>> add_relation(const std::string& name)
+	{
+		return relations_.emplace_back(darts_.add_attribute<Dart>(name));
+	}
+
+};
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_FUNCTIONS_CELLS_H_
+#endif // CGOGN_CORE_GMAP_CMAP_BASE_H_

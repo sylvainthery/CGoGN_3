@@ -21,65 +21,67 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_FUNCTIONS_CELLS_H_
-#define CGOGN_CORE_FUNCTIONS_CELLS_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP2_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP2_H_
 
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/cmap_info.h>
+#include <cgogn/core/cgogn_core_export.h>
 
-#include <sstream>
+#include <cgogn/core/types/gmap/gmap1.h>
 
 namespace cgogn
 {
 
-template <typename CELL, typename MESH>
-auto set_index(MESH& m, CELL c, uint32 index) 
--> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+struct CGOGN_CORE_EXPORT GMap2 : public GMap1
 {
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
-	foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-		set_index<CELL>(m, d, index);
-		return true;
-	});
-}
+	static const uint8 dimension = 2;
 
-/*****************************************************************************/
+	using Vertex = Cell<BETA1_BETA2>;
+	using HalfEdge = Cell<BETA0>;
+	using Edge = Cell<BETA0_BETA2>;
+	using Face = Cell<BETA0_BETA1>;
+	using Volume = Cell<BETA0_BETA1_BETA2>;
+	using CC = Volume;
 
-// template <typename CELL, typename MESH>
-// void index_cells(MESH& m);
+	using Cells = std::tuple<Vertex, HalfEdge, Edge, Face, Volume>;
 
-/*****************************************************************************/
+	std::shared_ptr<Attribute<Dart>> beta2_;
 
-//////////////
-// CMapBase //
-//////////////
-
-template <typename CELL, typename MESH>
-auto index_cells(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
-{
-	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
-	if (!is_indexed<CELL>(m))
-		init_cells_indexing<CELL>(m);
-
-	typename mesh_traits<MESH>::BaseType& base = static_cast<typename mesh_traits<MESH>::BaseType&>(m);
-	DartMarker dm(m);
-	for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
+	GMap2() : GMap1()
 	{
-		if (!is_boundary(m, d) && !dm.is_marked(d))
-		{
-			const CELL c(d);
-			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
-				dm.mark(d);
-				return true;
-			});
-
-			if (index_of(m, c) == INVALID_INDEX)
-				set_index(m, c, new_index<CELL>(m));
-		}
+		beta2_ = add_relation("beta2");
 	}
+};
+
+template <>
+struct mesh_traits<GMap2>
+{
+	static constexpr const char* name = "GMap2";
+	static constexpr const uint8 dimension = 2;
+
+	using Vertex = GMap2::Vertex;
+	using HalfEdge = GMap2::HalfEdge;
+	using Edge = GMap2::Edge;
+	using Face = GMap2::Face;
+	using Volume = GMap2::Volume;
+
+	using Cells = std::tuple<Vertex, HalfEdge, Edge, Face, Volume>;
+	static constexpr const char* cell_names[] = {"Vertex", "HalfEdge", "Edge", "Face", "Volume"};
+
+	template <typename T>
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	using MarkAttribute = GMapBase::MarkAttribute;
+};
+
+GMap2::Vertex CGOGN_CORE_EXPORT cut_edge(GMap2& m, GMap2::Edge e, bool set_indices = true);
+
+GMap2::Edge CGOGN_CORE_EXPORT cut_face(GMap2& m, GMap2::Vertex v1, GMap2::Vertex v2, bool set_indices = true);
+
+inline Dart beta2(const GMap2& m, Dart d)
+{
+	return (*(m.beta2_))[d.index];
 }
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_FUNCTIONS_CELLS_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP2_H_
