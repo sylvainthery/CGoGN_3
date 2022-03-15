@@ -37,9 +37,9 @@
 namespace cgogn
 {
 
-enum Orbit : uint32
-{
-	DART = 1024,
+	enum class GMapOrbit : uint32
+	{
+	DART = 0,
 	BETA0,// 1EDGE 
 	BETA1,// 1VERTEX
 	BETA0_BETA1, // 2FACE = 1CC
@@ -52,34 +52,34 @@ enum Orbit : uint32
 	BETA0_BETA1_BETA2_BETA3 // 3CC
 };
 
-static const std::size_t NB_ORBITS = Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
+static const std::size_t NB_ORBITS = GMapOrbit::BETA0_BETA1_BETA2_BETA3 + 1;
 
-inline std::string orbit_name(Orbit orbit)
+inline std::string orbit_name(GMapOrbit orbit)
 {
 	switch (orbit)
 	{
-    case DART:
-        return "cgogn::Orbit::DART";
-    case BETA1:
-        return "cgogn::Orbit::BETA1";
-    case BETA2:
-        return "cgogn::Orbit::BETA2";
-    case BETA0_BETA1:
+	case GMapOrbit::DART:
+		return "cgogn::Orbit::DART";
+	case GMapOrbit::BETA0:
+		return "cgogn::Orbit::BETA0";
+	case GMapOrbit::BETA1:
+		return "cgogn::Orbit::BETA1";
+	case GMapOrbit::BETA0_BETA1:
         return "cgogn::Orbit::BETA0_BETA1";
-    case Orbit::BETA0_BETA2:
-        return "cgogn::Orbit::BETA0_BETA2";
-    case Orbit::BETA1_BETA2:
+	case GMapOrbit::BETA0_BETA2:
+		return "cgogn::Orbit::BETA0_BETA2";
+	case GMapOrbit::BETA1_BETA2:
         return "cgogn::Orbit::BETA1_BETA2";
 		
-    case Orbit::BETA0_BETA1_BETA2:
+	case GMapOrbit::BETA0_BETA1_BETA2:
         return "cgogn::Orbit::BETA0_BETA1_BETA2";
-    case Orbit::BETA0_BETA1_BETA3:
+	case GMapOrbit::BETA0_BETA1_BETA3:
         return "cgogn::Orbit::BETA0_BETA1_BETA3";
-    case Orbit::BETA0_BETA2_BETA3:
+	case GMapOrbit::BETA0_BETA2_BETA3:
         return "cgogn::Orbit::BETA0_BETA2_BETA3";
-    case Orbit::BETA1_BETA2_BETA3:
+	case GMapOrbit::BETA1_BETA2_BETA3:
         return "cgogn::Orbit::BETA1_BETA2_BETA3";
-    case Orbit::BETA0_BETA1_BETA2_BETA3:
+	case GMapOrbit::BETA0_BETA1_BETA2_BETA3:
         return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
 		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}

@@ -47,9 +47,22 @@ enum Orbit : uint32
 	PHI1_PHI3,
 	PHI2_PHI3,
 	PHI21_PHI31,
-	PHI1_PHI2_PHI3
+	PHI1_PHI2_PHI3,
+
+	BETA0 = 1024, // 1EDGE
+	BETA1, // 1VERTEX
+	BETA0_BETA1, // 2FACE = 1CC
+	BETA0_BETA2, // 2EDGE
+	BETA1_BETA2, // 2VERTEX
+	BETA0_BETA1_BETA2, // 3VOLUME = 2CC
+	BETA0_BETA1_BETA3, // 3FACE
+	BETA0_BETA2_BETA3, // 3EDGE
+	BETA1_BETA2_BETA3, // 3VERTEX
+	BETA0_BETA1_BETA2_BETA3 // 3CC
 };
 
+// TODO
+//static const std::size_t NB_ORBITS = Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
 static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
 
 inline std::string orbit_name(Orbit orbit)
@@ -74,6 +87,26 @@ inline std::string orbit_name(Orbit orbit)
 		return "cgogn::Orbit::PHI21_PHI31";
 	case Orbit::PHI1_PHI2_PHI3:
 		return "cgogn::Orbit::PHI1_PHI2_PHI3";
+	case Orbit::BETA0:
+		return "cgogn::Orbit::BETA0";
+	case Orbit::BETA1:
+		return "cgogn::Orbit::BETA1";
+	case Orbit::BETA0_BETA1:
+		return "cgogn::Orbit::BETA0_BETA1";
+	case Orbit::BETA0_BETA2:
+		return "cgogn::Orbit::BETA0_BETA2";
+	case Orbit::BETA1_BETA2:
+		return "cgogn::Orbit::BETA1_BETA2";
+	case Orbit::BETA0_BETA1_BETA2:
+		return "cgogn::Orbit::BETA0_BETA1_BETA2";
+	case Orbit::BETA0_BETA1_BETA3:
+		return "cgogn::Orbit::BETA0_BETA1_BETA3";
+	case Orbit::BETA0_BETA2_BETA3:
+		return "cgogn::Orbit::BETA0_BETA2_BETA3";
+	case Orbit::BETA1_BETA2_BETA3:
+		return "cgogn::Orbit::BETA1_BETA2_BETA3";
+	case Orbit::BETA0_BETA1_BETA2_BETA3:
+		return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
 		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}
 	cgogn_assert_not_reached("This orbit does not exist");
@@ -82,10 +115,20 @@ inline std::string orbit_name(Orbit orbit)
 #endif
 }
 
+//constexpr int32 Orbit_Value(const Orbit o)
+//{
+//	constexpr int32 i = static_cast<int32>(o);
+//	if (i < 1024)
+//		return i;
+//	if (i < 2048)
+//		return i-1024;
+//}
+
 /**
  * \brief Cellular typing
  * \tparam ORBIT The type of the orbit used to create the Cell
  */
+//template <Orbit ORBIT_>
 template <Orbit ORBIT_>
 struct Cell
 {
@@ -163,6 +206,7 @@ struct Cell
 		in >> rhs.dart;
 		return in;
 	}
+
 };
 
 } // namespace cgogn
