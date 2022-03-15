@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/core/types/cmap/cph3.h>
-#include <cgogn/core/types/cmap/phi.h>
+#include <cgogn/core/types/map/cmap/cph3.h>
+#include <cgogn/core/types/map/cmap/phi.h>
 
 namespace cgogn
 {

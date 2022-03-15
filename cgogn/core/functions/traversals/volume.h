@@ -31,9 +31,9 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-#include <cgogn/core/types/cmap/cmap_info.h>
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/cmap/cmap_info.h>
+#include <cgogn/core/types/map/dart_marker.h>
+#include <cgogn/core/types/map/cmap/orbit_traversal.h>
 
 namespace cgogn
 {
@@ -46,19 +46,19 @@ namespace cgogn
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// MapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
-	foreach_incident_volume(m, c, func, CMapBase_TraversalPolicy::AUTO);
+	foreach_incident_volume(m, c, func, MapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase_TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, MapBase_TraversalPolicy traversal_policy)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	using Volume = typename mesh_traits<MESH>::Volume;
 
@@ -97,7 +97,7 @@ auto foreach_incident_volume(const MESH& m, CELL c, const FUNC& func, CMapBase_T
 	}
 	else
 	{
-		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Volume>(m))
+		if (traversal_policy == MapBase_TraversalPolicy::AUTO && is_indexed<Volume>(m))
 		{
 			CellMarkerStore<MESH, Volume> marker(m);
 			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {

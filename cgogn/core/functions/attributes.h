@@ -42,11 +42,11 @@ namespace cgogn
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 template <typename T, typename CELL, typename MESH,
-		  typename std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>* = nullptr>
+		  typename std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>* = nullptr>
 std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute(MESH& m, const std::string& name)
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -78,15 +78,15 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 //template <typename T, typename CELL, typename MESH,
-//		  typename std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>* = nullptr>
+//		  typename std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>* = nullptr>
 //std::shared_ptr<MESH::Attribute<T>> get_attribute(const MESH& m, const std::string& name)
 template <typename T, typename CELL, typename MESH>
 auto get_attribute(const MESH& m, const std::string& name) ->
-	typename std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>,
+	typename std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>,
 							  std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>>>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
@@ -145,7 +145,7 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> get_or_add_at
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 
@@ -195,7 +195,7 @@ inline const T& value(const MESH& m, const typename mesh_traits<MESH>::template 
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 } // namespace cgogn

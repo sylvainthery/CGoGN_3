@@ -21,14 +21,14 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
 
 #include <cgogn/geometry/types/vector_traits.h>
 
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
 
-#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
 #include <cgogn/core/functions/attributes.h>
 
 #include <cgogn/core/ui_modules/mesh_provider.h>

@@ -32,9 +32,9 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-#include <cgogn/core/types/cmap/cmap_info.h>
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/cmap/cmap_info.h>
+#include <cgogn/core/types/map/dart_marker.h>
+#include <cgogn/core/types/map/cmap/orbit_traversal.h>
 
 namespace cgogn
 {
@@ -47,25 +47,25 @@ namespace cgogn
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// MapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
-auto foreach_cell(const MESH& m, const FUNC& func) -> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+auto foreach_cell(const MESH& m, const FUNC& func) -> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
 {
-	foreach_cell(m, func, CMapBase_TraversalPolicy::AUTO);
+	foreach_cell(m, func, MapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_cell(const MESH& m, const FUNC& f, CMapBase_TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+auto foreach_cell(const MESH& m, const FUNC& f, MapBase_TraversalPolicy traversal_policy)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	using CELL = func_parameter_type<FUNC>;
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	static_assert(is_func_parameter_same<FUNC, CELL>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<CELL>(m))
+	if (traversal_policy == MapBase_TraversalPolicy::AUTO && is_indexed<CELL>(m))
 	{
 		CellMarker<MESH, CELL> cm(m);
 		for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
@@ -167,12 +167,12 @@ auto foreach_cell(const MESH& ig, const FUNC& f) -> std::enable_if_t<std::is_sam
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// MapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
 auto parallel_foreach_cell(const MESH& m, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	using CELL = func_parameter_type<FUNC>;
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");

@@ -31,9 +31,9 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-#include <cgogn/core/types/cmap/cmap_info.h>
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/cmap/cmap_info.h>
+#include <cgogn/core/types/map/dart_marker.h>
+#include <cgogn/core/types/map/cmap/orbit_traversal.h>
 
 namespace cgogn
 {
@@ -46,19 +46,19 @@ namespace cgogn
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// MapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
 {
-	foreach_incident_vertex(m, c, func, CMapBase_TraversalPolicy::AUTO);
+	foreach_incident_vertex(m, c, func, MapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, CMapBase_TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, MapBase_TraversalPolicy traversal_policy)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
 
@@ -99,7 +99,7 @@ auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, CMapBase_T
 	}
 	else
 	{
-		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Vertex>(m))
+		if (traversal_policy == MapBase_TraversalPolicy::AUTO && is_indexed<Vertex>(m))
 		{
 			CellMarkerStore<MESH, Vertex> marker(m);
 			foreach_dart_of_orbit(m, c, [&](Dart d) -> bool {
@@ -184,20 +184,20 @@ auto foreach_incident_vertex(const MESH& ig, CELL c, const FUNC& func)
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// MapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
 auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
 {
-	foreach_adjacent_vertex_through_edge(m, v, func, CMapBase_TraversalPolicy::AUTO);
+	foreach_adjacent_vertex_through_edge(m, v, func, MapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
 auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func,
-										  CMapBase_TraversalPolicy traversal_policy)
-	-> std::enable_if_t<std::is_convertible_v<MESH*, struct CMapBase*>>
+										  MapBase_TraversalPolicy traversal_policy)
+	-> std::enable_if_t<std::is_convertible_v<MESH*, struct MapBase*>>
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
 
@@ -214,7 +214,7 @@ auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<ME
 	}
 	else if constexpr (std::is_convertible_v<MESH&, struct CMap3&> && mesh_traits<MESH>::dimension == 3)
 	{
-		if (traversal_policy == CMapBase_TraversalPolicy::AUTO && is_indexed<Vertex>(m))
+		if (traversal_policy == MapBase_TraversalPolicy::AUTO && is_indexed<Vertex>(m))
 		{
 			CellMarkerStore<MESH, Vertex> marker(m);
 			foreach_dart_of_orbit(m, v, [&](Dart d) -> bool {

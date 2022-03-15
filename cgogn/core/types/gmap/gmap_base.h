@@ -31,7 +31,7 @@
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT GMapBase: public CMapBase
+struct CGOGN_CORE_EXPORT GMapBase: public MapBase
 {
 
 	// using AttributeContainer = AttributeContainerT<Vector>;

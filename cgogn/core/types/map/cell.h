@@ -24,7 +24,7 @@
 #ifndef CGOGN_CORE_TYPES_CMAP_CELL_H_
 #define CGOGN_CORE_TYPES_CMAP_CELL_H_
 
-#include <cgogn/core/types/cmap/dart.h>
+#include <cgogn/core/types/map/dart.h>
 
 #include <cgogn/core/utils/assert.h>
 #include <cgogn/core/utils/numerics.h>

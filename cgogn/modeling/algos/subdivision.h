@@ -25,8 +25,8 @@
 #define CGOGN_MODELING_ALGOS_SUBDIVISION_H_
 
 // WARNING Map include
-#include <cgogn/core/types/cmap/cmap3.h>
-#include <cgogn/core/types/cmap/cph3.h>
+#include <cgogn/core/types/map/cmap/cmap3.h>
+#include <cgogn/core/types/map/cmap/cph3.h>
 
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/functions/traversals/global.h>

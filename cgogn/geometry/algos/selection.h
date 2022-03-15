@@ -24,8 +24,8 @@
 #ifndef CGOGN_GEOMETRY_ALGOS_SELECTION_H_
 #define CGOGN_GEOMETRY_ALGOS_SELECTION_H_
 
-#include <cgogn/core/types/cmap/cmap2.h>
-#include <cgogn/core/types/cmap/dart_marker.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/mesh_views/cell_cache.h>
 
 #include <cgogn/geometry/functions/inclusion.h>

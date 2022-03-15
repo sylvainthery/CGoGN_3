@@ -70,7 +70,7 @@ constexpr bool is_dimension_of(const MESH&, uint8 dim)
 } // namespace cgogn
 
 // TODO find a better place ?
-enum CMapBase_TraversalPolicy
+enum MapBase_TraversalPolicy
 {
 	AUTO,
 	DART_MARKING

@@ -26,7 +26,7 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap0.h>
+#include <cgogn/core/types/map/cmap/cmap0.h>
 
 namespace cgogn
 {

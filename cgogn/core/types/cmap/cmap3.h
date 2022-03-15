@@ -26,7 +26,7 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
 
 namespace cgogn
 {
@@ -57,7 +57,7 @@ struct CGOGN_CORE_EXPORT CMap3 : public CMap2
 template <>
 struct mesh_traits<CMap3>
 {
-	using BaseType = CMapBase;
+	using BaseType = MapBase;
 	static constexpr const char* name = "CMap3";
 	static constexpr const uint8 dimension = 3;
 
@@ -75,9 +75,9 @@ struct mesh_traits<CMap3>
 												 "Edge2",  "Face",	  "Face2",	  "Volume"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 // PHI

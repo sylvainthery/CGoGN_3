@@ -28,7 +28,7 @@
 #include <cgogn/core/functions/mesh_ops/face.h>
 #include <cgogn/core/functions/mesh_ops/vertex.h>
 
-#include <cgogn/core/types/cmap/cmap_ops.h>
+#include <cgogn/core/types/map/cmap/cmap_ops.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
 
 #include <algorithm>

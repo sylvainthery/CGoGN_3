@@ -24,8 +24,8 @@
 #ifndef CGOGN_CORE_FUNCTIONS_CELLS_H_
 #define CGOGN_CORE_FUNCTIONS_CELLS_H_
 
-#include <cgogn/core/types/cmap/dart_marker.h>
-#include <cgogn/core/types/cmap/cmap_info.h>
+#include <cgogn/core/types/map/dart_marker.h>
+#include <cgogn/core/types/map/cmap/cmap_info.h>
 
 #include <sstream>
 
@@ -34,7 +34,7 @@ namespace cgogn
 
 template <typename CELL, typename MESH>
 auto set_index(MESH& m, CELL c, uint32 index) 
--> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
 	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
@@ -52,11 +52,11 @@ auto set_index(MESH& m, CELL c, uint32 index)
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 template <typename CELL, typename MESH>
-auto index_cells(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+auto index_cells(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
 	if (!is_indexed<CELL>(m))

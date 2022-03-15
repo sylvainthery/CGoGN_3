@@ -42,12 +42,12 @@ namespace cgogn
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 template <typename CELL, typename MESH>
 auto get_mark_attribute(const MESH& m)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>, typename mesh_traits<MESH>::MarkAttribute*>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>, typename mesh_traits<MESH>::MarkAttribute*>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	if (!is_indexed<CELL>(m))
@@ -68,7 +68,7 @@ auto get_mark_attribute(const MESH& m)
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 ////////////////////

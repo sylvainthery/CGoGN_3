@@ -26,7 +26,7 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/cmap/orbit_traversal.h>
 #include <cgogn/core/types/mesh_traits.h>
 #include <cgogn/core/utils/tuples.h>
 #include <cgogn/core/utils/type_traits.h>
@@ -42,12 +42,12 @@ namespace cgogn
 /*****************************************************************************/
 
 ///////////////////////////////
-// CMapBase (or convertible) //
+// MapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_incident_halfedge(const MESH& m, CELL c, const FUNC& func)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	using HalfEdge = typename mesh_traits<MESH>::HalfEdge;
 

@@ -28,7 +28,7 @@
 #include <cgogn/core/utils/tuples.h>
 #include <cgogn/core/utils/type_traits.h>
 #include <cgogn/core/types/mesh_traits.h>
-#include <cgogn/core/types/cmap/dart.h>
+#include <cgogn/core/types/map/dart.h>
 
 namespace cgogn
 {

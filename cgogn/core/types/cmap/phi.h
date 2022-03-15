@@ -24,7 +24,7 @@
 #ifndef CGOGN_CORE_TYPES_CMAP_PHI_H_
 #define CGOGN_CORE_TYPES_CMAP_PHI_H_
 
-#include <cgogn/core/types/cmap/dart.h>
+#include <cgogn/core/types/map/dart.h>
 #include <cgogn/core/types/mesh_traits.h>
 
 namespace cgogn

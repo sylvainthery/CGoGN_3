@@ -21,11 +21,11 @@
  *                                                                              *
  *******************************************************************************/
 
-#include <cgogn/core/types/cmap/cph3.h>
-#include <cgogn/core/types/cmap/phi.h>
+#include <cgogn/core/types/map/cmap/cph3.h>
+#include <cgogn/core/types/map/cmap/phi.h>
 
-#include <cgogn/core/types/cmap/cmap_ops.h>
-#include <cgogn/core/types/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/cmap/cmap_ops.h>
+#include <cgogn/core/types/map/cmap/orbit_traversal.h>
 #include <cgogn/core/functions/traversals/edge.h>
 #include <cgogn/core/functions/traversals/vertex.h>
 #include <cgogn/core/functions/traversals/face.h>

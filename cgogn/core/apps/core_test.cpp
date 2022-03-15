@@ -1,4 +1,4 @@
-#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
 
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/functions/mesh_ops/face.h>

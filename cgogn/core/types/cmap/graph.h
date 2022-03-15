@@ -26,13 +26,13 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/cmap/cell.h>
-#include <cgogn/core/types/cmap/cmap_base.h>
+#include <cgogn/core/types/map/cmap/cell.h>
+#include <cgogn/core/types/map/map_base.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT Graph : public CMapBase
+struct CGOGN_CORE_EXPORT Graph : public MapBase
 {
 	static const uint8 dimension = 1;
 
@@ -57,7 +57,7 @@ struct CGOGN_CORE_EXPORT Graph : public CMapBase
 template <>
 struct mesh_traits<Graph>
 {
-	using BaseType = CMapBase;
+	using BaseType = MapBase;
 	static constexpr const char* name = "Graph";
 	static constexpr const uint8 dimension = 1;
 
@@ -69,9 +69,9 @@ struct mesh_traits<Graph>
 	static constexpr const char* cell_names[] = {"Vertex", "HalfEdge", "Edge"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 // ALPHA

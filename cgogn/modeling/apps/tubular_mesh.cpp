@@ -20,8 +20,8 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#include <cgogn/core/types/cmap/graph.h>
-#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/map/cmap/graph.h>
+#include <cgogn/core/types/map/cmap/cmap3.h>
 
 #include <cgogn/geometry/types/vector_traits.h>
 

@@ -1,4 +1,4 @@
-/*******************************************************************************
+f/*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -31,7 +31,7 @@
 #include <cgogn/core/types/container/vector.h>
 #include <cgogn/core/types/mesh_traits.h>
 #include <cgogn/core/utils/type_traits.h>
-#include <cgogn/core/types/cmap/cell.h>
+#include <cgogn/core/types/map/cell.h>
 
 #include <any>
 #include <array>
@@ -41,7 +41,7 @@
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT CMapBase
+struct CGOGN_CORE_EXPORT MapBase
 {
 	// using AttributeContainer = AttributeContainerT<Vector>;
 	using AttributeContainer = AttributeContainerT<ChunkArray>;
@@ -74,8 +74,8 @@ struct CGOGN_CORE_EXPORT CMapBase
 	/*************************************************************************/
 	mutable std::array<AttributeContainer, NB_ORBITS> attribute_containers_;
 
-	CMapBase();
-	~CMapBase();
+	MapBase();
+	~MapBase();
 
 	// Map-wise attributes
 	template <typename T>
@@ -109,23 +109,23 @@ struct CGOGN_CORE_EXPORT CMapBase
 
 ///
 /// \brief is_boundary
-/// \param m const ref CMapBase inherited class
+/// \param m const ref MapBase inherited class
 /// \param d dart to check
 /// \return does this dart belong to the boundary
 ///
 
-inline bool is_boundary(const CMapBase& m, Dart d)
+inline bool is_boundary(const MapBase& m, Dart d)
 {
 	return (*m.boundary_marker_)[d.index] != 0u;
 }
 
 ///
 /// \brief set_boundary
-/// \param m ref CMapBase inherited class
+/// \param m ref MapBase inherited class
 /// \param d
 /// \param b
 ///
-inline void set_boundary(const CMapBase& m, Dart d, bool b) //TODO: const ??
+inline void set_boundary(const MapBase& m, Dart d, bool b) //TODO: const ??
 {
 	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
 }
@@ -135,7 +135,7 @@ inline void set_boundary(const CMapBase& m, Dart d, bool b) //TODO: const ??
 /// \param m
 /// \return number of darts of the map, O(0).
 ///
-inline uint32 nb_darts(const CMapBase& m)
+inline uint32 nb_darts(const MapBase& m)
 {
 	return m.darts_.nb_elements();
 }
@@ -144,21 +144,21 @@ inline uint32 nb_darts(const CMapBase& m)
 /// \brief dump_map_darts low level dump for debugging
 /// \param m
 ///
-void dump_map_darts(const CMapBase& m);
+void dump_map_darts(const MapBase& m);
 
 ///
 /// \brief add_dart [LOW LEVEL] Add a dart to a map. A dart is only an encapsulated index
 /// \param m
 /// \return itself
 ///
-Dart add_dart(CMapBase& m);
+Dart add_dart(MapBase& m);
 
 ///
 /// \brief remove_dart [LOW LEVEL] Remove a dart from the map
 /// \param m
 /// \param d
 ///
-void remove_dart(CMapBase& m, Dart d);
+void remove_dart(MapBase& m, Dart d);
 
 
 ///
@@ -168,7 +168,7 @@ void remove_dart(CMapBase& m, Dart d);
 /// \param index
 ///
 template <typename CELL>
-void set_index(CMapBase& m, Dart d, uint32 index)
+void set_index(MapBase& m, Dart d, uint32 index)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -185,9 +185,9 @@ void set_index(CMapBase& m, Dart d, uint32 index)
 }
 
 
-void clear(CMapBase& m, bool keep_attributes = true);
+void clear(MapBase& m, bool keep_attributes = true);
 
-void copy(CMapBase& dst, const CMapBase& src);
+void copy(MapBase& dst, const MapBase& src);
 
 ///
 /// \brief is_indexed Is this kind of CELL of map p embedded ?
@@ -195,7 +195,7 @@ void copy(CMapBase& dst, const CMapBase& src);
 /// \return
 ///
 template <typename CELL>
-bool is_indexed(const CMapBase& m)
+bool is_indexed(const MapBase& m)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -208,14 +208,14 @@ bool is_indexed(const CMapBase& m)
 /// \param orbit
 /// \return
 ///
-inline bool is_indexed(const CMapBase& m, Orbit orbit)
+inline bool is_indexed(const MapBase& m, Orbit orbit)
 {
 	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
 	return m.cells_indices_[orbit] != nullptr;
 }
 
 template <typename CELL>
-uint32 maximum_index(const CMapBase& m)
+uint32 maximum_index(const MapBase& m)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -230,7 +230,7 @@ uint32 maximum_index(const CMapBase& m)
 /// \return
 ///
 template <typename CELL>
-uint32 index_of(const CMapBase& m, CELL c)
+uint32 index_of(const MapBase& m, CELL c)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -245,7 +245,7 @@ uint32 index_of(const CMapBase& m, CELL c)
 /// \return
 ///
 template <typename CELL>
-CELL of_index(const CMapBase& m, uint32 i)
+CELL of_index(const MapBase& m, uint32 i)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -268,7 +268,7 @@ CELL of_index(const CMapBase& m, uint32 i)
 /// \return
 ///
 template <typename CELL>
-uint32 new_index(const CMapBase& m)
+uint32 new_index(const MapBase& m)
 {
 	return m.attribute_containers_[CELL::ORBIT].new_index();
 }
@@ -278,7 +278,7 @@ uint32 new_index(const CMapBase& m)
 /// \param m
 ///
 template <typename CELL>
-void init_cells_indexing(CMapBase& m)
+void init_cells_indexing(MapBase& m)
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -296,7 +296,7 @@ void init_cells_indexing(CMapBase& m)
 /// \param m
 /// \param orbit
 ///
-inline void init_cells_indexing(CMapBase& m, Orbit orbit)
+inline void init_cells_indexing(MapBase& m, Orbit orbit)
 {
 	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
 	if (!is_indexed(m, orbit))
@@ -310,13 +310,13 @@ inline void init_cells_indexing(CMapBase& m, Orbit orbit)
 
 
 template <typename CELL>
-void remove_attribute(CMapBase& m, const std::shared_ptr<CMapBase::AttributeGen>& attribute)
+void remove_attribute(MapBase& m, const std::shared_ptr<MapBase::AttributeGen>& attribute)
 {
 	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
 }
 
 template <typename CELL>
-void remove_attribute(CMapBase& m, CMapBase::AttributeGen* attribute)
+void remove_attribute(MapBase& m, MapBase::AttributeGen* attribute)
 {
 	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
 }
@@ -327,7 +327,7 @@ void remove_attribute(CMapBase& m, CMapBase::AttributeGen* attribute)
 /// \param m
 /// \return a pointer on Attribute reserved for DartMarkers
 ///
-inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase& m)
+inline typename MapBase::MarkAttribute* get_dart_mark_attribute(const MapBase& m)
 {
 	return m.darts_.get_mark_attribute();
 }
@@ -337,7 +337,7 @@ inline typename CMapBase::MarkAttribute* get_dart_mark_attribute(const CMapBase&
 /// \param m
 /// \param attribute pointer on the reserved attribute
 ///
-inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
+inline void release_dart_mark_attribute(const MapBase& m, MapBase::MarkAttribute* attribute)
 {
 	return m.darts_.release_mark_attribute(attribute);
 }
@@ -348,16 +348,16 @@ inline void release_dart_mark_attribute(const CMapBase& m, CMapBase::MarkAttribu
 /// \param attribute
 ///
 template <typename CELL>
-void release_mark_attribute(const CMapBase& m, CMapBase::MarkAttribute* attribute)
+void release_mark_attribute(const MapBase& m, MapBase::MarkAttribute* attribute)
 {
 	return m.attribute_containers_[CELL::ORBIT].release_mark_attribute(attribute);
 }
 
 
 template <typename CELL, typename FUNC>
-void foreach_attribute(const CMapBase& m, const FUNC& f)
+void foreach_attribute(const MapBase& m, const FUNC& f)
 {
-	using AttributeGen = CMapBase::AttributeGen;
+	using AttributeGen = MapBase::AttributeGen;
 	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
 				  "Wrong function attribute parameter type");
 	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
@@ -365,10 +365,10 @@ void foreach_attribute(const CMapBase& m, const FUNC& f)
 }
 
 template <typename T, typename CELL, typename FUNC>
-void foreach_attribute(const CMapBase& m, const FUNC& f)
+void foreach_attribute(const MapBase& m, const FUNC& f)
 {
-	using AttributeT = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
+	using AttributeT = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
 	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
 				  "Wrong function attribute parameter type");
 	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
@@ -380,14 +380,14 @@ void foreach_attribute(const CMapBase& m, const FUNC& f)
 }
 
 template <typename T>
-T& get_attribute(CMapBase& m, const std::string& name)
+T& get_attribute(MapBase& m, const std::string& name)
 {
 	return m.get_attribute<T>(name);
 }
 
 
 template <typename CELL>
-void copy_index(CMapBase& m, Dart dest, Dart src) 
+void copy_index(MapBase& m, Dart dest, Dart src) 
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");

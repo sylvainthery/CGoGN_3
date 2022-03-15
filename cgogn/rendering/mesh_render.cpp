@@ -22,7 +22,7 @@
  *******************************************************************************/
 
 // To avoid compile problems
-#include <cgogn/core/types/cmap/cmap3.h>
+#include <cgogn/core/types/map/cmap/cmap3.h>
 
 #include <cgogn/rendering/mesh_render.h>
 

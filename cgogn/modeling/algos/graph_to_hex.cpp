@@ -34,8 +34,8 @@
 
 #include <cgogn/core/functions/mesh_info.h>
 
-#include <cgogn/core/types/cmap/cmap_ops.h>
-#include <cgogn/core/types/cmap/dart_marker.h>
+#include <cgogn/core/types/map/cmap/cmap_ops.h>
+#include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/mesh_views/cell_cache.h>
 
 #include <cgogn/io/surface/surface_import.h>
@@ -725,8 +725,8 @@ uint32 get_ring_size(CMap3& m3, CMap3::Edge e)
 
 bool unchecked_ring(CMap3& m3, CMap3::Edge e, uint32 ring_size, CellMarker<CMap3, CMap3::Edge>& visited_edge)
 {
-	if (visited_edge.is_marked(e) /* || check_ring(m, e, ring_size)*/)
-		return false; // already explored || not a ring
+	if (visited_edge.is_marked(e) /* || check_ring(m, e, ring_size)*/)
+		return false; // already explored || not a ring
 
 	Dart d0 = e.dart;
 	uint32 n = 0;

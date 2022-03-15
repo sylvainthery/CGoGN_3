@@ -116,10 +116,10 @@ bool is_simplicial(const MESH& m)
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
-template <typename CELL, typename MESH, typename std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>* = nullptr>
+template <typename CELL, typename MESH, typename std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>* = nullptr>
 bool check_indexing(MESH& m, bool verbose = true)
 {
 	static_assert(is_in_tuple_v<CELL, typename mesh_traits<MESH>::Cells>, "CELL not supported in this MESH");
@@ -159,7 +159,7 @@ bool check_indexing(MESH& m, bool verbose = true)
 			result &= valid_index && all_darts_same_index;
 			return true;
 		},
-		CMapBase_TraversalPolicy::DART_MARKING);
+		MapBase_TraversalPolicy::DART_MARKING);
 
 	// check that all lines of the attribute container are used
 	for (uint32 i = m.attribute_containers_[CELL::ORBIT].first_index(),
@@ -285,11 +285,11 @@ uint32 codegree(const MESH& m, typename mesh_traits<MESH>::Volume v)
 /*****************************************************************************/
 
 //////////////
-// CMapBase //
+// MapBase //
 //////////////
 
 template <typename MESH, typename CELL>
-auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>, bool>
+auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>, bool>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	bool result = false;

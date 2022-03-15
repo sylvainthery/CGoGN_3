@@ -27,7 +27,7 @@
 #include <cgogn/core/functions/mesh_info.h>
 #include <cgogn/core/functions/mesh_ops/edge.h>
 #include <cgogn/core/functions/mesh_ops/face.h>
-#include <cgogn/core/types/cmap/phi.h>
+#include <cgogn/core/types/map/cmap/phi.h>
 
 namespace cgogn
 {

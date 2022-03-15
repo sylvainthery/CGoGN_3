@@ -24,7 +24,7 @@
 #ifndef CGOGN_MODELING_ALGOS_SUBDIVISION_SURFACE_CATMULL_CLARK_H_
 #define CGOGN_MODELING_ALGOS_SUBDIVISION_SURFACE_CATMULL_CLARK_H_
 
-#include <cgogn/core/types/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
 #include <cgogn/geometry/types/vector_traits.h>
 
 namespace cgogn

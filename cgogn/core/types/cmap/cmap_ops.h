@@ -24,7 +24,7 @@
 #ifndef CGOGN_CORE_CMAP_CMAP_OPS_H_
 #define CGOGN_CORE_CMAP_CMAP_OPS_H_
 //
-//#include <cgogn/core/types/cmap/dart.h>
+//#include <cgogn/core/types/map/dart.h>
 //#include <cgogn/core/utils/type_traits.h>
 //
 //namespace cgogn
@@ -32,7 +32,7 @@
 //
 //template <typename CELL, typename MESH>
 //auto copy_index(MESH& m, Dart dest, Dart src) 
-//	-> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>>
+//	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 //{
 //	static const Orbit orbit = CELL::ORBIT;
 //	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");

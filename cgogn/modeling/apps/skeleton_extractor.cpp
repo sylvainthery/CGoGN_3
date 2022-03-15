@@ -20,16 +20,16 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#include <cgogn/core/types/cmap/cmap2.h>
-#include <cgogn/core/types/cmap/graph.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/graph.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph.h>
 
 #include <cgogn/geometry/types/vector_traits.h>
 
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
-#include <cgogn/core/types/cmap/cmap2.h>
-#include <cgogn/core/types/cmap/graph.h>
+#include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/types/map/cmap/graph.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph.h>
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/geometry/ui_modules/surface_differential_properties.h>

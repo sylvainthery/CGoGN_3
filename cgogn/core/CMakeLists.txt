@@ -14,6 +14,12 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 set ( cgogn_src_core_types 
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_base.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_base.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cell.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/dart_marker.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/dart.h"
+
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_traits.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cell_marker.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cells_set.h"
@@ -22,9 +28,6 @@ set ( cgogn_src_core_types
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_views/cell_cache.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_views/cell_filter.h"
 
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cell.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap_base.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap_base.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap_info.h"
 //		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap_ops.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap0.h"
@@ -34,8 +37,6 @@ set ( cgogn_src_core_types
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cph3.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cph3.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/dart_marker.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/dart.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/graph.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/graph.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/orbit_traversal.h"
