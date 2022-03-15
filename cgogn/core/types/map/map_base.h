@@ -1,4 +1,4 @@
-f/*******************************************************************************
+/*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -114,10 +114,10 @@ struct CGOGN_CORE_EXPORT MapBase
 /// \return does this dart belong to the boundary
 ///
 
-inline bool is_boundary(const MapBase& m, Dart d)
-{
-	return (*m.boundary_marker_)[d.index] != 0u;
-}
+//inline bool is_boundary(const MapBase& m, Dart d)
+//{
+//	return (*m.boundary_marker_)[d.index] != 0u;
+//}
 
 ///
 /// \brief set_boundary
@@ -125,10 +125,10 @@ inline bool is_boundary(const MapBase& m, Dart d)
 /// \param d
 /// \param b
 ///
-inline void set_boundary(const MapBase& m, Dart d, bool b) //TODO: const ??
-{
-	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
-}
+//inline void set_boundary(const MapBase& m, Dart d, bool b) //TODO: const ??
+//{
+//	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
+//}
 
 ///
 /// \brief nb_darts
@@ -187,8 +187,6 @@ void set_index(MapBase& m, Dart d, uint32 index)
 
 void clear(MapBase& m, bool keep_attributes = true);
 
-void copy(MapBase& dst, const MapBase& src);
-
 ///
 /// \brief is_indexed Is this kind of CELL of map p embedded ?
 /// \param m
@@ -244,23 +242,7 @@ uint32 index_of(const MapBase& m, CELL c)
 /// \param i
 /// \return
 ///
-template <typename CELL>
-CELL of_index(const MapBase& m, uint32 i)
-{
-	static const Orbit orbit = CELL::ORBIT;
-	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
-	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
-	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
-	{
-		if (!is_boundary(m, d))
-		{
-			const CELL c(d);
-			if (index_of(m, c) == i)
-				return c;
-		}
-	}
-	return CELL();
-}
+
 
 ///
 /// \brief new_index Reserve a new line in CELL attribute container
@@ -273,40 +255,22 @@ uint32 new_index(const MapBase& m)
 	return m.attribute_containers_[CELL::ORBIT].new_index();
 }
 
-///
-/// \brief init_cells_indexing Add an index atttribute on dart for CELL embedding
-/// \param m
-///
-template <typename CELL>
-void init_cells_indexing(MapBase& m)
-{
-	static const Orbit orbit = CELL::ORBIT;
-	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
-	if (!is_indexed<CELL>(m))
-	{
-		std::ostringstream oss;
-		oss << "__index_" << orbit_name(orbit);
-		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
-		m.cells_indices_[orbit]->fill(INVALID_INDEX);
-	}
-}
-
-///
-/// \brief init_cells_indexing Add an index attribute on dart for orbit embedding
-/// \param m
-/// \param orbit
-///
-inline void init_cells_indexing(MapBase& m, Orbit orbit)
-{
-	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
-	if (!is_indexed(m, orbit))
-	{
-		std::ostringstream oss;
-		oss << "__index_" << orbit_name(orbit);
-		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
-		m.cells_indices_[orbit]->fill(INVALID_INDEX);
-	}
-}
+/////
+///// \brief init_cells_indexing Add an index attribute on dart for orbit embedding
+///// \param m
+///// \param orbit
+/////
+//inline void init_cells_indexing(MapBase& m, Orbit orbit)
+//{
+//	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+//	if (!is_indexed(m, orbit))
+//	{
+//		std::ostringstream oss;
+//		oss << "__index_" << orbit_name(orbit);
+//		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
+//		m.cells_indices_[orbit]->fill(INVALID_INDEX);
+//	}
+//}
 
 
 template <typename CELL>

@@ -26,13 +26,13 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/map/cmap/cell.h>
-#include <cgogn/core/types/map/map_base.h>
+#include <cgogn/core/types/map/cell.h>
+#include <cgogn/core/types/map/cmap/cmap_base.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT Graph : public MapBase
+struct CGOGN_CORE_EXPORT Graph : public CMapBase
 {
 	static const uint8 dimension = 1;
 

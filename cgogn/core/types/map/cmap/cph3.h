@@ -101,6 +101,15 @@ struct CPH3
 		return m_;
 	}
 
+	operator MapBase&()
+	{
+		return m_;
+	}
+	operator const MapBase&() const
+	{
+		return m_;
+	}
+
 	inline Dart begin() const
 	{
 		Dart d(m_.darts_.first_index());

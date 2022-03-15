@@ -20,82 +20,88 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
+
+#ifndef CGOGN_CORE_MAP_GMAP_GMAP_BASE_H_
+#define CGOGN_CORE_MAP_GMAP_GMAP_BASE_H_
+
+#include <cgogn/core/cgogn_core_export.h>
+
 #include <cgogn/core/types/map/map_base.h>
-#include <iomanip>
 
 namespace cgogn
 {
 
-MapBase::MapBase()
+struct CGOGN_CORE_EXPORT GMapBase: public MapBase
 {
-	boundary_marker_ = darts_.get_mark_attribute();
+
+};
+
+
+inline bool is_boundary(const GMapBase&, Dart)
+{
+	return false;
 }
 
-MapBase::~MapBase()
-{
-}
+inline void set_boundary(const GMapBase& , Dart) { }
 
-Dart add_dart(MapBase& m)
-{
-	uint32 index = m.darts_.new_index();
-	Dart d(index);
-	for (auto& rel : m.relations_)
-		(*rel)[d.index] = d;
-	for (auto& emb : m.cells_indices_)
-		if (emb)
-			(*emb)[d.index] = INVALID_INDEX;
-	return d;
-}
 
-void remove_dart(MapBase& m, Dart d)
+///
+/// \brief of_index Get the cell of type CELL of a given index
+/// \param m
+/// \param i
+/// \return
+///
+template <typename CELL>
+CELL of_index(const GMapBase& m, uint32 i)
 {
-	for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
+	static const Orbit orbit = CELL::ORBIT;
+	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
 	{
-		if (m.cells_indices_[orbit])
-		{
-			uint32 index = (*m.cells_indices_[orbit])[d.index];
-			if (index != INVALID_INDEX)
-				m.attribute_containers_[orbit].unref_index(index);
-		}
+		const CELL c(d);
+		if (index_of(m, c) == i)
+			return c;
 	}
-	m.darts_.release_index(d.index);
+	return CELL();
 }
 
+/////
+/////// \brief init_cells_indexing Add an index atttribute on dart for CELL embedding
+/////// \param m
+///////
+//template <typename CELL>
+//void init_cells_indexing(MapBase& m)
+//{
+//	static const Orbit orbit = CELL::ORBIT;
+//	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+//	if (!is_indexed<CELL>(m))
+//	{
+//		std::ostringstream oss;
+//		oss << "__index_" << orbit_name(m,orbit);
+//		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
+//		m.cells_indices_[orbit]->fill(INVALID_INDEX);
+//	}
+//}
 
-
-void clear(MapBase& m, bool keep_attributes)
-{
-	// clear darts and keep attributes (phi relations)
-	m.darts_.clear_attributes();
-	if (!keep_attributes)
-	{
-		// remove cells indices attributes
-		for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
-		{
-			if (m.cells_indices_[orbit] != nullptr)
-			{
-				m.darts_.remove_attribute(m.cells_indices_[orbit]);
-				m.cells_indices_[orbit].reset();
-			}
-		}
-	}
-
-	// clear all cell attributes
-	for (MapBase::AttributeContainer& container : m.attribute_containers_)
-	{
-		if (keep_attributes)
-			container.clear_attributes();
-		else
-		{
-			container.clear_attributes();
-			// if there are still shared_ptr somewhere, some attributes may not be removed
-			container.remove_attributes();
-		}
-	}
-}
-
+///////
+/////// \brief init_cells_indexing Add an index attribute on dart for orbit embedding
+/////// \param m
+/////// \param orbit
+///////
+//inline void init_cells_indexing(GMapBase& m, Orbit orbit)
+//{
+//	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+//	if (!is_indexed(m, orbit))
+//	{
+//		std::ostringstream oss;
+//		oss << "__index_" << orbit_name(m,orbit);
+//		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
+//		m.cells_indices_[orbit]->fill(INVALID_INDEX);
+//	}
+//}
 
 
 } // namespace cgogn
 
-
+#endif // CGOGN_CORE_CMAP_CMAP_BASE_H_

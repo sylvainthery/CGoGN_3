@@ -20,22 +20,59 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#include <cgogn/core/types/map/map_base.h>
-#include <iomanip>
+
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP1_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP1_H_
+
+#include <cgogn/core/cgogn_core_export.h>
+
+#include <cgogn/core/types/map/gmap/gmap0.h>
 
 namespace cgogn
 {
 
-MapBase::MapBase()
+struct CGOGN_CORE_EXPORT GMap1 : public GMap0
 {
-	boundary_marker_ = darts_.get_mark_attribute();
-}
+	static const uint8 dimension = 1;
 
-MapBase::~MapBase()
+	using Vertex = Cell<Orbit::DART>;
+	using Edge = Cell<Orbit::BETA0>;
+	using Face = Cell<Orbit::BETA0_BETA1>;
+
+	using Cells = std::tuple<Vertex, Edge, Face>;
+
+	std::shared_ptr<Attribute<Dart>> beta1_;
+
+	GMap1() : GMap0()
+	{
+		beta1_ = add_relation("beta1");
+	}
+};
+
+template <>
+struct mesh_traits<GMap1>
 {
-}
+	static constexpr const uint8 dimension = 1;
 
-Dart add_dart(MapBase& m)
+	using Vertex = GMap1::Vertex;
+	using Edge = GMap1::Edge;
+	using Face = GMap1::Face;
+
+	using Cells = std::tuple<Vertex, Edge, Face>;
+	static constexpr const char* cell_names[] = {"Vertex", "Edge", "Face"};
+
+	template <typename T>
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	static constexpr const char* name = "GMap1";
+using MarkAttribute = GMapBase::MarkAttribute;
+};
+
+GMap1::Vertex CGOGN_CORE_EXPORT cut_edge(GMap1& m, GMap1::Edge e, bool set_indices = true);
+
+GMap1::Face CGOGN_CORE_EXPORT add_face(GMap1& m, uint32 size, bool set_indices = true);
+
+inline Dart add_dart(GMapBase& m)
 {
 	uint32 index = m.darts_.new_index();
 	Dart d(index);
@@ -47,55 +84,41 @@ Dart add_dart(MapBase& m)
 	return d;
 }
 
-void remove_dart(MapBase& m, Dart d)
+
+
+
+inline Dart beta1(const GMap1& m, Dart d)
 {
-	for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
-	{
-		if (m.cells_indices_[orbit])
-		{
-			uint32 index = (*m.cells_indices_[orbit])[d.index];
-			if (index != INVALID_INDEX)
-				m.attribute_containers_[orbit].unref_index(index);
-		}
-	}
-	m.darts_.release_index(d.index);
+	return (*(m.beta1_))[d.index];
 }
 
 
-
-void clear(MapBase& m, bool keep_attributes)
+inline void beta1_sew(GMap1& m, Dart d, Dart e)
 {
-	// clear darts and keep attributes (phi relations)
-	m.darts_.clear_attributes();
-	if (!keep_attributes)
-	{
-		// remove cells indices attributes
-		for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
-		{
-			if (m.cells_indices_[orbit] != nullptr)
-			{
-				m.darts_.remove_attribute(m.cells_indices_[orbit]);
-				m.cells_indices_[orbit].reset();
-			}
-		}
-	}
+	cgogn_assert(beta1(m, d) == d);
+	cgogn_assert(beta1(m, e) == e);
+	(*(m.beta1_))[d.index] = e;
+	(*(m.beta1_))[e.index] = d;
+}
 
-	// clear all cell attributes
-	for (MapBase::AttributeContainer& container : m.attribute_containers_)
-	{
-		if (keep_attributes)
-			container.clear_attributes();
-		else
-		{
-			container.clear_attributes();
-			// if there are still shared_ptr somewhere, some attributes may not be removed
-			container.remove_attributes();
-		}
-	}
+inline void beta1_unsew(GMap1& m, Dart d, Dart e)
+{
+	(*(m.beta1_))[d.index] = d;
+	(*(m.beta1_))[e.index] = e;
 }
 
 
+/*****************************************************************************/
+
+// template <typename CMAP>
+// void remove_dart(CMAP& m, Dart d);
+
+/*****************************************************************************/
+
+
+/*}****************************************************************************/
 
 } // namespace cgogn
 
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP1_H_
 

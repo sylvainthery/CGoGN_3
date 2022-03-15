@@ -26,7 +26,8 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/gmap/gmap_base.h>
+#include <cgogn/core/types/map/gmap/gmap_base.h>
+#include <cgogn/core/types/map/cell.h>
 
 namespace cgogn
 {
@@ -35,12 +36,15 @@ struct CGOGN_CORE_EXPORT GMap0 : public GMapBase
 {
 	static const uint8 dimension = 0;
 
-	using Vertex = Cell<DART>;
+	using Vertex = Cell < Orbit::DART > ;
 
 	using Cells = std::tuple<Vertex>;
 
+	std::shared_ptr<Attribute<Dart>> beta0_;
+
 	GMap0()
 	{
+		beta0_ = add_relation("beta0");
 	}
 };
 
@@ -66,6 +70,41 @@ inline Dart beta0(const GMap0& m, Dart d)
 	return (*(m.beta0_))[d.index];
 }
 
+inline void beta0_sew(GMap0& m, Dart d, Dart e)
+{
+	cgogn_assert(beta0(m, d) == d);
+	cgogn_assert(beta0(m, e) == e);
+	(*(m.beta0_))[d.index] = e;
+	(*(m.beta0_))[e.index] = d;
+}
+
+inline void beta0_unsew(GMap0& m, Dart d, Dart e)
+{
+	(*(m.beta0_))[d.index] = d;
+	(*(m.beta0_))[e.index] = e;
+}
+
+
+template <uint8 Arg, uint8... Args, typename MESH>
+inline Dart beta(const MESH& m, Dart d)
+{
+	static_assert((Arg >= 0 && Arg <= mesh_traits<MESH>::dimension), "Bad beta value");
+
+	Dart res;
+	if constexpr (Arg == 0)
+		res = beta0(m, d);
+	if constexpr (Arg == 1)
+		res = beta1(m, d);
+	if constexpr (Arg == 2)
+		res = beta2(m, d);
+	if constexpr (Arg == 3)
+		res = beta3(m, d);
+
+	if constexpr (sizeof...(Args) > 0)
+		return beta<Args...>(m, res);
+	else
+		return res;
+}
 
 } // namespace cgogn
 

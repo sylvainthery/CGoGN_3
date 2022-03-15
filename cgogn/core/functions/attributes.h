@@ -187,16 +187,8 @@ inline const T& value(const MESH& m, const typename mesh_traits<MESH>::template 
 	return (*attribute)[index_of(m, c)];
 }
 
-/*****************************************************************************/
 
-// template <typename T, typename MESH>
-// T& get_attribute(MESH& m, const std::string& name);
 
-/*****************************************************************************/
-
-//////////////
-// MapBase //
-//////////////
 
 } // namespace cgogn
 

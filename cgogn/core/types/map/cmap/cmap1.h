@@ -54,7 +54,7 @@ struct CGOGN_CORE_EXPORT CMap1 : public CMap0
 template <>
 struct mesh_traits<CMap1>
 {
-	using BaseType = CMapBase;
+	using BaseType = MapBase;
 	static constexpr const char* name = "CMap1";
 	static constexpr const uint8 dimension = 1;
 
@@ -66,9 +66,9 @@ struct mesh_traits<CMap1>
 	static constexpr const char* cell_names[] = {"Vertex", "Edge", "Face"};
 
 	template <typename T>
-	using Attribute = CMapBase::Attribute<T>;
-	using AttributeGen = CMapBase::AttributeGen;
-	using MarkAttribute = CMapBase::MarkAttribute;
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 //

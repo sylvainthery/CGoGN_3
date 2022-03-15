@@ -25,12 +25,52 @@
 #define CGOGN_CORE_FUNCTIONS_CELLS_H_
 
 #include <cgogn/core/types/map/dart_marker.h>
-#include <cgogn/core/types/map/cmap/cmap_info.h>
+#include <cgogn/core/types/map/map_info.h>
 
 #include <sstream>
 
 namespace cgogn
 {
+
+///
+/// \brief init_cells_indexing Add an index atttribute on dart for CELL embedding
+/// \param m
+///
+template <typename CELL, typename MESH>
+auto init_cells_indexing(MESH& m) -> std::enable_if_t<std::is_base_of_v<struct MapBase&, MESH&>>
+{
+	static const Orbit orbit = CELL::ORBIT;
+	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+	if (!is_indexed<CELL>(m))
+	{
+		std::ostringstream oss;
+		oss << "__index_" << orbit_name(m, orbit);
+		m.cells_indices_[orbit] = m.darts_.template add_attribute<uint32>(oss.str());
+		m.cells_indices_[orbit]->fill(INVALID_INDEX);
+	}
+}
+
+///
+/// \brief init_cells_indexing Add an index attribute on dart for orbit embedding
+/// \param m
+/// \param orbit
+///
+template <typename MESH>
+auto init_cells_indexing(MESH& m, Orbit orbit) -> void //std::enable_if_t<std::is_convertible_v<MESH*, struct MapBase*>>
+{
+	static_assert(std::is_convertible_v<MESH*,struct MapBase*>, "must be MapBase");
+	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+	if (!is_indexed(m, orbit))
+	{
+		std::ostringstream oss;
+		oss << "__index_" << orbit_name(m,orbit);
+		m.cells_indices_[orbit] = m.darts_.template add_attribute<uint32>(oss.str());
+		m.cells_indices_[orbit]->fill(INVALID_INDEX);
+	}
+}
+
+
+
 
 template <typename CELL, typename MESH>
 auto set_index(MESH& m, CELL c, uint32 index) 

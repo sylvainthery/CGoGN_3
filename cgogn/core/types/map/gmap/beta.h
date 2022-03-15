@@ -21,40 +21,41 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_CMAP_CMAP_INFO_H_
-#define CGOGN_CORE_CMAP_CMAP_INFO_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_PHI_H_
+#define CGOGN_CORE_TYPES_GMAP_PHI_H_
 
-#include <cgogn/core/types/map/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/dart.h>
+#include <cgogn/core/types/map/dart.h>
 
-#include <iomanip>
 
 namespace cgogn
 {
 
 /*****************************************************************************/
 
-// template <typename CELL, typename CMAP>
-// uint32 nb_darts_of_orbit(const CMAP& m, CELL c);
+// template <typename MESH>
+// Dart phiX(const MESH& m, Dart d);
 
 /*****************************************************************************/
 
-/////////////
-// GENERIC //
-/////////////
+//////////////
+// GMapBase //
+//////////////
 
-template <typename CELL, typename CMAP>
-uint32 nb_darts_of_orbit(const CMAP& m, CELL c)
-{
-	static_assert(is_in_tuple<CELL, typename CMAP::Cells>::value, "CELL not supported in this CMAP");
-	uint32 result = 0;
-	foreach_dart_of_orbit(m, c, [&](Dart) -> bool {
-		++result;
-		return true;
-	});
-	return result;
-}
+
+
+	
+//////////////
+// GMapBase //
+//////////////
+
+
+
+
+
+
 
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_CMAP_CMAP_INFO_H_
+#endif // CGOGN_CORE_TYPES_GMAP_PHI_H_

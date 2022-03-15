@@ -26,7 +26,7 @@
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/gmap/gmap2.h>
+#include <cgogn/core/types/map/gmap/gmap2.h>
 
 namespace cgogn
 {
@@ -35,22 +35,22 @@ struct CGOGN_CORE_EXPORT GMap3 : public GMap2
 {
 	static const uint8 dimension = 3;
 
-	using Vertex = Cell<BETA1_BETA2_BETA_3>;
-	using Vertex2 = Cell<BETA1_BETA2>;
-	using HalfEdge = Cell<BETA0>;
-	using Edge = Cell<BETA0_BETA2_BETA3>;
-	using Edge2 = Cell<BETA0_BETA2>;
-	using Face = Cell<BETA0_BETA_BETA3>;
-	using Face2 = Cell<BETA0_BETA1>;
-	using Volume = Cell<BETA0_BETA1_BETA2>;
-	using CC = Cell<BETA0_BETA1_BETA2_BETA3>;
+	using Vertex = Cell<Orbit::BETA1_BETA2_BETA3>;
+	using Vertex2 = Cell<Orbit::BETA1_BETA2>;
+	using HalfEdge = Cell<Orbit::BETA0>;
+	using Edge = Cell<Orbit::BETA0_BETA2_BETA3>;
+	using Edge2 = Cell<Orbit::BETA0_BETA2>;
+	using Face = Cell<Orbit::BETA0_BETA1_BETA3>;
+	using Face2 = Cell<Orbit::BETA0_BETA1>;
+	using Volume = Cell<Orbit::BETA0_BETA1_BETA2>;
+	using CC = Cell<Orbit::BETA0_BETA1_BETA2_BETA3>;
 	using Cells = std::tuple<Vertex, Vertex2, HalfEdge, Edge, Edge2, Face, Face2, Volume>;
 
 	std::shared_ptr<Attribute<Dart>> beta3_;
 
 	GMap3() : GMap2()
 	{
-		phi3_ = add_relation("beta3");
+		beta3_ = add_relation("beta3");
 	}
 };
 
@@ -86,6 +86,22 @@ inline Dart beta3(const GMap3& m, Dart d)
 {
 	return (*(m.beta3_))[d.index];
 }
+
+
+inline void beta3_sew(GMap3& m, Dart d, Dart e)
+{
+	cgogn_assert(beta3(m, d) == d);
+	cgogn_assert(beta3(m, e) == e);
+	(*(m.beta3_))[d.index] = e;
+	(*(m.beta3_))[e.index] = d;
+}
+
+inline void beta3_unsew(GMap3& m, Dart d, Dart e)
+{
+	(*(m.beta3_))[d.index] = d;
+	(*(m.beta3_))[e.index] = e;
+}
+
 
 
 

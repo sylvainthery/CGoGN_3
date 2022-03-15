@@ -21,97 +21,65 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_GMAP_PHI_H_
-#define CGOGN_CORE_TYPES_GMAP_PHI_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CMAP2_H_
+#define CGOGN_CORE_TYPES_GMAP_CMAP2_H_
 
-#include <cgogn/core/types/GMap/GMap3.h>
+#include <cgogn/core/cgogn_core_export.h>
+
+#include <cgogn/core/types/map/gmap/gmap1.h>
 
 namespace cgogn
 {
 
-/*****************************************************************************/
-
-// template <typename MESH>
-// Dart phiX(const MESH& m, Dart d);
-
-/*****************************************************************************/
-
-//////////////
-// GMapBase //
-//////////////
-
-inline Dart beta0(const GMap0& m, Dart d)
+struct CGOGN_CORE_EXPORT GMap2 : public GMap1
 {
-	return (*(m.beta0_))[d.index];
-}
+	static const uint8 dimension = 2;
 
-inline Dart beta1(const GMap1& m, Dart d)
+	using Vertex = Cell<Orbit::BETA1_BETA2>;
+	using HalfEdge = Cell<Orbit::BETA0>;
+	using Edge = Cell<Orbit::BETA0_BETA2>;
+	using Face = Cell<Orbit::BETA0_BETA1>;
+	using Volume = Cell<Orbit::BETA0_BETA1_BETA2>;
+	using CC = Volume;
+
+	using Cells = std::tuple<Vertex, HalfEdge, Edge, Face, Volume>;
+
+	std::shared_ptr<Attribute<Dart>> beta2_;
+
+	GMap2() : GMap1()
+	{
+		beta2_ = add_relation("beta2");
+	}
+};
+
+template <>
+struct mesh_traits<GMap2>
 {
-	return (*(m.beta1_))[d.index];
-}
+	static constexpr const char* name = "GMap2";
+	static constexpr const uint8 dimension = 2;
+
+	using Vertex = GMap2::Vertex;
+	using HalfEdge = GMap2::HalfEdge;
+	using Edge = GMap2::Edge;
+	using Face = GMap2::Face;
+	using Volume = GMap2::Volume;
+
+	using Cells = std::tuple<Vertex, HalfEdge, Edge, Face, Volume>;
+	static constexpr const char* cell_names[] = {"Vertex", "HalfEdge", "Edge", "Face", "Volume"};
+
+	template <typename T>
+	using Attribute = GMapBase::Attribute<T>;
+	using AttributeGen = GMapBase::AttributeGen;
+	using MarkAttribute = GMapBase::MarkAttribute;
+};
+
+GMap2::Vertex CGOGN_CORE_EXPORT cut_edge(GMap2& m, GMap2::Edge e, bool set_indices = true);
+
+GMap2::Edge CGOGN_CORE_EXPORT cut_face(GMap2& m, GMap2::Vertex v1, GMap2::Vertex v2, bool set_indices = true);
 
 inline Dart beta2(const GMap2& m, Dart d)
 {
 	return (*(m.beta2_))[d.index];
-}
-
-inline Dart beta3(const GMap3& m, Dart d)
-{
-	return (*(m.beta3_))[d.index];
-}
-
-
-template <int8 Arg, uint8... Args, typename MESH>
-inline Dart beta(const MESH& m, Dart d)
-{
-	static_assert((Arg >= -1 && Arg <= mesh_traits<MESH>::dimension), "Bad beta value");
-
-	Dart res;
-	if constexpr (Arg == 0)
-		res = beta0(m, d);
-	if constexpr (Arg == 1)
-		res = beta1(m, d);
-	if constexpr (Arg == 2)
-		res = beta2(m, d);
-	if constexpr (Arg == 3)
-		res = beta3(m, d);
-
-	if constexpr (sizeof...(Args) > 0)
-		return beta<Args...>(m, res);
-	else
-		return res;
-
-	
-//////////////
-// GMapBase //
-//////////////
-
-inline void beta0_sew(GMap0& m, Dart d, Dart e)
-{
-	cgogn_assert(beta0(m, d) == d);
-	cgogn_assert(beta0(m, e) == e);
-	(*(m.beta0_))[d.index] = e;
-	(*(m.beta0_))[e.index] = d;
-}
-
-inline void beta0_unsew(GMap0& m, Dart d, Dart e)
-{
-	(*(m.beta0_))[d.index] = d;
-	(*(m.beta0_))[e.index] = e;
-}
-
-inline void beta1_sew(GMap1& m, Dart d, Dart e)
-{
-	cgogn_assert(beta1(m, d) == d);
-	cgogn_assert(beta1(m, e) == e);
-	(*(m.beta1_))[d.index] = e;
-	(*(m.beta1_))[e.index] = d;
-}
-
-inline void beta1_unsew(GMap1& m, Dart d, Dart e)
-{
-	(*(m.beta1_))[d.index] = d;
-	(*(m.beta1_))[e.index] = e;
 }
 
 inline void beta2_sew(GMap2& m, Dart d, Dart e)
@@ -128,23 +96,7 @@ inline void beta2_unsew(GMap2& m, Dart d, Dart e)
 	(*(m.beta2_))[e.index] = e;
 }
 
-inline void beta3_sew(GMap3& m, Dart d, Dart e)
-{
-	cgogn_assert(beta3(m, d) == d);
-	cgogn_assert(beta3(m, e) == e);
-	(*(m.beta3_))[d.index] = e;
-	(*(m.beta3_))[e.index] = d;
-}
-
-inline void beta3_unsew(GMap3& m, Dart d, Dart e)
-{
-	(*(m.beta3_))[d.index] = d;
-	(*(m.beta3_))[e.index] = e;
-}
-
-
-
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_GMAP_PHI_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CMAP2_H_

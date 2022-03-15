@@ -21,83 +21,60 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_GMAP_CMAP1_H_
-#define CGOGN_CORE_TYPES_GMAP_CMAP1_H_
+#ifndef CGOGN_CORE_MAP_CMAP_CMAP_BASE_H_
+#define CGOGN_CORE_MAP_CMAP_CMAP_BASE_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
-#include <cgogn/core/types/gmap/gmap0.h>
-#include <cgogn/core/types/gmap/cell.h>
+#include <cgogn/core/types/map/map_base.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT GMap1 : public GMap0
+struct CGOGN_CORE_EXPORT CMapBase: public MapBase
 {
-	static const uint8 dimension = 1;
-
-	using Vertex = Cell<DART>;
-	using Edge = Cell<BETA0>;
-	using Face = Cell<BETA0_BETA1>;
-
-	using Cells = std::tuple<Vertex, Edge, Face>;
-
-	std::shared_ptr<Attribute<Dart>> beta0_;
-	std::shared_ptr<Attribute<Dart>> beta1_;
-
-	GMap1() : GMap0()
-	{
-		beta0_ = add_relation("beta0");
-		beta1_ = add_relation("beta1");
-	}
+	// shortcut to boundary marker attribute
+	MarkAttribute* boundary_marker_;
 };
 
-template <>
-struct mesh_traits<GMap1>
+
+inline bool is_boundary(const CMapBase& m, Dart d)
 {
-	static constexpr const uint8 dimension = 1;
-
-	using Vertex = GMap1::Vertex;
-	using Edge = GMap1::Edge;
-	using Face = GMap1::Face;
-
-	using Cells = std::tuple<Vertex, Edge, Face>;
-	static constexpr const char* cell_names[] = {"Vertex", "Edge", "Face"};
-
-	template <typename T>
-	using Attribute = GMapBase::Attribute<T>;
-	using AttributeGen = GMapBase::AttributeGen;
-	static constexpr const char* name = "GMap1";
-using MarkAttribute = GMapBase::MarkAttribute;
-};
-
-GMap1::Vertex CGOGN_CORE_EXPORT cut_edge(GMap1& m, GMap1::Edge e, bool set_indices = true);
-
-GMap1::Face CGOGN_CORE_EXPORT add_face(GMap1& m, uint32 size, bool set_indices = true);
-
-inline Dart add_dart(GMapBase& m)
-{
-	uint32 index = m.darts_.new_index();
-	Dart d(index);
-	for (auto& rel : m.relations_)
-		(*rel)[d.index] = d;
-	for (auto& emb : m.cells_indices_)
-		if (emb)
-			(*emb)[d.index] = INVALID_INDEX;
-	return d;
+	return (*m.boundary_marker_)[d.index] != 0u;
 }
 
-/*****************************************************************************/
-
-// template <typename CMAP>
-// void remove_dart(CMAP& m, Dart d);
-
-/*****************************************************************************/
+inline void set_boundary(const CMapBase& m, Dart d, bool b) //TODO: const ??
+{
+	(*m.boundary_marker_)[d.index] = b ? 1u : 0u;
+}
 
 
-/*}****************************************************************************/
+///
+/// \brief of_index Get the cell of type CELL of a given index
+/// \param m
+/// \param i
+/// \return
+///
+template <typename CELL>
+CELL of_index(const CMapBase& m, uint32 i)
+{
+	static const Orbit orbit = CELL::ORBIT;
+	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access the cell index of an unindexed cell type");
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	{
+		if (!is_boundary(m, d))
+		{
+			const CELL c(d);
+			if (index_of(m, c) == i)
+				return c;
+		}
+	}
+	return CELL();
+}
+
+
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_GMAP_CMAP1_H_
-}
+#endif // CGOGN_CORE_CMAP_CMAP_BASE_H_

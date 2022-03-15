@@ -21,42 +21,47 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_GMAP_CMAP_BASE_H_
-#define CGOGN_CORE_GMAP_CMAP_BASE_H_
+#ifndef CGOGN_CORE_TYPES_CMAP_CMAP0_H_
+#define CGOGN_CORE_TYPES_CMAP_CMAP0_H_
 
 #include <cgogn/core/cgogn_core_export.h>
-#include <cgogn/core/types/cmap/cmap_base.h>
 
+#include <cgogn/core/types/map/cmap/cmap_base.h>
 
 namespace cgogn
 {
 
-struct CGOGN_CORE_EXPORT GMapBase: public MapBase
+struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 {
+	static const uint8 dimension = 0;
 
-	// using AttributeContainer = AttributeContainerT<Vector>;
-	using AttributeContainer = AttributeContainerT<ChunkArray>;
-	
-	inline GMapBase() {	}
+	using Vertex = Cell<DART>;
 
-	inline ~GMapBase() { }
+	using Cells = std::tuple<Vertex>;
 
+	CMap0()
+	{
+	}
+};
 
-	// Map-wise attributes
+template <>
+struct mesh_traits<CMap0>
+{
+	using BaseType = MapBase;
+	static constexpr const char* name = "CMap0";
+	static constexpr const uint8 dimension = 0;
+
+	using Vertex = typename CMap0::Vertex;
+
+	using Cells = std::tuple<Vertex>;
+	static constexpr const char* cell_names[] = {"Vertex"};
+
 	template <typename T>
-	T& get_attribute(const std::string& name)
-	{
-		auto [it, inserted] = attributes_.try_emplace(name, T());
-		return std::any_cast<T&>(it->second);
-	}
-
-	inline std::shared_ptr<Attribute<Dart>> add_relation(const std::string& name)
-	{
-		return relations_.emplace_back(darts_.add_attribute<Dart>(name));
-	}
-
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_GMAP_CMAP_BASE_H_
+#endif // CGOGN_CORE_TYPES_CMAP_CMAP0_H_

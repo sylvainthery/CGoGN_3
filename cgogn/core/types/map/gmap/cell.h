@@ -21,110 +21,69 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_CMAP_CELL_H_
-#define CGOGN_CORE_TYPES_CMAP_CELL_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_CELL_H_
+#define CGOGN_CORE_TYPES_GMAP_CELL_H_
 
 #include <cgogn/core/types/map/dart.h>
+#include <cgogn/core/types/map/cell.h>
+
 #include <cgogn/core/utils/assert.h>
 #include <cgogn/core/utils/numerics.h>
 
 /**
- * \file cgogn/core/types/cmap/cell.h
+ * \file cgogn/core/types/map/cell.h
  * \brief Orbit and cell definitions used in cgogn.
  */
 
 namespace cgogn
 {
 
-enum Orbit : uint32
+inline std::string orbit_name(Orbit orbit)
 {
-	DART = 0,
-	BETA0,
-	BETA1,
-	PHI1, BETA0_BETA1 = PHI1,  // 2FACE = 1CC
-	PHI2, BETA0_BETA2 = PHI2,  //2EDGE
-	PHI21, BETA1_BETA2= PHI21, // 2VERTEX
-	PHI1_PHI2,   BETA0_BETA1_BETA2 = PHI1_PHI2, // 3VOLUME 2CC
-	PHI1_PHI3,   BETA0_BETA1_BETA3 = PHI1_PHI3, // 3FACE
-	PHI2_PHI3,   BETA0_BETA2_BETA3 = PHI2_PHI3, // 3EDGE
-	PHI21_PHI31, BETA1_BETA2_BETA3 = PHI21_PHI31, // 3VERTEX
-	PHI1_PHI2_PHI3,	BETA0_BETA1_BETA2_BETA3 = PHI1_PHI2_PHI3
-
-};
-
-// TODO
-//static const std::size_t NB_ORBITS = Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
-static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
-
-template <typename MAP>
-std::string orbit_name(const MAP& m, Orbit orbit)
-{
-
-	std::cout << "M " << typeid(m).name() << std::endl;
-	if constexpr(std::is_convertible_v<MAP&, struct CMapBase&>)
+	switch (orbit)
 	{
-		switch (orbit)
-		{
-		case Orbit::DART:
-			return "cgogn::Orbit::DART";
-		case Orbit::PHI1:
-			return "cgogn::Orbit::PHI1";
-		case Orbit::PHI2:
-			return "cgogn::Orbit::PHI2";
-		case Orbit::PHI21:
-			return "cgogn::Orbit::PHI21";
-		case Orbit::PHI1_PHI2:
-			return "cgogn::Orbit::PHI1_PHI2";
-		case Orbit::PHI1_PHI3:
-			return "cgogn::Orbit::PHI1_PHI3";
-		case Orbit::PHI2_PHI3:
-			return "cgogn::Orbit::PHI2_PHI3";
-		case Orbit::PHI21_PHI31:
-			return "cgogn::Orbit::PHI21_PHI31";
-		case Orbit::PHI1_PHI2_PHI3:
-			return "cgogn::Orbit::PHI1_PHI2_PHI3";
-		}
-	}
-	if constexpr(std::is_convertible_v<MAP&, struct GMapBase&>)
-	{
-		switch (orbit)
-		{
-		case Orbit::DART:
-			return "cgogn::Orbit::DART";
-		case Orbit::BETA0_BETA1:
-			return "cgogn::Orbit::BETA0_BETA1";
-		case Orbit::BETA0_BETA2:
-			return "cgogn::Orbit::BETA0_BETA2";
-		case Orbit::BETA1_BETA2:
-			return "cgogn::Orbit::BETA1_BETA2";
-		case Orbit::BETA0_BETA1_BETA2:
-			return "cgogn::Orbit::BETA0_BETA1_BETA2";
-		case Orbit::BETA0_BETA1_BETA3:
-			return "cgogn::Orbit::BETA0_BETA1_BETA3";
-		case Orbit::BETA0_BETA2_BETA3:
-			return "cgogn::Orbit::BETA0_BETA2_BETA3";
-		case Orbit::BETA1_BETA2_BETA3:
-			return "cgogn::Orbit::BETA1_BETA2_BETA3";
-		case Orbit::BETA0_BETA1_BETA2_BETA3:
-			return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
-		}
+	case GMapOrbit::DART:
+		return "cgogn::Orbit::DART";
+	case GMapOrbit::BETA0:
+		return "cgogn::Orbit::BETA0";
+	case GMapOrbit::BETA1:
+		return "cgogn::Orbit::BETA1";
+	case GMapOrbit::BETA0_BETA1:
+        return "cgogn::Orbit::BETA0_BETA1";
+	case GMapOrbit::BETA0_BETA2:
+		return "cgogn::Orbit::BETA0_BETA2";
+	case GMapOrbit::BETA1_BETA2:
+        return "cgogn::Orbit::BETA1_BETA2";
+		
+	case GMapOrbit::BETA0_BETA1_BETA2:
+        return "cgogn::Orbit::BETA0_BETA1_BETA2";
+	case GMapOrbit::BETA0_BETA1_BETA3:
+        return "cgogn::Orbit::BETA0_BETA1_BETA3";
+	case GMapOrbit::BETA0_BETA2_BETA3:
+        return "cgogn::Orbit::BETA0_BETA2_BETA3";
+	case GMapOrbit::BETA1_BETA2_BETA3:
+        return "cgogn::Orbit::BETA1_BETA2_BETA3";
+	case GMapOrbit::BETA0_BETA1_BETA2_BETA3:
+        return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
+		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
 	}
 	cgogn_assert_not_reached("This orbit does not exist");
-	#ifdef NDEBUG
+#ifdef NDEBUG
 	return "UNKNOWN"; // little trick to avoid warning on VS
-	#endif
+#endif
 }
 
 /**
  * \brief Cellular typing
  * \tparam ORBIT The type of the orbit used to create the Cell
  */
-//template <Orbit ORBIT_>
-template < Orbit ORB>
+// SAME AS CMAP
+template <Orbit ORBIT_>
 struct Cell
 {
-	static const Orbit ORBIT = ORB;
+    static const Orbit ORBIT = ORBIT_;
 	using Self = Cell<ORBIT>;
+
 	/**
 	 * \brief the dart representing this cell
 	 */
@@ -196,9 +155,10 @@ struct Cell
 		in >> rhs.dart;
 		return in;
 	}
-
 };
+
+}
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_CMAP_CELL_H_
+#endif // CGOGN_CORE_TYPES_GMAP_CELL_H_

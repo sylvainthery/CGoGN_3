@@ -13,12 +13,13 @@ find_package(Eigen3 3.2)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-set ( cgogn_src_core_types 
+set ( cgogn_src_core
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_base.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_base.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/cell.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/dart_marker.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/dart.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_info.h"
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_traits.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cell_marker.h"
@@ -28,33 +29,30 @@ set ( cgogn_src_core_types
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_views/cell_cache.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_views/cell_filter.h"
 
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap_info.h"
-//		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap_ops.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap0.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap1.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap2.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap3.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cmap.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cph3.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/cph3.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/graph.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/graph.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/orbit_traversal.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/phi.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/types/cmap/phi.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cmap_base.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cmap0.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cmap1.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cmap2.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cmap3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cmap.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cph3.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/cph3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/graph.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/graph.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/orbit_traversal.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/phi.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/cmap/phi.h"
 
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_base.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/cell.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_info.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap_ops.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap0.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap1.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap2.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap3.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/orbit_traversal.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/beta.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/beta.cpp"
-#		"${CMAKE_CURRENT_LIST_DIR}/types/gmap/gmap.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/gmap_base.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/cell.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/gmap0.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/gmap1.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/gmap2.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/gmap3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/gmap.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/orbit_traversal.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/gmap/beta.h"
+
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph_ops.h"
@@ -64,9 +62,7 @@ set ( cgogn_src_core_types
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/attribute_container.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/chunk_array.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/vector.h"
-)
 
-set ( cgogn_src_core_functions 
 		"${CMAKE_CURRENT_LIST_DIR}/functions/attributes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/cells.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/convert.h"
@@ -77,9 +73,6 @@ set ( cgogn_src_core_functions
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/edge.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/face.h"
 		"${CMAKE_CURRENT_LIST_DIR}/functions/traversals/volume.h"
-)
-
-set ( cgogn_src_core_utils 
 
 		"${CMAKE_CURRENT_LIST_DIR}/utils/assert.h"
 		"${CMAKE_CURRENT_LIST_DIR}/utils/assert.cpp"
@@ -99,13 +92,13 @@ set ( cgogn_src_core_utils
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/mesh_data.h"
 )
 
-source_group(PREFIX "" FILES ${cgogn_src_core_types} ${cgogn_src_core_functions}  ${cgogn_src_core_utils} TREE ${CMAKE_CURRENT_LIST_DIR})
+source_group(PREFIX "" FILES ${cgogn_src_core} TREE ${CMAKE_CURRENT_LIST_DIR})
 
 add_library(${PROJECT_NAME} STATIC "")
 add_library(cgogn::core ALIAS ${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME}
-	PRIVATE ${cgogn_src_core_types} ${cgogn_src_core_functions} ${cgogn_src_core_utils} )
+	PRIVATE ${cgogn_src_core} )
 
 
 

@@ -24,7 +24,7 @@
 #ifndef CGOGN_CORE_CMAP_ORBIT_TRAVERSAL_H_
 #define CGOGN_CORE_CMAP_ORBIT_TRAVERSAL_H_
 
-#include <cgogn/core/types/map/cmap/cell.h>
+#include <cgogn/core/types/map/cell.h>
 #include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/map/cmap/phi.h>
 
@@ -328,6 +328,7 @@ auto foreach_dart_of_ALPHA1(const MESH& m, Dart d, const FUNC& f)
 		it = alpha1(m, it);
 	} while (it != d);
 }
+
 
 } // namespace cgogn
 

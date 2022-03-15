@@ -33,9 +33,20 @@
 namespace cgogn
 {
 
-///////////
-// CMap1 //
-///////////
+void dump_map_darts(const CMapBase& m)
+{
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	{
+		std::cout << "index: " << std::setw(5) << d.index << " / ";
+		for (auto& r : m.relations_)
+			std::cout << r->name() << ": " << std::setw(5) << (*r)[d.index] << " / ";
+		for (auto& ind : m.cells_indices_)
+			if (ind)
+				std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";
+		std::cout << " boundary: " << std::boolalpha << is_boundary(m, d) << std::endl;
+	}
+}
+
 
 bool check_integrity(CMap1& m, bool verbose)
 {

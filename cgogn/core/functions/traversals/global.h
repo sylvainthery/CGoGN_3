@@ -32,7 +32,7 @@
 
 #include <cgogn/core/types/cell_marker.h>
 
-#include <cgogn/core/types/map/cmap/cmap_info.h>
+#include <cgogn/core/types/map/map_info.h>
 #include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/map/cmap/orbit_traversal.h>
 
