@@ -55,6 +55,12 @@ bool import_OFF(MESH& m, const std::string& filename)
 
 	std::ifstream fp(filename.c_str(), std::ios::in);
 
+	if (! fp.good())
+	{
+		std::cerr << "File \"" << filename << "\" not found." << std::endl;
+		return false;
+	}
+
 	std::string line;
 	line.reserve(512u);
 
@@ -105,6 +111,8 @@ bool import_OFF(MESH& m, const std::string& filename)
 		surface_data.faces_nb_vertices_.push_back(n);
 		surface_data.faces_vertex_indices_.insert(surface_data.faces_vertex_indices_.end(), indices.begin(),
 												  indices.end());
+		// remove end of line in case of supplemental info
+		getline_safe(fp, line);
 	}
 
 	import_surface_data(m, surface_data);

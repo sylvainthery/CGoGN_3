@@ -52,15 +52,12 @@ enum Orbit : uint32
 
 };
 
-// TODO
-//static const std::size_t NB_ORBITS = Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
 static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
 
 template <typename MAP>
 std::string orbit_name(const MAP& m, Orbit orbit)
 {
-
-	std::cout << "M " << typeid(m).name() << std::endl;
+	unused_parameters(m);
 	if constexpr(std::is_convertible_v<MAP&, struct CMapBase&>)
 	{
 		switch (orbit)
@@ -85,7 +82,7 @@ std::string orbit_name(const MAP& m, Orbit orbit)
 			return "cgogn::Orbit::PHI1_PHI2_PHI3";
 		}
 	}
-	if constexpr(std::is_convertible_v<MAP&, struct GMapBase&>)
+	else if constexpr(std::is_convertible_v<MAP&, struct GMapBase&>)
 	{
 		switch (orbit)
 		{
@@ -109,6 +106,7 @@ std::string orbit_name(const MAP& m, Orbit orbit)
 			return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
 		}
 	}
+	unused_parameters(orbit);
 	cgogn_assert_not_reached("This orbit does not exist");
 	#ifdef NDEBUG
 	return "UNKNOWN"; // little trick to avoid warning on VS

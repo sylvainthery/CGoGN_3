@@ -46,11 +46,13 @@ struct CGOGN_CORE_EXPORT GMap0 : public GMapBase
 	{
 		beta0_ = add_relation("beta0");
 	}
+
 };
 
 template <>
 struct mesh_traits<GMap0>
 {
+	using MeshType = GMap0;
 	static constexpr const char* name = "GMap0";
 	static constexpr const uint8 dimension = 0;
 

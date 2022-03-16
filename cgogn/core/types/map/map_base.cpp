@@ -20,18 +20,26 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#include <cgogn/core/types/map/map_base.h>
+#include <cgogn/core/types/map/cmap/cmap_base.h>
 #include <iomanip>
 
 namespace cgogn
 {
-
 MapBase::MapBase()
+{
+}
+
+MapBase::~MapBase()
+{
+}
+
+
+CMapBase::CMapBase()
 {
 	boundary_marker_ = darts_.get_mark_attribute();
 }
 
-MapBase::~MapBase()
+CMapBase::~CMapBase()
 {
 }
 

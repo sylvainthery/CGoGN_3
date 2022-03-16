@@ -37,7 +37,7 @@ namespace cgogn
 /// \param m
 ///
 template <typename CELL, typename MESH>
-auto init_cells_indexing(MESH& m) -> std::enable_if_t<std::is_base_of_v<struct MapBase&, MESH&>>
+auto init_cells_indexing(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -56,7 +56,7 @@ auto init_cells_indexing(MESH& m) -> std::enable_if_t<std::is_base_of_v<struct M
 /// \param orbit
 ///
 template <typename MESH>
-auto init_cells_indexing(MESH& m, Orbit orbit) -> void //std::enable_if_t<std::is_convertible_v<MESH*, struct MapBase*>>
+auto init_cells_indexing(MESH& m, Orbit orbit) -> std::enable_if_t<std::is_convertible_v<MESH*, struct MapBase*>>
 {
 	static_assert(std::is_convertible_v<MESH*,struct MapBase*>, "must be MapBase");
 	cgogn_message_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
@@ -102,7 +102,8 @@ auto index_cells(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH&, struc
 	if (!is_indexed<CELL>(m))
 		init_cells_indexing<CELL>(m);
 
-	typename mesh_traits<MESH>::BaseType& base = static_cast<typename mesh_traits<MESH>::BaseType&>(m);
+	//typename mesh_traits<MESH>::BaseType& base = static_cast<typename mesh_traits<MESH>::BaseType&>(m);
+	auto& base = *(m.get_base_ptr());
 	DartMarker dm(m);
 	for (Dart d = base.begin(), end = base.end(); d != end; d = base.next(d))
 	{

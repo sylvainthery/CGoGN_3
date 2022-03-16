@@ -39,7 +39,7 @@ struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 
 	using Cells = std::tuple<Vertex>;
 
-	CMap0()
+	inline CMap0()
 	{
 	}
 };
@@ -47,7 +47,8 @@ struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 template <>
 struct mesh_traits<CMap0>
 {
-	using BaseType = MapBase;
+	using MeshType = CMap0;
+//	using BaseType = MapBase;
 	static constexpr const char* name = "CMap0";
 	static constexpr const uint8 dimension = 0;
 
@@ -60,6 +61,7 @@ struct mesh_traits<CMap0>
 	using Attribute = MapBase::Attribute<T>;
 	using AttributeGen = MapBase::AttributeGen;
 	using MarkAttribute = MapBase::MarkAttribute;
+
 };
 
 } // namespace cgogn

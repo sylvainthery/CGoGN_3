@@ -45,7 +45,6 @@ template <typename MESH>
 class CellCache
 {
 	using CellVectors = typename tuple_of_vectors_of_T_from_tuple_of_T<typename mesh_traits<MESH>::Cells>::type;
-
 	const MESH& m_;
 	CellVectors cells_;
 

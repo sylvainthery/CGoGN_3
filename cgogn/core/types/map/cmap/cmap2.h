@@ -50,12 +50,14 @@ struct CGOGN_CORE_EXPORT CMap2 : public CMap1
 	{
 		phi2_ = add_relation("phi2");
 	}
+
 };
 
 template <>
 struct mesh_traits<CMap2>
 {
-	using BaseType = MapBase;
+	using MeshType = CMap2;
+	//using BaseType = MapBase;
 	static constexpr const char* name = "CMap2";
 	static constexpr const uint8 dimension = 2;
 

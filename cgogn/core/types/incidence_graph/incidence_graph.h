@@ -146,12 +146,23 @@ struct CGOGN_CORE_EXPORT IncidenceGraph
 			attribute_containers_[Face::CELL_INDEX].add_attribute<std::vector<Edge>>("incident_edges");
 	};
 	// ~IncidenceGraph();
+
+	inline IncidenceGraph* get_base_ptr()
+	{
+		return this;
+	}
+
+	inline const IncidenceGraph* get_base_ptr() const
+	{
+		return this;
+	}
+
 };
 
 template <>
 struct mesh_traits<IncidenceGraph>
 {
-	using BaseType = IncidenceGraph;
+	using MeshType = IncidenceGraph;
 	static constexpr const char* name = "IncidenceGraph";
 	static constexpr const uint8 dimension = 2;
 

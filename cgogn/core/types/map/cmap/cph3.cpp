@@ -356,7 +356,8 @@ uint32 CPH3::volume_level(Dart d) const
 	uint32 lold = dart_level(oldest);
 	uint32 vLevel = std::numeric_limits<uint32>::max();
 
-	foreach_incident_face(*this, CPH3::CMAP::Volume(d), [&](CPH3::CMAP::Face f) -> bool {
+	foreach_incident_face(static_cast<const CPH3::CMAP&>(*this), CPH3::CMAP::Volume(d),
+						  [&](CPH3::CMAP::Face f) -> bool {
 		uint32 fLevel = face_level(f.dart);
 		vLevel = fLevel < vLevel ? fLevel : vLevel;
 		Dart old = face_oldest_dart(f.dart);
@@ -395,7 +396,8 @@ Dart CPH3::volume_oldest_dart(Dart d) const
 
 	Dart oldest = d;
 	uint32 l_old = dart_level(oldest);
-	foreach_incident_face(*this, CPH3::CMAP::Volume(oldest), [&](CPH3::CMAP::Face f) -> bool {
+	foreach_incident_face(static_cast<const CPH3::CMAP&>(*this), CPH3::CMAP::Volume(oldest),
+						  [&](CPH3::CMAP::Face f) -> bool {
 		Dart old = face_oldest_dart(f.dart);
 		uint32 l = dart_level(old);
 		if (l < l_old)
@@ -415,7 +417,8 @@ Dart CPH3::volume_youngest_dart(Dart d) const
 
 	Dart youngest = d;
 	uint32 l_young = dart_level(youngest);
-	foreach_incident_face(*this, CPH3::CMAP::Volume(youngest), [&](CPH3::CMAP::Face f) -> bool {
+	foreach_incident_face(static_cast<const CPH3::CMAP&>(*this), CPH3::CMAP::Volume(youngest),
+						  [&](CPH3::CMAP::Face f) -> bool {
 		Dart young = face_youngest_dart(f.dart);
 		uint32 l = dart_level(young);
 		if (l > l_young)
@@ -439,7 +442,8 @@ bool CPH3::volume_is_subdivided(Dart d) const
 
 	bool faceAreSubdivided = face_is_subdivided(d);
 
-	foreach_incident_face(*this, CPH3::CMAP::Volume(d), [&](CPH3::CMAP::Face f) -> bool {
+	foreach_incident_face(static_cast<const CPH3::CMAP&>(*this), CPH3::CMAP::Volume(d),
+						  [&](CPH3::CMAP::Face f) -> bool {
 		faceAreSubdivided &= face_is_subdivided(f.dart);
 		return true;
 	});
@@ -558,6 +562,7 @@ CPH3::CMAP::Edge cut_face(CPH3& m, CPH3::CMAP::Vertex v1, CPH3::CMAP::Vertex v2,
 
 	uint32 eid = m.refinement_edge_id(v1.dart, v2.dart);
 
+	// TODO:CHECK m or map ?
 	foreach_dart_of_orbit(m, result, [&](Dart d) -> bool {
 		m.set_edge_id(d, eid);
 		m.set_face_id(d, m.face_id(v1.dart));

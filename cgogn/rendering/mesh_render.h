@@ -510,7 +510,7 @@ public:
 		default:
 			break;
 		}
-
+		unused_parameters(func_update_ebo3);
 		// auto end_timer = std::chrono::high_resolution_clock::now();
 		// std::chrono::duration<double> elapsed_seconds = end_timer - start_timer;
 		// std::cout << "init primitive " << prim << " in " << elapsed_seconds.count() << std::endl;

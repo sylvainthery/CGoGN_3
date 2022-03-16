@@ -66,8 +66,6 @@ struct CGOGN_CORE_EXPORT MapBase
 	// shortcuts to cells indices attributes
 	std::array<std::shared_ptr<Attribute<uint32>>, NB_ORBITS> cells_indices_;
 
-	// shortcut to boundary marker attribute
-	MarkAttribute* boundary_marker_;
 
 	/*************************************************************************/
 	// Cells attributes containers
@@ -105,7 +103,20 @@ struct CGOGN_CORE_EXPORT MapBase
 	{
 		return Dart(darts_.next_index(d.index));
 	}
+
+	inline MapBase* get_base_ptr()
+	{
+		return this;
+	}
+
+	inline const MapBase* get_base_ptr() const
+	{
+		return this;
+	}
+
 };
+
+
 
 ///
 /// \brief is_boundary

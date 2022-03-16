@@ -8,6 +8,8 @@
 
 #include <cgogn/geometry/types/vector_traits.h>
 
+#define DEFAULT_MESH_PATH CGOGN_STR(CGOGN_DATA_PATH)
+
 using namespace cgogn;
 
 template <typename MESH>
@@ -40,7 +42,7 @@ int main()
 	for (auto ag : map2.attribute_containers_[CMap2::Face::ORBIT])
 		std::cout << ag->name() << std::endl;
 
-	io::import_OFF(map2, "/home/kraemer/Media/Data/surface/lowRes/cube_tri.off");
+	io::import_OFF(map2, std::string(DEFAULT_MESH_PATH) + "meshes/off/octa.off");
 
 	std::cout << "nb darts: " << nb_darts(map2) << std::endl;
 	std::cout << "vertex attributes:" << std::endl;

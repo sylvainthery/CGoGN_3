@@ -50,10 +50,13 @@ auto get_mark_attribute(const MESH& m)
 	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>, typename mesh_traits<MESH>::MarkAttribute*>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
+
 	if (!is_indexed<CELL>(m))
 		index_cells<CELL>(const_cast<MESH&>(m));
-	const typename mesh_traits<MESH>::BaseType& mb = static_cast<const typename mesh_traits<MESH>::BaseType&>(m);
-	return mb.attribute_containers_[CELL::ORBIT].get_mark_attribute();
+
+	//const typename mesh_traits<MESH>::BaseType& mb = static_cast<const typename mesh_traits<MESH>::BaseType&>(m);
+	//return mb.attribute_containers_[CELL::ORBIT].get_mark_attribute();
+	return m.get_base_ptr()->attribute_containers_[CELL::ORBIT].get_mark_attribute();
 }
 
 ////////////////////
@@ -81,7 +84,7 @@ template <typename MESH, typename CELL>
 class CellMarker
 {
 private:
-	const MESH& mesh_;
+	const typename mesh_traits<MESH>::MeshType& mesh_;
 	typename mesh_traits<MESH>::MarkAttribute* mark_attribute_;
 
 public:
@@ -122,7 +125,8 @@ template <typename MESH, typename CELL>
 class CellMarkerStore
 {
 private:
-	const MESH& mesh_;
+//	const typename MESH& mesh_;
+	const typename mesh_traits<MESH>::MeshType& mesh_;
 	typename mesh_traits<MESH>::MarkAttribute* mark_attribute_;
 	std::vector<uint32> marked_cells_;
 

@@ -101,14 +101,26 @@ struct CPH3
 		return m_;
 	}
 
-	operator MapBase&()
+	//operator MapBase&()
+	//{
+	//	return m_;
+	//}
+	//operator const MapBase&() const
+	//{
+	//	return m_;
+	//}
+
+	inline MapBase* get_base_ptr()
 	{
-		return m_;
+		return m_.get_base_ptr();
 	}
-	operator const MapBase&() const
+
+
+	inline const MapBase* get_base_ptr() const
 	{
-		return m_;
+		return m_.get_base_ptr();
 	}
+
 
 	inline Dart begin() const
 	{

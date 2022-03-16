@@ -52,12 +52,14 @@ struct CGOGN_CORE_EXPORT CMap3 : public CMap2
 	{
 		phi3_ = add_relation("phi3");
 	}
+
 };
 
 template <>
 struct mesh_traits<CMap3>
 {
-	using BaseType = MapBase;
+	using MeshType = CMap3;
+	//using BaseType = MapBase;
 	static constexpr const char* name = "CMap3";
 	static constexpr const uint8 dimension = 3;
 

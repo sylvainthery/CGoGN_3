@@ -52,12 +52,14 @@ struct CGOGN_CORE_EXPORT Graph : public CMapBase
 		alpha1_ = add_relation("alpha1");
 		alpha_1_ = add_relation("alpha_1");
 	}
+
 };
 
 template <>
 struct mesh_traits<Graph>
 {
-	using BaseType = MapBase;
+	using MeshType = Graph;
+	//using BaseType = MapBase;
 	static constexpr const char* name = "Graph";
 	static constexpr const uint8 dimension = 1;
 

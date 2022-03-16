@@ -47,11 +47,13 @@ struct CGOGN_CORE_EXPORT GMap1 : public GMap0
 	{
 		beta1_ = add_relation("beta1");
 	}
+
 };
 
 template <>
 struct mesh_traits<GMap1>
 {
+	using MeshType = GMap1;
 	static constexpr const uint8 dimension = 1;
 
 	using Vertex = GMap1::Vertex;

@@ -44,17 +44,19 @@ struct CGOGN_CORE_EXPORT CMap1 : public CMap0
 	std::shared_ptr<Attribute<Dart>> phi1_;
 	std::shared_ptr<Attribute<Dart>> phi_1_;
 
-	CMap1() : CMap0()
+	inline CMap1() : CMap0()
 	{
 		phi1_ = add_relation("phi1");
 		phi_1_ = add_relation("phi_1");
 	}
+
 };
 
 template <>
 struct mesh_traits<CMap1>
 {
-	using BaseType = MapBase;
+	using MeshType = CMap1;
+	//using BaseType = MapBase;
 	static constexpr const char* name = "CMap1";
 	static constexpr const uint8 dimension = 1;
 
