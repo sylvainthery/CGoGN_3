@@ -41,6 +41,7 @@ auto init_cells_indexing(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH
 {
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
+	static_assert(!std::is_same_v<MESH, struct IncidenceGraph>, "Merdeeeee");
 	if (!is_indexed<CELL>(m))
 	{
 		std::ostringstream oss;

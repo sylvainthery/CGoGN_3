@@ -21,6 +21,9 @@
  *                                                                              *
  *******************************************************************************/
 
+
+#include <cgogn/core/types/map/cmap/graph.h>
+#include <cgogn/core/types/incidence_graph/incidence_graph.h>
 #include <cgogn/modeling/algos/graph_utils.h>
 
 #include <cgogn/core/functions/mesh_info.h>

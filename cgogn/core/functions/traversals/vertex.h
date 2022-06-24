@@ -274,12 +274,14 @@ auto foreach_adjacent_vertex_through_edge(const MESH& ig, typename mesh_traits<M
 	-> std::enable_if_t<std::is_same_v<MESH&, struct IncidenceGraph&>>
 {
 	using IncidentGraph = typename mesh_traits<MESH>::MeshType;
-	static_assert(is_func_parameter_same<FUNC, IncidenceGraph::Vertex>::value, "Wrong function cell parameter type");
+	using Vertex = typename mesh_traits<MESH>::Vertex;
+	using Edge = typename mesh_traits<MESH>::Edge;
+	static_assert(is_func_parameter_same<FUNC, Vertex>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	for (IncidenceGraph::Edge e : (*ig.vertex_incident_edges_)[v.index_])
+	for (Edge e : (*ig.vertex_incident_edges_)[v.index_])
 	{
-		const std::pair<IncidenceGraph::Vertex, IncidenceGraph::Vertex>& ev = (*ig.edge_incident_vertices_)[e.index_];
+		const std::pair<Vertex,Vertex>& ev = (*ig.edge_incident_vertices_)[e.index_];
 		if (ev.first.index_ != v.index_)
 		{
 			if (!func(ev.first))
