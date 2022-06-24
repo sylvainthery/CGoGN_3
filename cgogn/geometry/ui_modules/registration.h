@@ -68,7 +68,8 @@ public:
 	void non_rigid_register_mesh(MESH& source, std::shared_ptr<Attribute<Vec3>>& source_position, MESH& target,
 								 const Attribute<Vec3>* target_position, Scalar fit_to_target, bool relax)
 	{
-		geometry::non_rigid_register_mesh(source, source_position, target, target_position, fit_to_target, relax);
+		geometry::non_rigid_register_mesh(source, source_position, target, target_position, fit_to_target, relax, false,
+										  geometry::NEAREST_POINT);
 		mesh_provider_->emit_attribute_changed(source, source_position.get());
 	}
 
@@ -79,7 +80,7 @@ protected:
 			app_.module("MeshProvider (" + std::string{mesh_traits<MESH>::name} + ")"));
 	}
 
-	void interface() override
+	void left_panel() override
 	{
 		imgui_mesh_selector(mesh_provider_, selected_source_mesh_, "Source mesh", [&](MESH& m) {
 			selected_source_mesh_ = &m;

@@ -84,6 +84,103 @@ namespace cgogn
 ///////////
 // Graph //
 ///////////
+<<<<<<< HEAD
+=======
+
+Graph::Edge connect_vertices(Graph& g, Graph::Vertex v1, Graph::Vertex v2, bool set_indices)
+{
+	static auto is_isolated = [](Graph& g, Graph::Vertex v) -> bool { return alpha0(g, v.dart) == alpha1(g, v.dart); };
+
+	Dart d = v1.dart;
+	Dart e = v2.dart;
+	Dart dd = alpha0(g, d);
+	Dart ee = alpha0(g, e);
+	if (is_isolated(g, v1))
+	{
+		if (is_isolated(g, v2))
+		{
+			alpha1_unsew(g, d);
+			alpha1_unsew(g, e);
+			remove_dart(g, dd);
+			remove_dart(g, ee);
+			alpha0_sew(g, d, e);
+			if (set_indices)
+			{
+				if (is_indexed<Graph::Edge>(g))
+					copy_index<Graph::Edge>(g, e, d);
+			}
+			return Graph::Edge(d);
+		}
+		else
+		{
+			alpha1_unsew(g, d);
+			alpha1_sew(g, e, dd);
+			if (set_indices)
+			{
+				if (is_indexed<Graph::Vertex>(g))
+					copy_index<Graph::Vertex>(g, dd, e);
+			}
+			return Graph::Edge(d);
+		}
+	}
+	else
+	{
+		if (is_isolated(g, v2))
+		{
+			alpha1_unsew(g, e);
+			alpha1_sew(g, d, ee);
+			if (set_indices)
+			{
+				if (is_indexed<Graph::Vertex>(g))
+					copy_index<Graph::Vertex>(g, ee, d);
+			}
+			return Graph::Edge(ee);
+		}
+		else
+		{
+			Dart ddd = add_dart(g);
+			Dart eee = add_dart(g);
+			alpha0_sew(g, ddd, eee);
+			alpha1_sew(g, d, ddd);
+			alpha1_sew(g, e, eee);
+			if (set_indices)
+			{
+				if (is_indexed<Graph::Vertex>(g))
+				{
+					copy_index<Graph::Vertex>(g, ddd, d);
+					copy_index<Graph::Vertex>(g, eee, e);
+				}
+				if (is_indexed<Graph::HalfEdge>(g))
+				{
+					set_index(g, Graph::HalfEdge(ddd), new_index<Graph::HalfEdge>(g));
+					set_index(g, Graph::HalfEdge(eee), new_index<Graph::HalfEdge>(g));
+				}
+				if (is_indexed<Graph::Edge>(g))
+					set_index(g, Graph::Edge(ddd), new_index<Graph::Edge>(g));
+			}
+			return Graph::Edge(ddd);
+		}
+	}
+}
+
+////////////////////
+// IncidenceGraph //
+////////////////////
+
+IncidenceGraph::Edge connect_vertices(IncidenceGraph& ig, IncidenceGraph::Vertex v1, IncidenceGraph::Vertex v2)
+{
+	using Edge = IncidenceGraph::Edge;
+
+	Edge e = add_cell<Edge>(ig);
+	(*ig.edge_incident_vertices_)[e.index_] = {v1, v2};
+	(*ig.edge_incident_faces_)[e.index_].clear();
+	(*ig.vertex_incident_edges_)[v1.index_].push_back(e);
+	(*ig.vertex_incident_edges_)[v2.index_].push_back(e);
+
+	return e;
+}
+
+>>>>>>> compilVS
 /*****************************************************************************/
 
 // template <typename MESH>

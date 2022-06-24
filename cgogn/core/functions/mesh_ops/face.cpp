@@ -64,6 +64,30 @@ namespace cgogn
 // IncidenceGraph //
 ////////////////////
 
+<<<<<<< HEAD
+=======
+IncidenceGraph::Face add_face(IncidenceGraph& ig, std::vector<IncidenceGraph::Edge>& edges)
+{
+	using Vertex = IncidenceGraph::Vertex;
+	using Edge = IncidenceGraph::Edge;
+	using Face = IncidenceGraph::Face;
+
+	Face f = add_cell<Face>(ig);
+	(*ig.face_incident_edges_)[f.index_] = edges;
+	if (sort_face_edges(ig, f))
+	{
+		for (Edge e : edges)
+			(*ig.edge_incident_faces_)[e.index_].push_back(f);
+		return f;
+	}
+	else
+	{
+		remove_cell<Face>(ig, f);
+		return Face();
+	}
+}
+
+>>>>>>> compilVS
 /*****************************************************************************/
 
 // template <typename MESH>
@@ -107,6 +131,68 @@ namespace cgogn
 // IncidenceGraph //
 ////////////////////
 
+<<<<<<< HEAD
+=======
+IncidenceGraph::Edge CGOGN_CORE_EXPORT cut_face(IncidenceGraph& ig, IncidenceGraph::Vertex v0,
+												IncidenceGraph::Vertex v1)
+{
+	using Vertex = IncidenceGraph::Vertex;
+	using Edge = IncidenceGraph::Edge;
+	using Face = IncidenceGraph::Face;
+
+	// TODO: manage face_incident_edges_dir_ !!!
+
+	// find common face
+	std::vector<Face> faces0 = incident_faces(ig, v0);
+	std::vector<Face> faces1 = incident_faces(ig, v1);
+
+	Face face;
+	for (uint32 i = 0; i < faces0.size(); ++i)
+	{
+		for (uint32 j = 0; j < faces1.size(); ++j)
+		{
+			if (faces0[i] == faces1[j])
+			{
+				face = faces0[i];
+				break;
+			}
+		}
+		if (face.is_valid())
+			break;
+	}
+
+	if (!face.is_valid())
+		return Edge();
+
+	std::vector<Edge>& edges = (*ig.face_incident_edges_)[face.index_];
+	std::vector<Vertex> vertices = sorted_face_vertices(ig, face);
+
+	std::vector<Edge> face_edge0;
+	std::vector<Edge> face_edge1;
+
+	bool inside = false;
+	for (uint32 i = 0; i < edges.size(); ++i)
+	{
+		if (vertices[i] == v0 || vertices[i] == v1)
+			inside = !inside;
+
+		if (inside)
+			face_edge1.push_back(edges[i]);
+		else
+			face_edge0.push_back(edges[i]);
+	}
+
+	remove_face(ig, face);
+	Edge new_edge = add_edge(ig, v0, v1);
+	face_edge0.push_back(new_edge);
+	face_edge1.push_back(new_edge);
+	add_face(ig, face_edge0);
+	add_face(ig, face_edge1);
+
+	return new_edge;
+}
+
+>>>>>>> compilVS
 ///////////
 // CMap2 //
 ///////////

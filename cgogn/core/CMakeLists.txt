@@ -55,8 +55,9 @@ set ( cgogn_src_core
 
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph.h"
-		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph_ops.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph_ops.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/incidence_graph/incidence_graph_ops.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/attribute_container.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/container/attribute_container.cpp"
@@ -112,8 +113,8 @@ endif()
 
 target_compile_options(${PROJECT_NAME} PUBLIC
 	# g++
-	$<$<CXX_COMPILER_ID:GNU>:$<BUILD_INTERFACE:-Wall>>
-	$<$<CXX_COMPILER_ID:GNU>:-Wextra>
+#	$<$<CXX_COMPILER_ID:GNU>:$<BUILD_INTERFACE:-Wall>>
+#	$<$<CXX_COMPILER_ID:GNU>:-Wextra>
 	$<$<CXX_COMPILER_ID:GNU>:-Wnon-virtual-dtor>
 	$<$<CXX_COMPILER_ID:GNU>:-Wno-unknown-pragmas>
 	# Clang

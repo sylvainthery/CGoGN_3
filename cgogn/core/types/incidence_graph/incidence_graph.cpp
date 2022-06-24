@@ -30,7 +30,6 @@
 #include <cgogn/core/functions/traversals/vertex.h>
 
 
-
 namespace cgogn
 {
 
@@ -42,9 +41,6 @@ namespace cgogn
 
 /*****************************************************************************/
 
-////////////////////
-// IncidenceGraph //
-////////////////////
 
 IncidenceGraph::Edge add_edge(IncidenceGraph& ig, IncidenceGraph::Vertex v0, IncidenceGraph::Vertex v1)
 {
@@ -293,6 +289,21 @@ void remove_vertex(IncidenceGraph& ig, IncidenceGraph::Vertex v)
 		remove_edge(ig, (*ig.vertex_incident_edges_)[v.index_].back());
 	remove_cell<Vertex>(ig, v);
 }
+
+
+IncidenceGraph::Edge connect_vertices(IncidenceGraph& ig, IncidenceGraph::Vertex v1, IncidenceGraph::Vertex v2)
+{
+	using Edge = IncidenceGraph::Edge;
+
+	Edge e = add_cell<Edge>(ig);
+	(*ig.edge_incident_vertices_)[e.index_] = {v1, v2};
+	(*ig.edge_incident_faces_)[e.index_].clear();
+	(*ig.vertex_incident_edges_)[v1.index_].push_back(e);
+	(*ig.vertex_incident_edges_)[v2.index_].push_back(e);
+
+	return e;
+}
+
 
 } // namespace cgogn
 
