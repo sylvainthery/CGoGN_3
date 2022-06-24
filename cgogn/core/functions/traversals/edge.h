@@ -133,9 +133,9 @@ auto foreach_incident_edge(const MESH& ig, CELL c, const FUNC& func)
 {
 	using IncidenceGraph = typename mesh_traits<MESH>::MeshType;
 	using Edge = typename mesh_traits<MESH>::Edge;
-	static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
+	static_assert(is_in_tuple<CELL, mesh_traits<MESH>::Cells>::value,
 				  "CELL not supported in this IncidenceGraph");
-	static_assert(is_func_parameter_same<FUNC, IncidenceGraph::Edge>::value, "Wrong function cell parameter type");
+	static_assert(is_func_parameter_same<FUNC, typename IncidenceGraph::Edge>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
 	if constexpr (std::is_same_v<CELL, IncidenceGraph::Vertex>)
