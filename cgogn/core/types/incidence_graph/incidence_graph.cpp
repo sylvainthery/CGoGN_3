@@ -21,6 +21,7 @@
  *                                                                              *
  *******************************************************************************/
 
+#include <cgogn/core/types/incidence_graph/incidence_graph.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph_ops.h>
 
 #include <cgogn/core/functions/cells.h>

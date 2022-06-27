@@ -161,15 +161,19 @@ auto foreach_incident_face(const MESH& ig, CELL c, const FUNC& func)
 	-> std::enable_if_t<std::is_same_v<MESH&, struct IncidenceGraph&>>
 {
 	using IncidentGraph = typename mesh_traits<MESH>::MeshType;
+	using Vertex = typename mesh_traits<MESH>::Vertex;
+	using Edge = typename mesh_traits<MESH>::Edge;
+	using Face = typename mesh_traits<MESH>::Face;
 
-	static_assert(is_in_tuple<CELL, mesh_traits<IncidenceGraph>::Cells>::value,
+
+	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value,
 				  "CELL not supported in this IncidenceGraph");
-	static_assert(is_func_parameter_same<FUNC, IncidenceGraph::Face>::value, "Wrong function cell parameter type");
+	static_assert(is_func_parameter_same<FUNC, Face>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
-	if constexpr (std::is_same_v<CELL, IncidenceGraph::Vertex>)
+	if constexpr (std::is_same_v<CELL,Vertex>)
 	{
-		CellMarkerStore<IncidenceGraph, IncidenceGraph::Face> marker(ig);
+		CellMarkerStore<IncidenceGraph,Face> marker(ig);
 		for (auto& ep : (*ig.vertex_incident_edges_)[c.index_])
 		{
 			bool stop = false;
@@ -187,7 +191,7 @@ auto foreach_incident_face(const MESH& ig, CELL c, const FUNC& func)
 				break;
 		}
 	}
-	else if constexpr (std::is_same_v<CELL, IncidenceGraph::Edge>)
+	else if constexpr (std::is_same_v<CELL, Edge>)
 	{
 		for (auto& fp : (*ig.edge_incident_faces_)[c.index_])
 		{
@@ -293,11 +297,13 @@ auto foreach_adjacent_face_through_edge(const MESH& ig, typename mesh_traits<MES
 -> std::enable_if_t<std::is_same_v<MESH&, struct IncidenceGraph&>>
 {
 	using IncidentGraph = typename mesh_traits<MESH>::MeshType;
-	static_assert(is_func_parameter_same<FUNC, IncidenceGraph::Face>::value, "Wrong function cell parameter type");
+	using Face = typename mesh_traits<MESH>::Face;
+
+	static_assert(is_func_parameter_same<FUNC,Face>::value, "Wrong function cell parameter type");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 
 	bool stop = false;
-	CellMarkerStore<IncidenceGraph, IncidenceGraph::Face> marker(ig);
+	CellMarkerStore<IncidenceGraph, Face> marker(ig);
 	marker.mark(f);
 	for (auto& ie : (*ig.face_incident_edges_)[f.index_])
 	{
