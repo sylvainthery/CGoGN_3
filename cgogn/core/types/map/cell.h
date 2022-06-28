@@ -49,69 +49,10 @@ enum Orbit : uint32
 	PHI2_PHI3,   BETA0_BETA2_BETA3 = PHI2_PHI3, // 3EDGE
 	PHI21_PHI31, BETA1_BETA2_BETA3 = PHI21_PHI31, // 3VERTEX
 	PHI1_PHI2_PHI3,	BETA0_BETA1_BETA2_BETA3 = PHI1_PHI2_PHI3
-
 };
 
 static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
 
-template <typename MAP>
-std::string orbit_name(const MAP& m, Orbit orbit)
-{
-	unused_parameters(m);
-	if constexpr(std::is_convertible_v<MAP&, struct CMapBase&>)
-	{
-		switch (orbit)
-		{
-		case Orbit::DART:
-			return "cgogn::Orbit::DART";
-		case Orbit::PHI1:
-			return "cgogn::Orbit::PHI1";
-		case Orbit::PHI2:
-			return "cgogn::Orbit::PHI2";
-		case Orbit::PHI21:
-			return "cgogn::Orbit::PHI21";
-		case Orbit::PHI1_PHI2:
-			return "cgogn::Orbit::PHI1_PHI2";
-		case Orbit::PHI1_PHI3:
-			return "cgogn::Orbit::PHI1_PHI3";
-		case Orbit::PHI2_PHI3:
-			return "cgogn::Orbit::PHI2_PHI3";
-		case Orbit::PHI21_PHI31:
-			return "cgogn::Orbit::PHI21_PHI31";
-		case Orbit::PHI1_PHI2_PHI3:
-			return "cgogn::Orbit::PHI1_PHI2_PHI3";
-		}
-	}
-	else if constexpr(std::is_convertible_v<MAP&, struct GMapBase&>)
-	{
-		switch (orbit)
-		{
-		case Orbit::DART:
-			return "cgogn::Orbit::DART";
-		case Orbit::BETA0_BETA1:
-			return "cgogn::Orbit::BETA0_BETA1";
-		case Orbit::BETA0_BETA2:
-			return "cgogn::Orbit::BETA0_BETA2";
-		case Orbit::BETA1_BETA2:
-			return "cgogn::Orbit::BETA1_BETA2";
-		case Orbit::BETA0_BETA1_BETA2:
-			return "cgogn::Orbit::BETA0_BETA1_BETA2";
-		case Orbit::BETA0_BETA1_BETA3:
-			return "cgogn::Orbit::BETA0_BETA1_BETA3";
-		case Orbit::BETA0_BETA2_BETA3:
-			return "cgogn::Orbit::BETA0_BETA2_BETA3";
-		case Orbit::BETA1_BETA2_BETA3:
-			return "cgogn::Orbit::BETA1_BETA2_BETA3";
-		case Orbit::BETA0_BETA1_BETA2_BETA3:
-			return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
-		}
-	}
-	unused_parameters(orbit);
-	cgogn_assert_not_reached("This orbit does not exist");
-	#ifdef NDEBUG
-	return "UNKNOWN"; // little trick to avoid warning on VS
-	#endif
-}
 
 /**
  * \brief Cellular typing
