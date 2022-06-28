@@ -39,8 +39,6 @@ namespace cgogn
 enum Orbit : uint32
 {
 	DART = 0,
-	BETA0,
-	BETA1,
 	PHI1, BETA0_BETA1 = PHI1,  // 2FACE = 1CC
 	PHI2, BETA0_BETA2 = PHI2,  //2EDGE
 	PHI21, BETA1_BETA2= PHI21, // 2VERTEX
@@ -48,10 +46,16 @@ enum Orbit : uint32
 	PHI1_PHI3,   BETA0_BETA1_BETA3 = PHI1_PHI3, // 3FACE
 	PHI2_PHI3,   BETA0_BETA2_BETA3 = PHI2_PHI3, // 3EDGE
 	PHI21_PHI31, BETA1_BETA2_BETA3 = PHI21_PHI31, // 3VERTEX
-	PHI1_PHI2_PHI3,	BETA0_BETA1_BETA2_BETA3 = PHI1_PHI2_PHI3
+	PHI1_PHI2_PHI3,	BETA0_BETA1_BETA2_BETA3 = PHI1_PHI2_PHI3,
+	BETA0,
+	BETA1
 };
 
 static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
+static const std::size_t NB_ORBITS_CMAP3 = Orbit::PHI1_PHI2_PHI3 + 1;
+static const std::size_t NB_ORBITS_CMAP2 = Orbit::PHI1_PHI2 + 1;
+static const std::size_t NB_ORBITS_CMAP1 = Orbit::PHI1 + 1;
+static const std::size_t NB_ORBITS_CMAP0 = 1;
 
 
 /**

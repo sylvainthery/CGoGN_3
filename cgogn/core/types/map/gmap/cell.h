@@ -38,40 +38,6 @@
 namespace cgogn
 {
 
-inline std::string orbit_name(Orbit orbit)
-{
-	switch (orbit)
-	{
-	case GMapOrbit::DART:
-		return "cgogn::Orbit::DART";
-	case GMapOrbit::BETA0:
-		return "cgogn::Orbit::BETA0";
-	case GMapOrbit::BETA1:
-		return "cgogn::Orbit::BETA1";
-	case GMapOrbit::BETA0_BETA1:
-        return "cgogn::Orbit::BETA0_BETA1";
-	case GMapOrbit::BETA0_BETA2:
-		return "cgogn::Orbit::BETA0_BETA2";
-	case GMapOrbit::BETA1_BETA2:
-        return "cgogn::Orbit::BETA1_BETA2";
-		
-	case GMapOrbit::BETA0_BETA1_BETA2:
-        return "cgogn::Orbit::BETA0_BETA1_BETA2";
-	case GMapOrbit::BETA0_BETA1_BETA3:
-        return "cgogn::Orbit::BETA0_BETA1_BETA3";
-	case GMapOrbit::BETA0_BETA2_BETA3:
-        return "cgogn::Orbit::BETA0_BETA2_BETA3";
-	case GMapOrbit::BETA1_BETA2_BETA3:
-        return "cgogn::Orbit::BETA1_BETA2_BETA3";
-	case GMapOrbit::BETA0_BETA1_BETA2_BETA3:
-        return "cgogn::Orbit::BETA0_BETA1_BETA2_BETA3";
-		//		default: cgogn_assert_not_reached("This orbit does not exist"); return "UNKNOWN";
-	}
-	cgogn_assert_not_reached("This orbit does not exist");
-#ifdef NDEBUG
-	return "UNKNOWN"; // little trick to avoid warning on VS
-#endif
-}
 
 /**
  * \brief Cellular typing
