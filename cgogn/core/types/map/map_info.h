@@ -58,9 +58,13 @@ template <typename CMAP>
 void copy(CMAP& dst, const CMAP& src)
 {
 	clear(dst, false);
-	for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
+//	for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
+//	{
+//		if (src.cells_indices_[orbit] != nullptr)
+//			init_cells_indexing(dst, Orbit(orbit));
+//	}
+	for(uint32 orbit: src.cells_used_orbit_)
 	{
-		if (src.cells_indices_[orbit] != nullptr)
 			init_cells_indexing(dst, Orbit(orbit));
 	}
 	dst.darts_.copy(src.darts_);

@@ -80,9 +80,14 @@ inline Dart add_dart(GMapBase& m)
 	Dart d(index);
 	for (auto& rel : m.relations_)
 		(*rel)[d.index] = d;
-	for (auto& emb : m.cells_indices_)
-		if (emb)
-			(*emb)[d.index] = INVALID_INDEX;
+	//	for (auto& emb : m.cells_indices_)
+	//		if (emb)
+
+	for (uint32 orb : m.cells_used_orbit_)
+	{
+		auto& emb = m.cells_indices_[orb];
+		(*emb)[d.index] = INVALID_INDEX;
+	}
 	return d;
 }
 

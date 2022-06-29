@@ -41,6 +41,7 @@ struct CGOGN_CORE_EXPORT CMap0 : public CMapBase
 
 	inline CMap0()
 	{
+		cells_indices_.resize(NB_ORBITS_CMAP0);
 	}
 };
 
