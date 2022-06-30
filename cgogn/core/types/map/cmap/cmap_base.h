@@ -37,6 +37,7 @@ struct CGOGN_CORE_EXPORT CMapBase: public MapBase
 	MarkAttribute* boundary_marker_;
 	inline CMapBase()
 	{
+		boundary_marker_ = this->darts_.get_mark_attribute();
 	}
 	
 	inline ~CMapBase()
