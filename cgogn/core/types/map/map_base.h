@@ -64,9 +64,9 @@ struct CGOGN_CORE_EXPORT MapBase
 	// shortcuts to topological relations attributes
 	std::vector<std::shared_ptr<Attribute<Dart>>> relations_;
 	// shortcuts to cells indices attributes
-//	std::array<std::shared_ptr<Attribute<uint32>>, NB_ORBITS> cells_indices_;
-	std::vector<std::shared_ptr<Attribute<uint32>>> cells_indices_;
-	std::vector<uint32> cells_used_orbit_;
+	std::array<std::shared_ptr<Attribute<uint32>>, NB_ORBITS> cells_indices_;
+	// shortcuts to embedded cells 
+	std::vector<uint32> cells_embedded_orbit_;
 
 
 	/*************************************************************************/

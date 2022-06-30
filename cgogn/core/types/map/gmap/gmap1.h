@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_GMAP_CMAP1_H_
-#define CGOGN_CORE_TYPES_GMAP_CMAP1_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_GMAP1_H_
+#define CGOGN_CORE_TYPES_GMAP_GMAP1_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
@@ -74,25 +74,6 @@ GMap1::Vertex CGOGN_CORE_EXPORT cut_edge(GMap1& m, GMap1::Edge e, bool set_indic
 
 GMap1::Face CGOGN_CORE_EXPORT add_face(GMap1& m, uint32 size, bool set_indices = true);
 
-inline Dart add_dart(GMapBase& m)
-{
-	uint32 index = m.darts_.new_index();
-	Dart d(index);
-	for (auto& rel : m.relations_)
-		(*rel)[d.index] = d;
-	//	for (auto& emb : m.cells_indices_)
-	//		if (emb)
-
-	for (uint32 orb : m.cells_used_orbit_)
-	{
-		auto& emb = m.cells_indices_[orb];
-		(*emb)[d.index] = INVALID_INDEX;
-	}
-	return d;
-}
-
-
-
 
 inline Dart beta1(const GMap1& m, Dart d)
 {
@@ -127,5 +108,5 @@ inline void beta1_unsew(GMap1& m, Dart d, Dart e)
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_GMAP_CMAP1_H_
+#endif // CGOGN_CORE_TYPES_GMAP_GMAP1_H_
 

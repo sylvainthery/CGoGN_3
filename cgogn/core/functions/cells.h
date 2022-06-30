@@ -107,7 +107,7 @@ auto init_cells_indexing(MESH& m) -> std::enable_if_t<std::is_convertible_v<MESH
 		std::ostringstream oss;
 		oss << "__index_" << orbit_name(m, orbit);
 		m.cells_indices_[orbit] = m.darts_.template add_attribute<uint32>(oss.str());
-		m.cells_used_orbit_.push_back(orbit);
+		m.cells_embedded_orbit_.push_back(orbit);
 		m.cells_indices_[orbit]->fill(INVALID_INDEX);
 	}
 }
@@ -127,7 +127,7 @@ auto init_cells_indexing(MESH& m, Orbit orbit) -> std::enable_if_t<std::is_conve
 		std::ostringstream oss;
 		oss << "__index_" << orbit_name(m,orbit);
 		m.cells_indices_[orbit] = m.darts_.template add_attribute<uint32>(oss.str());
-		m.cells_used_orbit_.push_back(orbit);
+		m.cells_embedded_orbit_.push_back(orbit);
 		m.cells_indices_[orbit]->fill(INVALID_INDEX);
 	}
 }

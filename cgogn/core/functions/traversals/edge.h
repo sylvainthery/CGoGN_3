@@ -34,6 +34,7 @@
 #include <cgogn/core/types/map/map_info.h>
 #include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/map/cmap/orbit_traversal.h>
+#include <cgogn/core/types/map/gmap/orbit_traversal.h>
 
 namespace cgogn
 {

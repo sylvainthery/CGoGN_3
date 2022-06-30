@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_GMAP_CMAP0_H_
-#define CGOGN_CORE_TYPES_GMAP_CMAP0_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_GMAP0_H_
+#define CGOGN_CORE_TYPES_GMAP_GMAP0_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
@@ -110,4 +110,4 @@ inline Dart beta(const MESH& m, Dart d)
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_GMAP_CMAP0_H_
+#endif // CGOGN_CORE_TYPES_GMAP_GMAP0_H_

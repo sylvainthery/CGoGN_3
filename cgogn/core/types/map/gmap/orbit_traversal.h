@@ -34,13 +34,9 @@
 namespace cgogn
 {
 
-///////////////////////////////
-// MapBase (or convertible) //
-///////////////////////////////
-
 template <typename MESH, typename CELL, typename FUNC>
 auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
@@ -54,126 +50,186 @@ auto foreach_dart_of_orbit(const MESH& m, CELL c, const FUNC& f)
 		f(c.dart);
 		return;
 	}
-	if constexpr (orbit == PHI1)
+	if constexpr (orbit == BETA0)
 	{
-		foreach_dart_of_PHI1(m, c.dart, f);
+		foreach_dart_of_BETA0(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI2)
+	if constexpr (orbit == BETA1)
 	{
-		foreach_dart_of_PHI2(m, c.dart, f);
+		foreach_dart_of_BETA1(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI21)
+	if constexpr (orbit == BETA0_BETA1)
 	{
-		foreach_dart_of_PHI21(m, c.dart, f);
+		foreach_dart_of_BETA0_BETA1(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI1_PHI2)
+	if constexpr (orbit == BETA0_BETA2)
 	{
-		foreach_dart_of_PHI1_PHI2(m, c.dart, f);
+		foreach_dart_of_BETA0_BETA2(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI1_PHI3)
+	if constexpr (orbit == BETA1_BETA2)
 	{
-		foreach_dart_of_PHI1_PHI3(m, c.dart, f);
+		foreach_dart_of_BETA1_BETA2(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI2_PHI3)
+	if constexpr (orbit == BETA0_BETA1_BETA2)
 	{
-		foreach_dart_of_PHI2_PHI3(m, c.dart, f);
+		foreach_dart_of_BETA0_BETA1_BETA2(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI21_PHI31)
+	if constexpr (orbit == BETA0_BETA1_BETA3)
 	{
-		foreach_dart_of_PHI21_PHI31(m, c.dart, f);
+		foreach_dart_of_BETA0_BETA1_BETA3(m, c.dart, f);
 		return;
 	}
-	if constexpr (orbit == PHI1_PHI2_PHI3)
+	if constexpr (orbit == BETA0_BETA2_BETA3)
 	{
-		foreach_dart_of_PHI1_PHI2_PHI3(m, c.dart, f);
+		foreach_dart_of_BETA0_BETA2_BETA3(m, c.dart, f);
+		return;
+	}
+	if constexpr (orbit == BETA1_BETA2_BETA3)
+	{
+		foreach_dart_of_BETA1_BETA2_BETA3(m, c.dart, f);
+		return;
+	}
+	if constexpr (orbit == BETA0_BETA1_BETA2_BETA3)
+	{
+		foreach_dart_of_BETA0_BETA1_BETA2_BETA3(m, c.dart, f);
 		return;
 	}
 }
-
-///////////
-// Graph //
-///////////
-
-template <typename CELL, typename FUNC>
-void foreach_dart_of_orbit(const Graph& m, CELL c, const FUNC& f)
-{
-	static_assert(is_in_tuple<CELL, typename Graph::Cells>::value, "Cell not supported in a Graph");
-	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	static const Orbit orbit = CELL::ORBIT;
-	switch (orbit)
-	{
-	case DART:
-		f(c.dart);
-		break;
-	case PHI2:
-		foreach_dart_of_ALPHA0(m, c.dart, f);
-		break;
-	case PHI21:
-		foreach_dart_of_ALPHA1(m, c.dart, f);
-		break;
-	default:
-		break;
-	}
-}
-
 /*****************************************************************************/
 // orbits traversals
 /*****************************************************************************/
 
 ///////////////////////////////
-// MapBase (or convertible) //
+//  GMapBase (or convertible) //
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI1(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA0(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	Dart it = d;
-	do
-	{
-		if (!f(it))
-			break;
-		it = phi1(m, it);
-	} while (it != d);
-}
 
-template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI2(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
-{
-	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
 	if (f(d))
-		f(phi2(m, d));
+		f(beta0(m, d));
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI21(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA1(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	Dart it = d;
+
+	if (f(d))
+		f(beta1(m, d));
+}
+
+
+template <typename MESH, typename FUNC>
+auto foreach_dart_of_BETA0_BETA1(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
+{
+	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
+	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+
+	Dart jt = d;
+	Dart it;
 	do
 	{
+		it = jt;
 		if (!f(it))
-			break;
-		it = phi<-1, 2>(m, it);
-	} while (it != d);
+			return;
+		it = beta0(m, it);
+		if (!f(it))
+			return;
+		jt = beta1(m, it);
+	} while ((jt != it) && (jt != d));
+
+	if (jt != it)
+		return;
+
+	it = d;
+	jt = beta1(m, it);
+	while (jt != it)
+	{
+		it = jt;
+		if (!f(it))
+			return;
+		it = beta0(m, it);
+		if (!f(it))
+			return;
+		jt = beta1(m, it);
+	}
+}
+
+
+template <typename MESH, typename FUNC>
+auto foreach_dart_of_BETA0_BETA2(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
+{
+	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
+	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+	if (!f(d))
+		return;
+	Dart dd = beta2(m, d);
+	if (dd != d)
+		if (!f(dd))
+			return;
+	d = beta0(m, d);
+	if (!f(d))
+		return;
+	dd = beta2(m, d);
+	if (dd != d)
+		f(dd);
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI1_PHI2(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA1_BETA2(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
+{
+	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
+	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+
+	Dart jt = d;
+	Dart it;
+	do
+	{
+		it = jt;
+		if (!f(it))
+			return;
+		it = beta1(m, it);
+		if (!f(it))
+			return;
+		jt = beta2(m, it);
+	} while ((jt != it) && (jt != d));
+
+	if (jt != it)
+		return;
+
+	it = d;
+	jt = beta2(m, it);
+	while (jt != it)
+	{
+		it = jt;
+		if (!f(it))
+			return;
+		it = beta1(m, it);
+		if (!f(it))
+			return;
+		jt = beta2(m, it);
+	}
+}
+
+template <typename MESH, typename FUNC>
+auto foreach_dart_of_BETA0_BETA1_BETA2(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -194,52 +250,87 @@ auto foreach_dart_of_PHI1_PHI2(const MESH& m, Dart d, const FUNC& f)
 			Dart it = e;
 			do
 			{
-				if (!f(it)) // apply the function to the darts of the face
+				if (!f(it))
 					return;
 				marker.mark(it);			  // Mark
-				const Dart adj = phi2(m, it); // Get adjacent face
-				if (!marker.is_marked(adj))
+				const Dart adj = beta2(m, it); // Get adjacent face
+				if (!marker.is_marked(adj)) // no need to test FP because of marker
 					visited_faces.push_back(adj); // Add it
-				it = phi1(m, it);
+				it = beta0(m, it);		// Mark beta0
+				marker.mark(it);
+				if (!f(it))
+					return;
+				it = beta1(m, it);
 			} while (it != e);
 		}
 	}
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI1_PHI3(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA0_BETA1_BETA3(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	foreach_dart_of_PHI1(m, d, [&](Dart fd) -> bool {
+	foreach_dart_of_BETA0_BETA1(m, d, [&](Dart fd) -> bool {
 		if (f(fd))
-			return f(phi3(m, fd));
+		{
+			Dart e = beta3(m, fd);
+			if (e != fd)
+				return f(e);
+		}
 		return false;
 	});
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI2_PHI3(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA0_BETA2_BETA3(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	Dart it = d;
+
+	Dart jt = d;
+	Dart it;
 	do
 	{
+		it = jt;
 		if (!f(it))
-			break;
-		it = phi2(m, it);
+			return;
+		if (!f(beta0(m, it)))
+			return;
+		it = beta2(m, it);
 		if (!f(it))
-			break;
-		it = phi3(m, it);
-	} while (it != d);
+			return;
+		if (!f(beta0(m, it)))
+			return;
+		jt = beta3(m, it);
+	} while ((jt != it) && (jt != d));
+
+	if (jt != it)
+		return;
+
+	it = d;
+	jt = beta3(m, it);
+	while (jt != it)
+	{
+		it = jt;
+		if (!f(it))
+			return;
+		if (!f(beta0(m, it)))
+			return;
+		it = beta2(m, it);
+		if (!f(it))
+			return;
+		if (!f(beta0(m, it)))
+			return;
+		jt = beta3(m, it);
+	}
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI21_PHI31(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA1_BETA2_BETA3(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
@@ -251,82 +342,58 @@ auto foreach_dart_of_PHI21_PHI31(const MESH& m, Dart d, const FUNC& f)
 	for (uint32 i = 0; i < uint32(marked_darts.size()); ++i)
 	{
 		const Dart curr_dart = marked_darts[i];
-		//			if ( !(is_boundary(curr_dart) && is_boundary(phi3(curr_dart))) )
 		if (!f(curr_dart))
 			break;
 
-		const Dart d_1 = phi_1(m, curr_dart);
-		const Dart d2_1 = phi2(m, d_1); // turn in volume
-		const Dart d3_1 = phi3(m, d_1); // change volume
+		const Dart d1 = beta1(m, curr_dart);
+		const Dart d2 = beta2(m, curr_dart);
+		const Dart d3 = beta3(m, curr_dart);
 
-		if (!marker.is_marked(d2_1))
-			marker.mark(d2_1);
-		if (!marker.is_marked(d3_1))
-			marker.mark(d3_1);
+		if (!marker.is_marked(d1))
+			marker.mark(d1);
+		if (!marker.is_marked(d2))
+			marker.mark(d2);
+		if (!marker.is_marked(d3))
+			marker.mark(d3);
 	}
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_dart_of_PHI1_PHI2_PHI3(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
+auto foreach_dart_of_BETA0_BETA1_BETA2_BETA3(const MESH& m, Dart d, const FUNC& f)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>>
 {
 	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
 	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
+
+	// NON OPTIMIZED (BUT SO SIMPLE TO CODE!)
 
 	DartMarkerStore<MESH> marker(m);
+	const std::vector<Dart>& marked_darts = marker.marked_darts();
 
-	std::vector<Dart> visited_face2;
-	visited_face2.push_back(d); // Start with the face of d
-
-	// For every face added to the list
-	for (uint32 i = 0; i < visited_face2.size(); ++i)
+	marker.mark(d);
+	for (uint32 i = 0; i < uint32(marked_darts.size()); ++i)
 	{
-		const Dart e = visited_face2[i];
-		if (!marker.is_marked(e)) // Face2 has not been visited yet
-		{
-			// mark visited darts (current face2)
-			// and add non visited phi2-adjacent face2 to the list of face2
-			Dart it = e;
-			do
-			{
-				if (!f(it)) // apply the function to the darts of the face2
-					return;
-				marker.mark(it);			   // Mark
-				const Dart adj2 = phi2(m, it); // Get phi2-adjacent face2
-				if (!marker.is_marked(adj2))
-					visited_face2.push_back(adj2); // Add it
-				it = phi1(m, it);
-			} while (it != e);
-			// add phi3-adjacent face2 to the list
-			visited_face2.push_back(phi3(m, it));
-		}
+		const Dart curr_dart = marked_darts[i];
+		if (!f(curr_dart))
+			break;
+
+		const Dart d0 = beta0(m, curr_dart);
+		const Dart d1 = beta1(m, curr_dart);
+		const Dart d2 = beta2(m, curr_dart);
+		const Dart d3 = beta3(m, curr_dart);
+
+		if (!marker.is_marked(d0))
+			marker.mark(d0);
+		if (!marker.is_marked(d1))
+			marker.mark(d1);
+		if (!marker.is_marked(d2))
+			marker.mark(d2);
+		if (!marker.is_marked(d3))
+			marker.mark(d3);
 	}
 }
 
-template <typename MESH, typename FUNC>
-auto foreach_dart_of_ALPHA0(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
-{
-	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	if (f(d))
-		f(alpha0(m, d));
-}
 
-template <typename MESH, typename FUNC>
-auto foreach_dart_of_ALPHA1(const MESH& m, Dart d, const FUNC& f)
-	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
-{
-	static_assert(is_func_parameter_same<FUNC, Dart>::value, "Given function should take a Dart as parameter");
-	static_assert(is_func_return_same<FUNC, bool>::value, "Given function should return a bool");
-	Dart it = d;
-	do
-	{
-		if (!f(it))
-			break;
-		it = alpha1(m, it);
-	} while (it != d);
-}
 
 } // namespace cgogn
 

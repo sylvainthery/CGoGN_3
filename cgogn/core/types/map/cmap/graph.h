@@ -48,8 +48,6 @@ struct CGOGN_CORE_EXPORT Graph : public CMapBase
 
 	Graph()
 	{
-		cells_indices_.resize(NB_ORBITS_CMAP2);
-
 		alpha0_ = add_relation("alpha0");
 		alpha1_ = add_relation("alpha1");
 		alpha_1_ = add_relation("alpha_1");

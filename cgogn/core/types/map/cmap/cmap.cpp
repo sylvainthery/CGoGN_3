@@ -42,7 +42,7 @@ void dump_map_darts(const CMapBase& m)
 			std::cout << r->name() << ": " << std::setw(5) << (*r)[d.index] << " / ";
 		//		for (auto& ind : m.cells_indices_)
 		//			if (ind)
-		for (uint32 orb : m.cells_used_orbit_)
+		for (uint32 orb : m.cells_embedded_orbit_)
 		{
 			auto& ind = m.cells_indices_[orb];
 			std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";

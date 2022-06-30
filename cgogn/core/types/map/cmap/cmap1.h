@@ -46,7 +46,6 @@ struct CGOGN_CORE_EXPORT CMap1 : public CMap0
 
 	inline CMap1() : CMap0()
 	{
-		cells_indices_.resize(NB_ORBITS_CMAP1);
 		phi1_ = add_relation("phi1");
 		phi_1_ = add_relation("phi_1");
 	}

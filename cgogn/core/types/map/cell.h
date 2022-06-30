@@ -39,30 +39,20 @@ namespace cgogn
 enum Orbit : uint32
 {
 	DART = 0,
-	PHI1,				BETA0 = PHI1,
-	PHI2,				BETA1 = PHI2,
-	PHI21,				BETA0_BETA1 = PHI21,
-	PHI1_PHI2,			BETA0_BETA2 = PHI1_PHI2,
-	PHI1_PHI3,			BETA1_BETA2 = PHI1_PHI3,
-	PHI2_PHI3,			BETA0_BETA1_BETA2 = PHI2_PHI3,
-	PHI21_PHI31,		BETA0_BETA1_BETA3 = PHI21_PHI31,
-	PHI1_PHI2_PHI3,		BETA0_BETA2_BETA3 = PHI1_PHI2_PHI3,
-						BETA1_BETA2_BETA3,
-						BETA0_BETA1_BETA2_BETA3
-
+	BETA0,
+	BETA1,
+	PHI1,			BETA0_BETA1 = PHI1, // 2FACE = 1CC
+	PHI2,			BETA0_BETA2 = PHI2, // 2EDGE
+	PHI21,			BETA1_BETA2 = PHI21, // 2VERTEX
+	PHI1_PHI2,		BETA0_BETA1_BETA2 = PHI1_PHI2, // 3VOLUME 2CC
+	PHI1_PHI3,		BETA0_BETA1_BETA3 = PHI1_PHI3, // 3FACE
+	PHI2_PHI3,		BETA0_BETA2_BETA3 = PHI2_PHI3, // 3EDGE
+	PHI21_PHI31,	BETA1_BETA2_BETA3 = PHI21_PHI31, // 3VERTEX
+	PHI1_PHI2_PHI3,	BETA0_BETA1_BETA2_BETA3 = PHI1_PHI2_PHI3,
+	END_ORBIT
 };
 
-static const std::size_t NB_ORBITS = Orbit::PHI1_PHI2_PHI3 + 1;
-static const std::size_t NB_ORBITS_CMAP3 = Orbit::PHI1_PHI2_PHI3 + 1;
-static const std::size_t NB_ORBITS_CMAP2 = Orbit::PHI1_PHI2 + 1;
-static const std::size_t NB_ORBITS_CMAP1 = Orbit::PHI1 + 1;
-static const std::size_t NB_ORBITS_CMAP0 = 1;
-static const std::size_t NB_ORBITS_GMAP3 = Orbit::BETA0_BETA1_BETA2_BETA3 + 1;
-static const std::size_t NB_ORBITS_GMAP2 = Orbit::BETA0_BETA1_BETA2 + 1;
-static const std::size_t NB_ORBITS_GMAP1 = Orbit::BETA0_BETA1 + 1;
-static const std::size_t NB_ORBITS_GMAP0 = Orbit::BETA0 + 1;
-static const std::size_t NB_ORBITS_GMAPx = 1;
-
+static const std::size_t NB_ORBITS = Orbit::END_ORBIT;
 
 /**
  * \brief Cellular typing

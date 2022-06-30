@@ -27,6 +27,7 @@ namespace cgogn
 {
 MapBase::MapBase()
 {
+	cells_embedded_orbit_.reserve(NB_ORBITS);
 }
 
 MapBase::~MapBase()
@@ -34,24 +35,13 @@ MapBase::~MapBase()
 }
 
 
-CMapBase::CMapBase()
-{
-	boundary_marker_ = darts_.get_mark_attribute();
-}
-
-CMapBase::~CMapBase()
-{
-}
-
 Dart add_dart(MapBase& m)
 {
 	uint32 index = m.darts_.new_index();
 	Dart d(index);
 	for (auto& rel : m.relations_)
 		(*rel)[d.index] = d;
-	//	for (auto& emb : m.cells_indices_)
-	//		if (emb)
-	for (uint32 orb : m.cells_used_orbit_)
+	for (uint32 orb : m.cells_embedded_orbit_)
 	{
 		auto& emb = m.cells_indices_[orb];
 		(*emb)[d.index] = INVALID_INDEX;
@@ -70,7 +60,7 @@ void remove_dart(MapBase& m, Dart d)
 //				m.attribute_containers_[orbit].unref_index(index);
 //		}
 //	}
-	for (uint32 orbit : m.cells_used_orbit_)
+	for (uint32 orbit : m.cells_embedded_orbit_)
 	{
 		uint32 index = (*m.cells_indices_[orbit])[d.index];
 		if (index != INVALID_INDEX)
@@ -90,7 +80,7 @@ void clear(MapBase& m, bool keep_attributes)
 		// remove cells indices attributes
 //		for (uint32 orbit = 0; orbit < NB_ORBITS; ++orbit)
 //		{
-		for(uint32 orbit: m.cells_used_orbit_)
+		for(uint32 orbit: m.cells_embedded_orbit_)
 		{
 			if (m.cells_indices_[orbit] != nullptr)
 			{

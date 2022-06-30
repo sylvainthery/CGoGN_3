@@ -35,8 +35,13 @@ struct CGOGN_CORE_EXPORT CMapBase: public MapBase
 {
 	// shortcut to boundary marker attribute
 	MarkAttribute* boundary_marker_;
-	CMapBase();
-	~CMapBase();
+	inline CMapBase()
+	{
+	}
+	
+	inline ~CMapBase()
+	{
+	}
 };
 
 

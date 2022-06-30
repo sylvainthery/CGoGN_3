@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_CORE_TYPES_GMAP_CMAP3_H_
-#define CGOGN_CORE_TYPES_GMAP_CMAP3_H_
+#ifndef CGOGN_CORE_TYPES_GMAP_GMAP3_H_
+#define CGOGN_CORE_TYPES_GMAP_GMAP3_H_
 
 #include <cgogn/core/cgogn_core_export.h>
 
@@ -110,4 +110,4 @@ inline void beta3_unsew(GMap3& m, Dart d, Dart e)
 
 } // namespace cgogn
 
-#endif // CGOGN_CORE_TYPES_GMAP_CMAP3_H_
+#endif // CGOGN_CORE_TYPES_GMAP_GMAP3_H_

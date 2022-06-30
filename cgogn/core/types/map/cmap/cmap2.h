@@ -48,7 +48,6 @@ struct CGOGN_CORE_EXPORT CMap2 : public CMap1
 
 	CMap2() : CMap1()
 	{
-		cells_indices_.resize(NB_ORBITS_CMAP2);
 		phi2_ = add_relation("phi2");
 	}
 

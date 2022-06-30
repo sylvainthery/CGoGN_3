@@ -63,7 +63,7 @@ void copy(CMAP& dst, const CMAP& src)
 //		if (src.cells_indices_[orbit] != nullptr)
 //			init_cells_indexing(dst, Orbit(orbit));
 //	}
-	for(uint32 orbit: src.cells_used_orbit_)
+	for(uint32 orbit: src.cells_embedded_orbit_)
 	{
 			init_cells_indexing(dst, Orbit(orbit));
 	}
