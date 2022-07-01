@@ -37,8 +37,9 @@ struct CGOGN_CORE_EXPORT GMap0 : public GMapBase
 	static const uint8 dimension = 0;
 
 	using Vertex = Cell < Orbit::DART > ;
+	using Edge = Cell < Orbit::BETA0 > ;
 
-	using Cells = std::tuple<Vertex>;
+	using Cells = std::tuple<Vertex,Edge>;
 
 	std::shared_ptr<Attribute<Dart>> beta0_;
 
@@ -57,9 +58,10 @@ struct mesh_traits<GMap0>
 	static constexpr const uint8 dimension = 0;
 
 	using Vertex = typename GMap0::Vertex;
+	using Edge = typename GMap0::Edge;
 
-	using Cells = std::tuple<Vertex>;
-	static constexpr const char* cell_names[] = {"Vertex"};
+	using Cells = std::tuple<Vertex,Edge>;
+	static constexpr const char* cell_names[] = {"Vertex","Edge"};
 
 	template <typename T>
 	using Attribute = GMapBase::Attribute<T>;
@@ -80,8 +82,9 @@ inline void beta0_sew(GMap0& m, Dart d, Dart e)
 	(*(m.beta0_))[e.index] = d;
 }
 
-inline void beta0_unsew(GMap0& m, Dart d, Dart e)
+inline void beta0_unsew(GMap0& m, Dart d)
 {
+	Dart e = beta0(m, d);
 	(*(m.beta0_))[d.index] = d;
 	(*(m.beta0_))[e.index] = e;
 }
@@ -107,6 +110,10 @@ inline Dart beta(const MESH& m, Dart d)
 	else
 		return res;
 }
+
+GMap0::Edge add_edge(GMap0& m, bool set_indices = true);
+
+void remove_edge(GMap0& m, GMap0::Edge e, bool set_indice = true);
 
 } // namespace cgogn
 

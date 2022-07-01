@@ -187,8 +187,8 @@ auto foreach_dart_of_BETA0_BETA1(const MESH& m, Dart d, const FUNC& f)
 		it = beta0(m, it);
 		if (!f(it))
 			return;
-		jt = beta1(m, it);
-	} while ((jt != d));
+		it = beta1(m, it);
+	} while ((it != d));
 }
 
 

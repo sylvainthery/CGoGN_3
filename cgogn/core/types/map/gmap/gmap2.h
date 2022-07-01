@@ -79,6 +79,7 @@ GMap2::Vertex CGOGN_CORE_EXPORT cut_edge(GMap2& m, GMap2::Edge e, bool set_indic
 
 GMap2::Edge CGOGN_CORE_EXPORT cut_face(GMap2& m, GMap2::Vertex v1, GMap2::Vertex v2, bool set_indices = true);
 
+
 inline Dart beta2(const GMap2& m, Dart d)
 {
 	return (*(m.beta2_))[d.index];
@@ -92,10 +93,18 @@ inline void beta2_sew(GMap2& m, Dart d, Dart e)
 	(*(m.beta2_))[e.index] = d;
 }
 
-inline void beta2_unsew(GMap2& m, Dart d, Dart e)
+inline void beta2_unsew(GMap2& m, Dart d)
 {
+	Dart e = beta2(m, d);
 	(*(m.beta2_))[d.index] = d;
 	(*(m.beta2_))[e.index] = e;
+}
+
+inline void phi2_sew(GMap2& m, Dart d)
+{
+	Dart e = beta0(m, d);
+	beta2_unsew(m, d);
+	beta2_unsew(m, e);
 }
 
 

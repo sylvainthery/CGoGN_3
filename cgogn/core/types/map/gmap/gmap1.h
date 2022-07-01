@@ -35,8 +35,8 @@ struct CGOGN_CORE_EXPORT GMap1 : public GMap0
 {
 	static const uint8 dimension = 1;
 
-	using Vertex = Cell<Orbit::DART>;
-	using Edge = Cell<Orbit::BETA0>;
+	using Vertex = Cell<Orbit::BETA1>;
+	using Edge = typename GMap0::Edge;
 	using Face = Cell<Orbit::BETA0_BETA1>;
 
 	using Cells = std::tuple<Vertex, Edge, Face>;
@@ -70,14 +70,32 @@ struct mesh_traits<GMap1>
 using MarkAttribute = GMapBase::MarkAttribute;
 };
 
+
 GMap1::Vertex CGOGN_CORE_EXPORT cut_edge(GMap1& m, GMap1::Edge e, bool set_indices = true);
 
 GMap1::Face CGOGN_CORE_EXPORT add_face(GMap1& m, uint32 size, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_face(GMap1& m, GMap1::Face f);
+
+GMap1::Vertex CGOGN_CORE_EXPORT collapse_edge(GMap1& m, GMap1::Edge e, bool set_indices);
+
 
 
 inline Dart beta1(const GMap1& m, Dart d)
 {
 	return (*(m.beta1_))[d.index];
+}
+
+
+inline Dart phi1(const GMap1& m, Dart d)
+{
+	return beta1(m,beta0(m,d));
+}
+
+
+inline Dart phi_1(const GMap1& m, Dart d)
+{
+	return beta0(m,beta1(m,d));
 }
 
 
@@ -89,11 +107,15 @@ inline void beta1_sew(GMap1& m, Dart d, Dart e)
 	(*(m.beta1_))[e.index] = d;
 }
 
-inline void beta1_unsew(GMap1& m, Dart d, Dart e)
+inline void beta1_unsew(GMap1& m, Dart d)
 {
+	Dart e = beta1(m, d);
 	(*(m.beta1_))[d.index] = d;
 	(*(m.beta1_))[e.index] = e;
 }
+
+
+
 
 
 /*****************************************************************************/
