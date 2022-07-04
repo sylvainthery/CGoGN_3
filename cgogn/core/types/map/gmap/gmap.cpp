@@ -34,9 +34,9 @@ void dump_map_darts(const GMapBase& m)
 		std::cout << "index: " << std::setw(5) << d.index << " / ";
 		for (auto& r : m.relations_)
 			std::cout << r->name() << ": " << std::setw(5) << (*r)[d.index] << " / ";
-//		for (auto& ind : m.cells_indices_)
-//			if (ind)
-//				std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";
+		//		for (auto& ind : m.cells_indices_)
+		//			if (ind)
+		//				std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";
 		for (uint32 orb : m.cells_embedded_orbit_)
 		{
 			auto& ind = m.cells_indices_[orb];
@@ -45,18 +45,16 @@ void dump_map_darts(const GMapBase& m)
 	}
 }
 
-
 bool check_integrity(GMap1& m, bool verbose)
 {
 	bool result = true;
-	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
-	{
-		//		bool relations = phi<-1, 1>(m, d) == d && phi<1, -1>(m, d) == d;
-		//		if (verbose && !relations)
-		//			std::cerr << "Dart " << d << " has bad relations" << std::endl;
+	//for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	//{
+	//	//		if (verbose && !relations)
+	//	//			std::cerr << "Dart " << d << " has bad relations" << std::endl;
 
-		//		result &= relations;
-	}
+	//	//		result &= relations;
+	//}
 	result &= check_indexing<GMap1::Vertex>(m);
 	result &= check_indexing<GMap1::Edge>(m);
 	result &= check_indexing<GMap1::Face>(m);
@@ -102,7 +100,7 @@ GMap1::Face add_face(GMap1& m, uint32 size, bool set_indices)
 
 	Edge e0 = add_edge(m, false);
 	Edge ep = e0;
-	for (int i = 1; i < size; ++i)
+	for (uint32 i = 1u; i < size; ++i)
 	{
 		Edge e = add_edge(m, false);
 		beta1_sew(m, e.dart, beta0(m, ep.dart));
@@ -113,7 +111,7 @@ GMap1::Face add_face(GMap1& m, uint32 size, bool set_indices)
 
 	if (set_indices)
 	{
-		for (int i = 0; i < size; ++i)
+		for (uint32 i = 0u; i < size; ++i)
 		{
 			Edge e{phi1(m, ep.dart)};
 			if (is_indexed<Vertex>(m))
@@ -202,6 +200,35 @@ GMap1::Vertex collapse_edge(GMap1& m, GMap1::Edge e, bool set_indices)
 	return v;
 }
 
+
+
+
+
+bool check_integrity(GMap2& m, bool verbose)
+{
+	bool result = true;
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+	{
+		bool relations = true;
+		relations &= beta<0,2,0,2>(m, d) == d;
+		relations &= beta1(m,d) != d;
+		if (verbose && !relations)
+		{
+			std::cerr << "Dart " << d << " has bad relations" << std::endl;
+			if (beta1(m, d)==d)
+				std::cerr << "beta1 fixed point" << std::endl;
+			if (beta<0, 2, 0, 2>(m, d) != d)
+				std::cerr << "edge constraint not respected" << std::endl;
+		}
+
+	}
+	result &= check_indexing<GMap2::Vertex>(m);
+	result &= check_indexing<GMap2::HalfEdge>(m);
+	result &= check_indexing<GMap2::Edge>(m);
+	result &= check_indexing<GMap2::Face>(m);
+	result &= check_indexing<GMap2::Volume>(m);
+	return result;
+}
 
 
 GMap2::Vertex cut_edge(GMap2& m, GMap2::Edge e, bool set_indices)
@@ -295,4 +322,274 @@ GMap2::Edge cut_face(GMap2& m, GMap2::Vertex v1, GMap2::Vertex v2, bool set_indi
 
 
 
+void CGOGN_CORE_EXPORT merge_incident_faces(GMap2& m, GMap2::Edge e, bool set_indices)
+{
+	using Vertex = GMap2::Vertex;
+	using Edge = GMap2::Edge;
+	using Face = GMap2::Face;
+
+	// DartMarker df = DartMarker(m);
+	//
+	// foreach_dart_of_BETA0_BETA1(m, e.dart, [&](Dart x)
+	//{
+	//	df.mark(x);
+	//});
+
+	// Dart d0 = beta2(m, e.dart);
+	// do
+	//{
+	//	d0 = beta1(m, beta0(m, d0));
+	//} while (df.is_marked(beta2(m,d0)));
+	// d0 = beta0(m, beta1(m, d0));
+
+	// Dart d1 = beta2(m, e.dart);
+	// while (df.is_marked(beta2(m, d1)));
+	//{
+	//	d1 = beta0(m, beta1(m, d0));
+	//}
+	// d1 = beta1(m, beta0(m, d0));
+
+	Dart d0 = e.dart;
+	Dart d1 = beta<0, 2>(m, d0);
+
+	Dart e1 = beta1(m, d0);
+	beta1_unsew(m, e1);
+	Dart e2 = beta<2, 1>(m, d0);
+	beta1_unsew(m, e2);
+	beta1_sew(m, e1, e2);
+
+	Dart ee1 = beta1(m, d1);
+	beta1_unsew(m, ee1);
+	Dart ee2 = beta<2, 1>(m, d1);
+	beta1_unsew(m, ee2);
+	beta1_sew(m, ee1, ee2);
+
+	remove_edge(m, GMap1::Edge{d0},false);
+	remove_edge(m, GMap1::Edge{d1}, false);
+
+	if (set_indices)
+	{
+		if (is_indexed<Face>(m))
+			set_index(m, Face{e1}, new_index<Face>(m));
+	}
+
+}
+
+
+// SAME CODE AS IN CMAP2
+bool CGOGN_CORE_EXPORT edge_can_flip(const GMap2& m, GMap2::Edge e)
+{
+	if (is_incident_to_boundary(m, e))
+		return false;
+
+	Dart e1 = e.dart;
+	Dart e2 = phi2(m, e1);
+
+	auto next_edge = [&m](Dart d) { return phi<-1, 2>(m, d); };
+
+	if (codegree(m, GMap2::Face(e1)) == 3 && codegree(m, GMap2::Face(e2)) == 3)
+	{
+		uint32 idxv2 = index_of(m, GMap2::Vertex(phi_1(m, e2)));
+		Dart d = phi_1(m, e1);
+		Dart it = d;
+		do
+		{
+			if (index_of(m, GMap2::Vertex(phi1(m, it))) == idxv2)
+				return false;
+			it = next_edge(it);
+		} while (it != d);
+	}
+	return true;
+}
+
+
+bool CGOGN_CORE_EXPORT flip_edge(GMap2& m, GMap2::Edge e, bool set_indices)
+{
+	auto externals = [&](Dart x) { return std::make_pair(beta1(m, x), beta1(m, beta2(m, x))); };
+
+	auto turn = [&](const std::pair<Dart,Dart> & x) { return std::make_pair(beta<0,1>(m, x.first), beta<1,0>(m, x.second)); };
+
+	auto p1_darts = externals(e.dart);
+	auto p2_darts = externals(beta<0,2>(m, e.dart));
+	auto pt1 = turn(p1_darts);
+	auto pt2 = turn(p2_darts);
+
+	beta1_unsew(m, p1_darts.first);
+	beta1_unsew(m, p1_darts.second);
+	beta1_unsew(m, p2_darts.first);
+	beta1_unsew(m, p2_darts.second);
+	// TODO remove unsew in release mode ?
+	beta1_sew(m, p1_darts.first, p1_darts.second);
+	beta1_sew(m, p2_darts.first, p2_darts.second);
+
+	beta1_unsew(m, pt1.first);
+	beta1_unsew(m, pt1.second);
+	beta1_unsew(m, pt2.first);
+	beta1_unsew(m, pt2.second);
+	// TODO remove unsew in release mode ?
+
+	Dart ed = e.dart;
+	// is it more efficient like that ?
+	//beta1_sew(m, pt1.first, e.dart);
+	//beta1_sew(m, pt1.second, beta2(m,e.dart));
+	//beta1_sew(m, pt2.first, beta<0,2>(m,e.dart));
+	//beta1_sew(m, pt2.second, beta0(m,e.dart));
+	beta1_sew(m, pt1.first, ed);
+	ed = beta2(m, ed);
+	beta1_sew(m, pt1.second, beta2(m, ed));
+	ed = beta0(m, ed);
+	beta1_sew(m, pt2.first, beta<0, 2>(m, ed));
+	ed = beta0(m, ed);
+	beta1_sew(m, pt2.second, beta0(m, ed));
+
+	if (set_indices)
+	{
+		if (is_indexed<GMap2::Vertex>(m))
+		{
+			copy_index<GMap2::Vertex>(m, e.dart, pt1.first);
+			copy_index<GMap2::Vertex>(m, ed, pt2.first);
+		}
+
+		if (is_indexed<GMap2::Face>(m))
+		{
+			copy_index<GMap2::Face>(m, p1_darts.first, pt1.first);
+			copy_index<GMap2::Face>(m, beta0(m, p1_darts.first), beta0(m, pt1.first));
+			copy_index<GMap2::Face>(m, p2_darts.first, pt2.first);
+			copy_index<GMap2::Face>(m, beta0(m, p2_darts.first), beta0(m, pt2.first));
+		}
+	}
+
+	return true;
+}
+
+
+GMap2::Face CGOGN_CORE_EXPORT add_face(GMap2& m, uint32 size, bool set_indices)
+{
+	// NOTHING TO DO, THANKS TO FIXED POINTS BOUNDARY
+	return add_face(static_cast<GMap1&>(m), size, set_indices);
+}
+
+// SAME COE AS IN CMAP2
+void CGOGN_CORE_EXPORT remove_volume(GMap2& m, GMap2::Volume v)
+{
+	std::vector<Dart> darts;
+	darts.reserve(96);
+	foreach_dart_of_orbit(m, v, [&](Dart d) -> bool {
+		darts.push_back(d);
+		return true;
+	});
+	for (Dart d : darts)
+		remove_dart(m, d);
+}
+
+
+//void CGOGN_CORE_EXPORT reverse_orientation(GMap2& m);
+
+// SAME CODE  AS IN CMAP2
+bool CGOGN_CORE_EXPORT edge_can_collapse(const GMap2& m, GMap2::Edge e)
+{
+	using Vertex = GMap2::Vertex;
+	using Face = GMap2::Face;
+
+	auto vertices = incident_vertices(m, e);
+
+	if (is_incident_to_boundary(m, vertices[0]) || is_incident_to_boundary(m, vertices[1]))
+		return false;
+
+	uint32 val_v1 = degree(m, vertices[0]);
+	uint32 val_v2 = degree(m, vertices[1]);
+
+	if (val_v1 + val_v2 < 8 || val_v1 + val_v2 > 14)
+		return false;
+
+	Dart e1 = e.dart;
+	Dart e2 = phi2(m, e.dart);
+	if (codegree(m, Face(e1)) == 3)
+	{
+		if (degree(m, Vertex(phi_1(m, e1))) < 4)
+			return false;
+	}
+	if (codegree(m, Face(e2)) == 3)
+	{
+		if (degree(m, Vertex(phi_1(m, e2))) < 4)
+			return false;
+	}
+
+	auto next_edge = [&m](Dart d) { return phi<-1, 2>(m, d); };
+
+	// Check vertex sharing condition
+	std::vector<uint32> vn1;
+	Dart it = next_edge(next_edge(e1));
+	Dart end = phi1(m, e2);
+	do
+	{
+		vn1.push_back(index_of(m, Vertex(phi1(m, it))));
+		it = next_edge(it);
+	} while (it != end);
+	it = next_edge(next_edge(e2));
+	end = phi1(m, e1);
+	do
+	{
+		auto vn1it = std::find(vn1.begin(), vn1.end(), index_of(m, Vertex(phi1(m, it))));
+		if (vn1it != vn1.end())
+			return false;
+		it = next_edge(it);
+	} while (it != end);
+
+	return true;
+}
+
+
+//WIP
+//GMap2::Vertex CGOGN_CORE_EXPORT collapse_edge(GMap2& m, GMap2::Edge e, bool set_indices)
+//{
+//	Dart dd = e.dart;
+//	Dart dd_1 = phi_1(m, dd);
+//	Dart dd_12 = phi2(m, dd_1);
+
+	//collapse_edge(static_cast<GMap1&>(m), GMap1::Edge(dd), false);
+
+
+	//if (codegree(m, GMap2::Face(dd_1)) == 2u)
+	//{
+	//	Dart dd1 = phi1(m, dd_1);
+	//	Dart dd12 = phi2(m, dd1);
+	//	phi2_unsew(m, dd1);
+	//	phi2_unsew(m, dd_1);
+	//	phi2_sew(m, dd12, dd_12);
+	//	remove_face(static_cast<CMap1&>(m), CMap1::Face(dd1), false);
+	//}
+
+	// Dart ee = phi2(m, dd);
+	// Dart ee_1 = phi_1(m, ee);
+	// Dart ee_12 = phi2(m, ee_1);
+	//collapse_edge(static_cast<GMap1&>(m), GMap1::Edge(ee), false);
+	//if (codegree(m, GMap2::Face(ee_1)) == 2u)
+	//{
+	//	Dart ee1 = phi1(m, ee_1);
+	//	Dart ee12 = phi2(m, ee1);
+	//	phi2_unsew(m, ee1);
+	//	phi2_unsew(m, ee_1);
+	//	phi2_sew(m, ee12, ee_12);
+	//	remove_face(static_cast<CMap1&>(m), CMap1::Face(ee1), false);
+	//}
+
+	//CMap2::Vertex v(dd_12);
+
+	//if (set_indices)
+	//{
+	//	if (is_indexed<CMap2::Vertex>(m))
+	//		set_index(m, v, index_of(m, v));
+	//	if (is_indexed<CMap2::Edge>(m))
+	//	{
+	//		copy_index<CMap2::Edge>(m, dd_12, phi2(m, dd_12));
+	//		copy_index<CMap2::Edge>(m, ee_12, phi2(m, ee_12));
+	//	}
+	//}
+
+	//return v;
+//}
+
+
 } // namespace cgogn
+                    

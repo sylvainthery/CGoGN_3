@@ -73,17 +73,24 @@ using MarkAttribute = GMapBase::MarkAttribute;
 
 GMap1::Vertex CGOGN_CORE_EXPORT cut_edge(GMap1& m, GMap1::Edge e, bool set_indices = true);
 
+GMap1::Vertex CGOGN_CORE_EXPORT collapse_edge(GMap1& m, GMap1::Edge e, bool set_indices);
+
 GMap1::Face CGOGN_CORE_EXPORT add_face(GMap1& m, uint32 size, bool set_indices = true);
 
 void CGOGN_CORE_EXPORT remove_face(GMap1& m, GMap1::Face f);
 
-GMap1::Vertex CGOGN_CORE_EXPORT collapse_edge(GMap1& m, GMap1::Edge e, bool set_indices);
+bool CGOGN_CORE_EXPORT check_integrity(GMap1& m, bool verbose = true);
 
 
 
 inline Dart beta1(const GMap1& m, Dart d)
 {
 	return (*(m.beta1_))[d.index];
+}
+
+inline Dart boundary_beta1(const GMap1& m, Dart d)
+{
+	return beta1(m,d);
 }
 
 
@@ -114,7 +121,10 @@ inline void beta1_unsew(GMap1& m, Dart d)
 	(*(m.beta1_))[e.index] = e;
 }
 
-
+inline bool on_boundary(const GMap1& m, Dart d)
+{
+	return beta1(m, d) == d;
+}
 
 
 

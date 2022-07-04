@@ -79,11 +79,38 @@ GMap2::Vertex CGOGN_CORE_EXPORT cut_edge(GMap2& m, GMap2::Edge e, bool set_indic
 
 GMap2::Edge CGOGN_CORE_EXPORT cut_face(GMap2& m, GMap2::Vertex v1, GMap2::Vertex v2, bool set_indices = true);
 
+bool CGOGN_CORE_EXPORT flip_edge(GMap2& m, GMap2::Edge e, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT merge_incident_faces(GMap2& m, GMap2::Edge e, bool set_indices = true);
+
+GMap2::Face CGOGN_CORE_EXPORT add_face(GMap2& m, uint32 size, bool set_indices = true);
+
+void CGOGN_CORE_EXPORT remove_volume(GMap2& m, GMap2::Volume v);
+
+void CGOGN_CORE_EXPORT reverse_orientation(GMap2& m);
+
+bool CGOGN_CORE_EXPORT edge_can_collapse(const GMap2& m, GMap2::Edge e);
+
+bool CGOGN_CORE_EXPORT edge_can_flip(const GMap2& m, GMap2::Edge e);
+
+bool CGOGN_CORE_EXPORT check_integrity(GMap2& m, bool verbose = true);
+
 
 inline Dart beta2(const GMap2& m, Dart d)
 {
 	return (*(m.beta2_))[d.index];
 }
+
+inline Dart boundary_beta1(const GMap2& m, Dart d)
+{
+	return beta2(m, d);
+}
+
+inline bool on_boundary(const GMap2& m, Dart d)
+{
+	return beta2(m, d) == d;
+}
+
 
 inline void beta2_sew(GMap2& m, Dart d, Dart e)
 {
@@ -100,7 +127,20 @@ inline void beta2_unsew(GMap2& m, Dart d)
 	(*(m.beta2_))[e.index] = e;
 }
 
-inline void phi2_sew(GMap2& m, Dart d)
+inline Dart phi2(const GMap2& m, Dart d)
+{
+	Dart dd = beta2(m, d);
+	cgogn_assert(dd != d); // return d (FP)
+	return beta0(m, dd);
+}
+
+inline void phi2_sew(GMap2& m, Dart d, Dart e)
+{
+	beta2_sew(m, d, beta0(m,e));
+	beta2_sew(m, beta0(m, d), e);
+}
+
+inline void phi2_unsew(GMap2& m, Dart d)
 {
 	Dart e = beta0(m, d);
 	beta2_unsew(m, d);

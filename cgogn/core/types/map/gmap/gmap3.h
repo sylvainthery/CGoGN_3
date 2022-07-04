@@ -91,6 +91,11 @@ inline Dart beta3(const GMap3& m, Dart d)
 }
 
 
+inline bool on_boundary(const GMap3& m, Dart d)
+{
+	return beta3(m, d) == d;
+}
+
 inline void beta3_sew(GMap3& m, Dart d, Dart e)
 {
 	cgogn_assert(beta3(m, d) == d);

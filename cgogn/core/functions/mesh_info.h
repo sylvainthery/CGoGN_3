@@ -289,7 +289,7 @@ uint32 codegree(const MESH& m, typename mesh_traits<MESH>::Volume v)
 //////////////
 
 template <typename MESH, typename CELL>
-auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>, bool>
+auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_convertible_v<MESH&, struct CMapBase&>, bool>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
 	bool result = false;
@@ -303,6 +303,24 @@ auto is_incident_to_boundary(const MESH& m, CELL c) -> std::enable_if_t<std::is_
 	});
 	return result;
 }
+
+template <typename MESH, typename CELL>
+auto is_incident_to_boundary(const MESH& m, CELL c)
+	-> std::enable_if_t<std::is_convertible_v<MESH&, struct GMapBase&>, bool>
+{
+	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
+	bool result = false;
+	foreach_dart_of_orbit(m, c, [&m, &result](Dart d) -> bool {
+		if (on_boundary(m, d))
+		{
+			result = true;
+			return false;
+		}
+		return true;
+	});
+	return result;
+}
+
 
 /*****************************************************************************/
 
