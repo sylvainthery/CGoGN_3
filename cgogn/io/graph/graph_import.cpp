@@ -27,8 +27,6 @@
 #include <cgogn/core/functions/mesh_ops/edge.h>
 #include <cgogn/core/functions/mesh_ops/vertex.h>
 
-#include <cgogn/core/types/map/cmap/cmap_ops.h>
-
 #include <vector>
 
 namespace cgogn

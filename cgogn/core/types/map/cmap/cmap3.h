@@ -60,6 +60,7 @@ template <>
 struct mesh_traits<CMap3>
 {
 	using MeshType = CMap3;
+	using ParentDimType = CMap2;
 	//using BaseType = MapBase;
 	static constexpr const char* name = "CMap3";
 	static constexpr const uint8 dimension = 3;

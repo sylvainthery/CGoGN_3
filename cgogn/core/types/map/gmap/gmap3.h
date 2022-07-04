@@ -60,6 +60,7 @@ template <>
 struct mesh_traits<GMap3>
 {
 	using MeshType = GMap3;
+	using ParentDimType = GMap2;
 	static constexpr const char* name = "GMap3";
 	static constexpr const uint8 dimension = 3;
 

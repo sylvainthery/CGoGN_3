@@ -20,6 +20,7 @@ set ( cgogn_src_core
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/dart_marker.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/dart.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_info.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/map/map_ops.h"
 
 		"${CMAKE_CURRENT_LIST_DIR}/types/mesh_traits.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/cell_marker.h"

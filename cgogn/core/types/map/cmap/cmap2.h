@@ -58,6 +58,7 @@ struct mesh_traits<CMap2>
 {
 	using MeshType = CMap2;
 	//using BaseType = MapBase;
+	using ParentDimType = CMap1;
 	static constexpr const char* name = "CMap2";
 	static constexpr const uint8 dimension = 2;
 
@@ -114,19 +115,19 @@ CMap2::Face close_hole(CMap2& m, Dart d, bool set_indices = true);
 
 uint32 close(CMap2& m, bool set_indices = true);
 
-CMap2::Volume CGOGN_CORE_EXPORT add_pyramid(CMap2& m, uint32 size, bool set_indices = true);
+//CMap2::Volume CGOGN_CORE_EXPORT add_pyramid(CMap2& m, uint32 size, bool set_indices = true);
 
-inline CMap2::Volume CGOGN_CORE_EXPORT add_tetrahedron(CMap2& m, bool set_indices = true)
-{
-	return add_pyramid(m, 3, set_indices);
-}
+//inline CMap2::Volume CGOGN_CORE_EXPORT add_tetrahedron(CMap2& m, bool set_indices = true)
+//{
+//	return add_pyramid(m, 3, set_indices);
+//}
 
-CMap2::Volume CGOGN_CORE_EXPORT add_prism(CMap2& m, uint32 size, bool set_indices = true);
+//CMap2::Volume CGOGN_CORE_EXPORT add_prism(CMap2& m, uint32 size, bool set_indices = true);
 
-inline CMap2::Volume CGOGN_CORE_EXPORT add_hexahedron(CMap2& m, bool set_indices = true)
-{
-	return add_prism(m, 4, set_indices);
-}
+//inline CMap2::Volume CGOGN_CORE_EXPORT add_hexahedron(CMap2& m, bool set_indices = true)
+//{
+//	return add_prism(m, 4, set_indices);
+//}
 
 void CGOGN_CORE_EXPORT remove_volume(CMap2& m, CMap2::Volume v);
 

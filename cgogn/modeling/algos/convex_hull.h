@@ -25,7 +25,7 @@
 #define CGOGN_MODELING_ALGOS_CONVEX_HULL_H_
 
 #include <cgogn/core/utils/numerics.h>
-
+#include <cgogn/core/types/map/map_ops.h>
 #include <cgogn/core/functions/mesh_ops/edge.h>
 #include <cgogn/core/functions/mesh_ops/face.h>
 #include <cgogn/core/functions/mesh_ops/volume.h>

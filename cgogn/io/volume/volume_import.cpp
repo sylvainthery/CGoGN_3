@@ -26,8 +26,7 @@
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/functions/mesh_info.h>
 #include <cgogn/core/functions/mesh_ops/volume.h>
-
-#include <cgogn/core/types/map/cmap/cmap_ops.h>
+#include <cgogn/core/types/map/map_ops.h>
 
 #include <vector>
 
@@ -146,7 +145,7 @@ void import_volume_data(CMap3& m, VolumeImportData& volume_data)
 		}
 		else if (vol_type == VolumeType::Hexa) // hexahedral case
 		{
-			vol = add_prism(static_cast<CMap2&>(m), 4u, false);
+			vol = add_hexahedron(static_cast<CMap2&>(m), false);
 
 			const std::array<Dart, 8> vertices_of_hexa = {vol.dart,
 														  phi1(m, vol.dart),

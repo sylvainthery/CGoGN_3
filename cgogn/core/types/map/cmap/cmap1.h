@@ -57,6 +57,8 @@ struct mesh_traits<CMap1>
 {
 	using MeshType = CMap1;
 	//using BaseType = MapBase;
+	using ParentDimType = CMap0;
+
 	static constexpr const char* name = "CMap1";
 	static constexpr const uint8 dimension = 1;
 

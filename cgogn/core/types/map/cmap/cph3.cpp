@@ -24,7 +24,7 @@
 #include <cgogn/core/types/map/cmap/cph3.h>
 #include <cgogn/core/types/map/cmap/phi.h>
 
-#include <cgogn/core/types/map/cmap/cmap_ops.h>
+
 #include <cgogn/core/types/map/cmap/orbit_traversal.h>
 #include <cgogn/core/functions/traversals/edge.h>
 #include <cgogn/core/functions/traversals/vertex.h>

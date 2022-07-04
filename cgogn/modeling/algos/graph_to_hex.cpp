@@ -32,9 +32,9 @@
 #include <cgogn/core/functions/traversals/halfedge.h>
 #include <cgogn/core/functions/traversals/vertex.h>
 
+#include <cgogn/core/types/map/map_ops.h>
 #include <cgogn/core/functions/mesh_info.h>
 
-#include <cgogn/core/types/map/cmap/cmap_ops.h>
 #include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/mesh_views/cell_cache.h>
 
@@ -299,8 +299,8 @@ void unsew_volumes(CMap3& m, Dart d)
 
 Dart add_branch_section(CMap3& m3)
 {
-	std::vector<Dart> D = {add_prism(static_cast<CMap2&>(m3), 4).dart, add_prism(static_cast<CMap2&>(m3), 4).dart,
-						   add_prism(static_cast<CMap2&>(m3), 4).dart, add_prism(static_cast<CMap2&>(m3), 4).dart};
+	std::vector<Dart> D = {add_hexahedron(static_cast<CMap2&>(m3)).dart, add_prism(static_cast<CMap2&>(m3), 4).dart,
+						   add_hexahedron(static_cast<CMap2&>(m3)).dart, add_prism(static_cast<CMap2&>(m3), 4).dart};
 
 	sew_volumes(m3, phi2(m3, D[0]), phi2(m3, phi_1(m3, (D[1]))));
 	sew_volumes(m3, phi2(m3, D[1]), phi2(m3, phi_1(m3, (D[2]))));

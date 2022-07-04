@@ -57,6 +57,7 @@ template <>
 struct mesh_traits<GMap2>
 {
 	using MeshType = GMap2;
+	using ParentDimType = GMap1;
 	static constexpr const char* name = "GMap2";
 	static constexpr const uint8 dimension = 2;
 
@@ -87,7 +88,7 @@ GMap2::Face CGOGN_CORE_EXPORT add_face(GMap2& m, uint32 size, bool set_indices =
 
 void CGOGN_CORE_EXPORT remove_volume(GMap2& m, GMap2::Volume v);
 
-void CGOGN_CORE_EXPORT reverse_orientation(GMap2& m);
+//void CGOGN_CORE_EXPORT reverse_orientation(GMap2& m);
 
 bool CGOGN_CORE_EXPORT edge_can_collapse(const GMap2& m, GMap2::Edge e);
 

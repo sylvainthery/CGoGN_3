@@ -54,6 +54,7 @@ template <>
 struct mesh_traits<GMap1>
 {
 	using MeshType = GMap1;
+	using ParentDimType = GMap0;
 	static constexpr const uint8 dimension = 1;
 
 	using Vertex = GMap1::Vertex;
