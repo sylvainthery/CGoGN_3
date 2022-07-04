@@ -21,6 +21,7 @@
  *                                                                              *
  *******************************************************************************/
 
+#define _SURFACE_IMPORT_CPP_
 #include <cgogn/io/surface/surface_import.h>
 
 #include <cgogn/core/functions/attributes.h>

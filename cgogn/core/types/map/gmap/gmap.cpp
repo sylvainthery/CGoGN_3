@@ -376,6 +376,78 @@ void CGOGN_CORE_EXPORT merge_incident_faces(GMap2& m, GMap2::Edge e, bool set_in
 }
 
 
+GMap2::Face close_hole(GMap2& m, Dart d, bool set_indices)
+{
+	cgogn_message_assert(phi2(m, d) == d, "CMap2: close hole called on a dart that is not a phi2 fix point");
+
+	std::vector<Dart> vd;
+	vd.reserve(128);
+	Dart d_next = d; // Turn around the hole
+	Dart dd1; // to complete the face
+	do
+	{
+		d_next = beta0(m, d_next);
+		do
+		{
+			dd1 = beta1(m, d_next);
+			d_next = beta2(m, dd1);
+		} while (d_next != dd1 && dd1 != d);
+
+		if (dd1 != d)
+			vd.push_back(d);
+	} while (dd1 != d);
+
+	GMap2::Face f = add_face(m, vd.size(), false);
+	Dart df = f.dart;
+	for (Dart dh : vd)
+	{
+		phi2_sew(m, dh, df);
+		df = phi1(m, df);
+	}
+
+	if (set_indices)
+	{
+		foreach_dart_of_orbit(m,f , [&](Dart fd) -> bool {
+			Dart hd = phi2(m, fd);
+			if (is_indexed<GMap2::Vertex>(m))
+				copy_index<GMap2::Vertex>(m, fd, hd);
+			if (is_indexed<GMap2::Edge>(m))
+				copy_index<GMap2::Edge>(m, fd, hd);
+			if (is_indexed<GMap2::Volume>(m))
+				copy_index<GMap2::Volume>(m, fd, hd);
+			return true;
+		});
+	}
+
+	return f;
+}
+
+int32 close(GMap2& m, bool set_indices)
+{
+	uint32 nb_holes = 0u;
+
+	std::vector<Dart> fix_point_darts;
+	for (Dart d = m.begin(), end = m.end(); d != end; d = m.next(d))
+		if (phi2(m, d) == d)
+			fix_point_darts.push_back(d);
+
+	for (Dart d : fix_point_darts)
+	{
+		if (phi2(m, d) == d)
+		{
+			GMap2::Face h = close_hole(m, d, set_indices);
+			foreach_dart_of_orbit(m, h, [&](Dart hd) -> bool {
+//				set_boundary(m, hd, true);
+				return true;
+			});
+			++nb_holes;
+		}
+	}
+
+	return nb_holes;
+}
+
+
 // SAME CODE AS IN CMAP2
 bool CGOGN_CORE_EXPORT edge_can_flip(const GMap2& m, GMap2::Edge e)
 {

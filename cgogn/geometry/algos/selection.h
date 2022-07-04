@@ -24,7 +24,7 @@
 #ifndef CGOGN_GEOMETRY_ALGOS_SELECTION_H_
 #define CGOGN_GEOMETRY_ALGOS_SELECTION_H_
 
-#include <cgogn/core/types/map/cmap/cmap2.h>
+//#include <cgogn/core/types/map/cmap/cmap2.h>
 #include <cgogn/core/types/map/dart_marker.h>
 #include <cgogn/core/types/mesh_views/cell_cache.h>
 
@@ -41,16 +41,16 @@ namespace cgogn
 
 namespace geometry
 {
-
-CellCache<CMap2> within_sphere(const CMap2& m, typename CMap2::Vertex center, geometry::Scalar radius,
-							   const typename CMap2::template Attribute<Vec3>* vertex_position)
+template <typename MAP2>
+CellCache<MAP2> within_sphere(const MAP2& m, typename MAP2::Vertex center, geometry::Scalar radius,
+			   const typename MAP2::template Attribute<Vec3>* vertex_position)
 {
-	using Vertex = typename CMap2::Vertex;
-	using HalfEdge = typename CMap2::HalfEdge;
-	using Edge = typename CMap2::Edge;
-	using Face = typename CMap2::Face;
+	using Vertex = typename MAP2::Vertex;
+	using HalfEdge = typename MAP2::HalfEdge;
+	using Edge = typename MAP2::Edge;
+	using Face = typename MAP2::Face;
 
-	CellCache<CMap2> cache(m);
+	CellCache<MAP2> cache(m);
 
 	const Vec3& center_position = value<Vec3>(m, vertex_position, center);
 
@@ -93,9 +93,9 @@ CellCache<CMap2> within_sphere(const CMap2& m, typename CMap2::Vertex center, ge
 	mark_vertex(center);
 
 	uint32 i = 0;
-	while (i < cache.cell_vector<Vertex>().size())
+	while (i < cache.template cell_vector<Vertex>().size())
 	{
-		Vertex v = cache.cell_vector<Vertex>()[i];
+		Vertex v = cache.template cell_vector<Vertex>()[i];
 		foreach_adjacent_vertex_through_edge(m, v, [&](Vertex av) -> bool {
 			const Vec3& p = value<Vec3>(m, vertex_position, av);
 			if (in_sphere(p, center_position, radius))
