@@ -27,6 +27,7 @@
 #include <cgogn/io/cgogn_io_export.h>
 
 #include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph.h>
 
 #include <cgogn/geometry/types/vector_traits.h>

@@ -50,14 +50,14 @@ namespace cgogn
 ///////////////////////////////
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func)
+inline auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func)
 	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
 {
 	foreach_incident_vertex(m, c, func, MapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, MapBase_TraversalPolicy traversal_policy)
+inline auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, MapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<std::is_convertible_v<MESH&, struct MapBase&>>
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
@@ -136,7 +136,7 @@ auto foreach_incident_vertex(const MESH& m, CELL c, const FUNC& func, MapBase_Tr
 ////////////////////
 
 template <typename MESH, typename CELL, typename FUNC>
-auto foreach_incident_vertex(const MESH& ig, CELL c, const FUNC& func)
+inline auto foreach_incident_vertex(const MESH& ig, CELL c, const FUNC& func)
 	-> std::enable_if_t<std::is_convertible_v<MESH&, struct IncidenceGraph&>>
 {
 	using Vertex = typename mesh_traits<MESH>::Vertex;
@@ -207,14 +207,14 @@ auto foreach_incident_vertex(const MESH& ig, CELL c, const FUNC& func)
 ///////////////////////////////
 
 template <typename MESH, typename FUNC>
-auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func)
+inline auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func)
 	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
 {
 	foreach_adjacent_vertex_through_edge(m, v, func, MapBase_TraversalPolicy::AUTO);
 }
 
 template <typename MESH, typename FUNC>
-auto foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func,
+auto  inline foreach_adjacent_vertex_through_edge(const MESH& m, typename mesh_traits<MESH>::Vertex v, const FUNC& func,
 										  MapBase_TraversalPolicy traversal_policy)
 	-> std::enable_if_t<std::is_convertible_v<MESH*, struct MapBase*>>
 {
