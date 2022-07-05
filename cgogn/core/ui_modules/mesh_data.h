@@ -69,6 +69,7 @@ struct MeshData
 	void init(const MESH* m)
 	{
 		mesh_ = m;
+//		dump_map_darts(m);
 		update_nb_cells();
 	}
 

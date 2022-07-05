@@ -36,6 +36,7 @@
 #define DEFAULT_MESH_PATH CGOGN_STR(CGOGN_DATA_PATH) "/meshes/"
 
 // using Mesh = cgogn::IncidenceGraph;
+//using Mesh = cgogn::GMap2;
 using Mesh = cgogn::CMap2;
 
 template <typename T>
@@ -49,9 +50,9 @@ using Scalar = cgogn::geometry::Scalar;
 int main(int argc, char** argv)
 {
 	std::string filename;
-	if (argc > 1)
-	// 	filename = std::string(DEFAULT_MESH_PATH) + std::string("off/socket.off");
-	// else
+	if (argc <= 1)
+	 	filename = std::string(DEFAULT_MESH_PATH) + std::string("off/socket.off");
+	else
 		filename = std::string(argv[1]);
 
 	cgogn::thread_start();
@@ -99,6 +100,10 @@ int main(int argc, char** argv)
 
 		sr.set_vertex_position(*v1, *m, vertex_position);
 		sr.set_vertex_normal(*v1, *m, vertex_normal);
+
+		std::cout << "nb darts: " << nb_darts(*m) << std::endl;
+
+		
 	}
 
 	return app.launch();

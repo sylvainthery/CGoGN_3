@@ -23,7 +23,8 @@
 
 #include <cgogn/geometry/types/vector_traits.h>
 
-#include <cgogn/core/types/map/cmap/cmap2.h>
+//#include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/types/map/gmap/gmap2.h>
 
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/view.h>
@@ -38,7 +39,8 @@
 
 using namespace cgogn::numerics;
 
-using Mesh = cgogn::CMap2;
+//using Mesh = cgogn::CMap2;
+using Mesh = cgogn::GMap2;
 
 template <typename T>
 using Attribute = typename cgogn::mesh_traits<Mesh>::Attribute<T>;

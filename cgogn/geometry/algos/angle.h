@@ -41,23 +41,25 @@ namespace cgogn
 
 namespace geometry
 {
-
-inline std::vector<Scalar> opposite_angles(const CMap2& m, typename CMap2::Edge e,
-										   const typename mesh_traits<CMap2>::template Attribute<Vec3>* vertex_position)
+template <typename MAP2>
+auto  opposite_angles(const MAP2& m, typename MAP2::Edge e, const typename mesh_traits<MAP2>::template Attribute<Vec3>* vertex_position)
+		-> std::enable_if_t<std::is_convertible_v<MAP2&, struct CMap2&> || std::is_convertible_v<MAP2&, struct GMap2&>,
+							std::vector<Scalar>>
 {
+	using Vertex = typename mesh_traits<MAP2>::Vertex;
 	if (!is_incident_to_boundary(m, e))
 	{
-		const Vec3& p1 = value<Vec3>(m, vertex_position, CMap2::Vertex(e.dart));
-		const Vec3& p2 = value<Vec3>(m, vertex_position, CMap2::Vertex(phi1(m, e.dart)));
-		const Vec3& p3 = value<Vec3>(m, vertex_position, CMap2::Vertex(phi_1(m, e.dart)));
-		const Vec3& p4 = value<Vec3>(m, vertex_position, CMap2::Vertex(phi<2, -1>(m, e.dart)));
+		const Vec3& p1 = value<Vec3>(m, vertex_position, Vertex(e.dart));
+		const Vec3& p2 = value<Vec3>(m, vertex_position, Vertex(phi1(m, e.dart)));
+		const Vec3& p3 = value<Vec3>(m, vertex_position, Vertex(phi_1(m, e.dart)));
+		const Vec3& p4 = value<Vec3>(m, vertex_position, Vertex(phi<2, -1>(m, e.dart)));
 		return {angle(p1 - p3, p2 - p3), angle(p2 - p4, p1 - p4)};
 	}
 	else
 	{
-		const Vec3& p1 = value<Vec3>(m, vertex_position, CMap2::Vertex(e.dart));
-		const Vec3& p2 = value<Vec3>(m, vertex_position, CMap2::Vertex(phi1(m, e.dart)));
-		const Vec3& p3 = value<Vec3>(m, vertex_position, CMap2::Vertex(phi_1(m, e.dart)));
+		const Vec3& p1 = value<Vec3>(m, vertex_position, Vertex(e.dart));
+		const Vec3& p2 = value<Vec3>(m, vertex_position, Vertex(phi1(m, e.dart)));
+		const Vec3& p3 = value<Vec3>(m, vertex_position, Vertex(phi_1(m, e.dart)));
 		return {angle(p1 - p3, p2 - p3)};
 	}
 }

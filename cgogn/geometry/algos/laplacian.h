@@ -43,8 +43,9 @@ namespace geometry
 ///////////
 // CMap2 //
 ///////////
-
-Scalar edge_cotan_weight(const CMap2& m, CMap2::Edge e, const CMap2::Attribute<Vec3>* vertex_position)
+template <typename MAP2>
+auto edge_cotan_weight(const MAP2& m, typename MAP2::Edge e, const typename MAP2::template Attribute<Vec3>* vertex_position)
+	-> std::enable_if_t<std::is_convertible_v<MAP2&, struct CMap2&> || std::is_convertible_v<MAP2&, struct GMap2&>, Scalar>
 {
 	Scalar result = 0.0;
 
@@ -61,7 +62,21 @@ Scalar edge_cotan_weight(const CMap2& m, CMap2::Edge e, const CMap2::Attribute<V
 
 	result += e1value / 2.0;
 
-	if (!is_boundary(m, d2))
+	auto check_not_boundary = [&]() -> bool {
+		if constexpr (std::is_convertible_v<MAP2&, struct CMap2&>)
+		{
+			return !is_boundary(m, d2);
+		}
+		if constexpr (std::is_convertible_v<MAP2&, struct GMap2&>)
+		{
+			return d2 != d1;
+		}
+		// never reached
+		return true;
+	};
+
+
+	if (check_not_boundary()) //(!is_boundary(m, d2))
 	{
 		const Vec3& p4 = value<Vec3>(m, vertex_position, CMap2::Vertex(phi_1(m, d2)));
 		Vec3 vecR = p2 - p4;

@@ -157,7 +157,7 @@ inline uint32 nb_darts(const MapBase& m)
 /// \brief dump_map_darts low level dump for debugging
 /// \param m
 ///
-void dump_map_darts(const MapBase& m);
+//void dump_map_darts(const MapBase& m);
 
 ///
 /// \brief add_dart [LOW LEVEL] Add a dart to a map. A dart is only an encapsulated index

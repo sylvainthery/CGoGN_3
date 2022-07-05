@@ -1,4 +1,5 @@
-#include <cgogn/core/types/map/cmap/cmap2.h>
+//#include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/types/map/gmap/gmap2.h>
 
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/functions/mesh_ops/face.h>
@@ -30,7 +31,7 @@ using Vec3 = geometry::Vec3;
 
 int main()
 {
-	CMap2 map2;
+	GMap2 map2;
 
 	do_something(map2);
 
@@ -77,7 +78,7 @@ int main()
 
 	///////////////////////
 
-	CMap1 map1;
+	GMap1 map1;
 
 	do_something(map1);
 

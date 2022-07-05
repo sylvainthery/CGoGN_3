@@ -20,7 +20,8 @@
  * Contact information: cgogn@unistra.fr                                        *
  *                                                                              *
  *******************************************************************************/
-#include <cgogn/core/types/map/cmap/cmap2.h>
+//#include <cgogn/core/types/map/cmap/cmap2.h>
+#include <cgogn/core/types/map/gmap/gmap2.h>
 #include <cgogn/core/types/incidence_graph/incidence_graph.h>
 
 
@@ -44,7 +45,8 @@
 
 using namespace cgogn::numerics;
 
-using Mesh = cgogn::CMap2;
+//using Mesh = cgogn::CMap2;
+using Mesh = cgogn::GMap2;
 
 template <typename T>
 using Attribute = typename cgogn::mesh_traits<Mesh>::Attribute<T>;

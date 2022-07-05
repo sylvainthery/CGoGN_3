@@ -81,7 +81,7 @@ CELL of_index(const CMapBase& m, uint32 i)
 	return CELL();
 }
 
-
+void dump_map_darts(const CMapBase& m);
 
 } // namespace cgogn
 

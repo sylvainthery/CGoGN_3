@@ -66,6 +66,8 @@ CELL of_index(const GMapBase& m, uint32 i)
 	return CELL();
 }
 
+void dump_map_darts(const GMapBase& m);
+
 /////
 /////// \brief init_cells_indexing Add an index atttribute on dart for CELL embedding
 /////// \param m

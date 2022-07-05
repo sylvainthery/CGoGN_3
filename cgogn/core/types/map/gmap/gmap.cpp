@@ -42,6 +42,7 @@ void dump_map_darts(const GMapBase& m)
 			auto& ind = m.cells_indices_[orb];
 			std::cout << ind->name() << ": " << std::setw(5) << (*ind)[d.index] << " / ";
 		}
+		std::cout << std::endl;
 	}
 }
 

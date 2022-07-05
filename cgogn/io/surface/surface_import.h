@@ -70,7 +70,7 @@ void CGOGN_IO_EXPORT import_surface_data(IncidenceGraph& m, SurfaceImportData& s
 #ifndef _SURFACE_IMPORT_CPP_
 template <typename MAP>
 auto import_surface_data(MAP& m, SurfaceImportData& surface_data)
-	-> std::enable_if_t<std::is_same_v<MAP, struct CMap2> || std::is_same_v<MAP, struct GMap2>, void>
+	-> std::enable_if_t<std::is_convertible_v<MAP&, struct CMap2&> || std::is_convertible_v<MAP&, struct GMap2&>, void>
 {
 	using Vertex = typename mesh_traits<MAP>::Vertex;
 
@@ -118,6 +118,10 @@ auto import_surface_data(MAP& m, SurfaceImportData& surface_data)
 			{
 				const uint32 vertex_index = vertices_buffer[j];
 				set_index<Vertex>(m, d, vertex_index);
+				if constexpr (std::is_convertible_v<MAP&, struct GMap2&>)
+				{
+					set_index<Vertex>(m, beta1(m, d), vertex_index);
+				}
 				(*darts_per_vertex)[vertex_index].push_back(d);
 				d = phi1(m, d);
 			}

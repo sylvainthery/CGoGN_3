@@ -71,9 +71,9 @@ struct mesh_traits<GMap2>
 	static constexpr const char* cell_names[] = {"Vertex", "HalfEdge", "Edge", "Face", "Volume"};
 
 	template <typename T>
-	using Attribute = GMapBase::Attribute<T>;
-	using AttributeGen = GMapBase::AttributeGen;
-	using MarkAttribute = GMapBase::MarkAttribute;
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 GMap2::Vertex CGOGN_CORE_EXPORT cut_edge(GMap2& m, GMap2::Edge e, bool set_indices = true);
@@ -131,7 +131,8 @@ inline void beta2_unsew(GMap2& m, Dart d)
 inline Dart phi2(const GMap2& m, Dart d)
 {
 	Dart dd = beta2(m, d);
-	cgogn_assert(dd != d); // return d (FP)
+	if (dd == d)
+		return d;
 	return beta0(m, dd);
 }
 

@@ -64,9 +64,9 @@ struct mesh_traits<GMap0>
 	static constexpr const char* cell_names[] = {"Vertex","Edge"};
 
 	template <typename T>
-	using Attribute = GMapBase::Attribute<T>;
-	using AttributeGen = GMapBase::AttributeGen;
-	using MarkAttribute = GMapBase::MarkAttribute;
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 inline Dart beta0(const GMap0& m, Dart d)

@@ -65,10 +65,10 @@ struct mesh_traits<GMap1>
 	static constexpr const char* cell_names[] = {"Vertex", "Edge", "Face"};
 
 	template <typename T>
-	using Attribute = GMapBase::Attribute<T>;
-	using AttributeGen = GMapBase::AttributeGen;
+	using Attribute = MapBase::Attribute<T>;
+	using AttributeGen = MapBase::AttributeGen;
 	static constexpr const char* name = "GMap1";
-using MarkAttribute = GMapBase::MarkAttribute;
+	using MarkAttribute = MapBase::MarkAttribute;
 };
 
 
