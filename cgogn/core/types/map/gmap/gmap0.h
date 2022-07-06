@@ -90,27 +90,6 @@ inline void beta0_unsew(GMap0& m, Dart d)
 }
 
 
-template <uint8 Arg, uint8... Args, typename MESH>
-inline Dart beta(const MESH& m, Dart d)
-{
-	static_assert((Arg >= 0 && Arg <= mesh_traits<MESH>::dimension), "Bad beta value");
-
-	Dart res;
-	if constexpr (Arg == 0)
-		res = beta0(m, d);
-	if constexpr (Arg == 1)
-		res = beta1(m, d);
-	if constexpr (Arg == 2)
-		res = beta2(m, d);
-	if constexpr (Arg == 3)
-		res = beta3(m, d);
-
-	if constexpr (sizeof...(Args) > 0)
-		return beta<Args...>(m, res);
-	else
-		return res;
-}
-
 GMap0::Edge add_edge(GMap0& m, bool set_indices = true);
 
 void remove_edge(GMap0& m, GMap0::Edge e, bool set_indice = true);

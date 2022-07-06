@@ -25,37 +25,33 @@
 #define CGOGN_CORE_TYPES_GMAP_PHI_H_
 
 #include <cgogn/core/types/map/dart.h>
-#include <cgogn/core/types/map/dart.h>
+#include <cgogn/core/types/mesh_traits.h>
 
 
 namespace cgogn
 {
 
-/*****************************************************************************/
+template <int8 Arg, int8... Args, typename MESH>
+		inline auto beta(const MESH& m, Dart d) -> std::enable_if_t < std::is_convertible_v<MESH&, struct GMapBase&> ||
+															std::is_convertible_v<MESH&, struct CMapBase&>, Dart >
+{
+	static_assert((Arg >= 0 && Arg <= mesh_traits<MESH>::dimension), "Bad phi value");
 
-// template <typename MESH>
-// Dart phiX(const MESH& m, Dart d);
+	Dart res;
+	if constexpr (Arg == 0)
+		res = beta0(m, d);
+	if constexpr (Arg == 1)
+		res = beta1(m, d);
+	if constexpr (Arg == 2)
+		res = beta2(m, d);
+	if constexpr (Arg == 3)
+		res = beta3(m, d);
 
-/*****************************************************************************/
-
-//////////////
-// GMapBase //
-//////////////
-
-
-
-	
-//////////////
-// GMapBase //
-//////////////
-
-
-
-
-
-
-
-
+	if constexpr (sizeof...(Args) > 0)
+		return beta<Args...>(m, res);
+	else
+		return res;
+}
 } // namespace cgogn
 
 #endif // CGOGN_CORE_TYPES_GMAP_PHI_H_
