@@ -162,9 +162,9 @@ bool check_indexing(MESH& m, bool verbose = true)
 		MapBase_TraversalPolicy::DART_MARKING);
 
 	// check that all lines of the attribute container are used
-	for (uint32 i = m.attribute_containers_[CELL::ORBIT].first_index(),
-				end = m.attribute_containers_[CELL::ORBIT].last_index();
-		 i != end; i = m.attribute_containers_[CELL::ORBIT].next_index(i))
+	for (uint32 i = m.attribute_containers_[CELL::ORBIT]->first_index(),
+		 end = m.attribute_containers_[CELL::ORBIT]->last_index();
+		 i != end; i = m.attribute_containers_[CELL::ORBIT]->next_index(i))
 	{
 		if ((*counter)[i] == 0)
 		{

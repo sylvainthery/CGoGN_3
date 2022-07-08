@@ -54,7 +54,7 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 		index_cells<CELL>(m);
 	//typename mesh_traits<MESH>::BaseType& mb = static_cast<typename mesh_traits<MESH>::BaseType&>(m);
 	//return mb.attribute_containers_[CELL::ORBIT].template add_attribute<T>(name);
-	return m.get_base_ptr()->attribute_containers_[CELL::ORBIT].template add_attribute<T>(name);
+	return m.get_base_ptr()->attribute_containers_[CELL::ORBIT]->template add_attribute<T>(name);
 }
 
 ////////////////////
@@ -93,7 +93,7 @@ auto get_attribute(const MESH& m, const std::string& name) ->
 							  std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>>>
 {
 	static_assert(is_in_tuple<CELL, typename mesh_traits<MESH>::Cells>::value, "CELL not supported in this MESH");
-	return m.attribute_containers_[CELL::ORBIT].template get_attribute<T>(name);
+	return m.attribute_containers_[CELL::ORBIT]->template get_attribute<T>(name);
 }
 
 ////////////////////

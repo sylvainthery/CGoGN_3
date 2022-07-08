@@ -67,6 +67,10 @@ std::string orbit_name(const MAP& m, Orbit orbit)
 		{
 		case Orbit::DART:
 			return "cgogn::Orbit::DART";
+		case Orbit::BETA0:
+			return "cgogn::Orbit::BETA0";
+		case Orbit::BETA1:
+			return "cgogn::Orbit::BETA1";
 		case Orbit::BETA0_BETA1:
 			return "cgogn::Orbit::BETA0_BETA1";
 		case Orbit::BETA0_BETA2:

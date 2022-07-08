@@ -150,7 +150,7 @@ auto foreach_cell(const MESH& ig, const FUNC& f) -> std::enable_if_t<std::is_sam
 {
 	using CELL = func_parameter_type<FUNC>;
 	for (uint32 i = ig.attribute_containers_[CELL::CELL_INDEX].first_index(),
-				end = ig.attribute_containers_[CELL::CELL_INDEX].last_index();
+		 end = ig.attribute_containers_[CELL::CELL_INDEX].last_index();
 		 i != end; i = ig.attribute_containers_[CELL::CELL_INDEX].next_index(i))
 	{
 		CELL c(i);

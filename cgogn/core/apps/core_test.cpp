@@ -37,17 +37,17 @@ int main()
 
 	std::cout << "nb darts: " << nb_darts(map2) << std::endl;
 	std::cout << "vertex attributes:" << std::endl;
-	for (auto ag : map2.attribute_containers_[CMap2::Vertex::ORBIT])
+	for (auto ag : *(map2.attribute_containers_[CMap2::Vertex::ORBIT]))
 		std::cout << ag->name() << std::endl;
 	std::cout << "face attributes:" << std::endl;
-	for (auto ag : map2.attribute_containers_[CMap2::Face::ORBIT])
+	for (auto ag : *(map2.attribute_containers_[CMap2::Face::ORBIT]))
 		std::cout << ag->name() << std::endl;
 
 	io::import_OFF(map2, std::string(DEFAULT_MESH_PATH) + "meshes/off/octa.off");
 
 	std::cout << "nb darts: " << nb_darts(map2) << std::endl;
 	std::cout << "vertex attributes:" << std::endl;
-	for (auto ag : map2.attribute_containers_[CMap2::Vertex::ORBIT])
+	for (auto ag : *(map2.attribute_containers_[CMap2::Vertex::ORBIT]))
 		std::cout << ag->name() << std::endl;
 
 	auto bla = add_attribute<uint32, CMap2::Vertex>(map2, "bla");
@@ -73,7 +73,7 @@ int main()
 	remove_attribute<CMap2::Vertex>(map2, position);
 
 	std::cout << "vertex attributes:" << std::endl;
-	for (auto ag : map2.attribute_containers_[CMap2::Vertex::ORBIT])
+	for (auto ag : *(map2.attribute_containers_[CMap2::Vertex::ORBIT]))
 		std::cout << ag->name() << std::endl;
 
 	///////////////////////
@@ -84,7 +84,7 @@ int main()
 
 	std::cout << "nb darts: " << nb_darts(map1) << std::endl;
 	std::cout << "face attributes:" << std::endl;
-	for (auto ag : map1.attribute_containers_[CMap1::Face::ORBIT])
+	for (auto ag : *(map1.attribute_containers_[CMap1::Face::ORBIT]))
 		std::cout << ag->name() << std::endl;
 
 	auto att1 = get_attribute<float64, CMap2::Face>(map1, "value");

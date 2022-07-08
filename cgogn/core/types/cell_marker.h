@@ -56,7 +56,7 @@ auto get_mark_attribute(const MESH& m)
 
 	//const typename mesh_traits<MESH>::BaseType& mb = static_cast<const typename mesh_traits<MESH>::BaseType&>(m);
 	//return mb.attribute_containers_[CELL::ORBIT].get_mark_attribute();
-	return m.get_base_ptr()->attribute_containers_[CELL::ORBIT].get_mark_attribute();
+	return m.get_base_ptr()->attribute_containers_[CELL::ORBIT]->get_mark_attribute();
 }
 
 ////////////////////

@@ -69,7 +69,7 @@ void copy(CMAP& dst, const CMAP& src)
 	}
 	dst.darts_.copy(src.darts_);
 	for (uint32 i = 0; i < NB_ORBITS; ++i)
-		dst.attribute_containers_[i].copy(src.attribute_containers_[i]);
+		dst.attribute_containers_[i]->copy(*(src.attribute_containers_[i]));
 
 	if constexpr (std::is_convertible_v<CMAP, struct CMapBase>)
 	{

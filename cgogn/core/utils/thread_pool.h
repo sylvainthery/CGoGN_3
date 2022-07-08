@@ -117,7 +117,7 @@ public:
 #endif
 
 	template <class F, class... Args>
-	std::future<void> enqueue(const F& f, Args&&... args)
+		std::future<void> enqueue(const F& f, Args&&... args)
 	{
 		static_assert(std::is_same_v<typename std::invoke_result_t<F, Args...>, void>,
 					  "The thread pool only accepts non-returning functions.");

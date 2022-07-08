@@ -27,6 +27,9 @@ namespace cgogn
 {
 MapBase::MapBase()
 {
+	for (auto shptr : attribute_containers_)
+		shptr = std::make_shared<AttributeContainer>();
+
 	cells_embedded_orbit_.reserve(NB_ORBITS);
 }
 
@@ -64,7 +67,7 @@ void remove_dart(MapBase& m, Dart d)
 	{
 		uint32 index = (*m.cells_indices_[orbit])[d.index];
 		if (index != INVALID_INDEX)
-			m.attribute_containers_[orbit].unref_index(index);
+			m.attribute_containers_[orbit]->unref_index(index);
 	}
 	m.darts_.release_index(d.index);
 }
@@ -91,15 +94,15 @@ void clear(MapBase& m, bool keep_attributes)
 	}
 
 	// clear all cell attributes
-	for (MapBase::AttributeContainer& container : m.attribute_containers_)
+	for (auto container : m.attribute_containers_)
 	{
 		if (keep_attributes)
-			container.clear_attributes();
+			container->clear_attributes();
 		else
 		{
-			container.clear_attributes();
+			container->clear_attributes();
 			// if there are still shared_ptr somewhere, some attributes may not be removed
-			container.remove_attributes();
+			container->remove_attributes();
 		}
 	}
 }

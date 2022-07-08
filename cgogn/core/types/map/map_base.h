@@ -72,7 +72,7 @@ struct CGOGN_CORE_EXPORT MapBase
 	/*************************************************************************/
 	// Cells attributes containers
 	/*************************************************************************/
-	mutable std::array<AttributeContainer, NB_ORBITS> attribute_containers_;
+	mutable std::array<std::shared_ptr<AttributeContainer>, NB_ORBITS> attribute_containers_;
 
 	MapBase();
 	~MapBase();
@@ -191,9 +191,9 @@ void set_index(MapBase& m, Dart d, uint32 index)
 	const uint32 old = (*m.cells_indices_[orbit])[d.index];
 	// ref_index() is done before unref_index() to avoid deleting the index if old == index
 	if (index != INVALID_INDEX)
-		m.attribute_containers_[obv].ref_index(index); // ref the new index
+		m.attribute_containers_[obv]->ref_index(index); // ref the new index
 	if (old != INVALID_INDEX)
-		m.attribute_containers_[obv].unref_index(old); // unref the old index
+		m.attribute_containers_[obv]->unref_index(old); // unref the old index
 	(*m.cells_indices_[orbit])[d.index] = index;		 // affect the index to the dart
 }
 
@@ -231,7 +231,7 @@ uint32 maximum_index(const MapBase& m)
 	static const Orbit orbit = CELL::ORBIT;
 	static_assert(orbit < NB_ORBITS, "Unknown orbit parameter");
 	cgogn_message_assert(is_indexed<CELL>(m), "Trying to access a cell index of an unindexed cell type");
-	return m.attribute_containers_[CELL::ORBIT].maximum_index();
+	return m.attribute_containers_[CELL::ORBIT]->maximum_index();
 }
 
 ///
@@ -265,7 +265,7 @@ uint32 index_of(const MapBase& m, CELL c)
 template <typename CELL>
 uint32 new_index(const MapBase& m)
 {
-	return m.attribute_containers_[CELL::ORBIT].new_index();
+	return m.attribute_containers_[CELL::ORBIT]->new_index();
 }
 
 /////
@@ -289,13 +289,13 @@ uint32 new_index(const MapBase& m)
 template <typename CELL>
 void remove_attribute(MapBase& m, const std::shared_ptr<MapBase::AttributeGen>& attribute)
 {
-	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
+	m.attribute_containers_[CELL::ORBIT]->remove_attribute(attribute);
 }
 
 template <typename CELL>
 void remove_attribute(MapBase& m, MapBase::AttributeGen* attribute)
 {
-	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
+	m.attribute_containers_[CELL::ORBIT]->remove_attribute(attribute);
 }
 
 
@@ -327,7 +327,7 @@ inline void release_dart_mark_attribute(const MapBase& m, MapBase::MarkAttribute
 template <typename CELL>
 void release_mark_attribute(const MapBase& m, MapBase::MarkAttribute* attribute)
 {
-	return m.attribute_containers_[CELL::ORBIT].release_mark_attribute(attribute);
+	return m.attribute_containers_[CELL::ORBIT]->release_mark_attribute(attribute);
 }
 
 
@@ -337,7 +337,7 @@ void foreach_attribute(const MapBase& m, const FUNC& f)
 	using AttributeGen = MapBase::AttributeGen;
 	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
 				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
+	for (const std::shared_ptr<AttributeGen>& a : *(m.attribute_containers_[CELL::ORBIT]))
 		f(a);
 }
 
@@ -348,7 +348,7 @@ void foreach_attribute(const MapBase& m, const FUNC& f)
 	using AttributeGen = MapBase::AttributeGen;
 	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
 				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
+	for (const std::shared_ptr<AttributeGen> a : *(m.attribute_containers_[CELL::ORBIT]))
 	{
 		std::shared_ptr<AttributeT> at = std::dynamic_pointer_cast<AttributeT>(a);
 		if (at)

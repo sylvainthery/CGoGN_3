@@ -76,11 +76,11 @@ target_link_libraries(test_shape
 	${CMAKE_DL_LIBS} ${APPLE_LIBS}
 )
 
-add_executable(test_topo_drawer test_topo_drawer.cpp)
-target_link_libraries(test_topo_drawer
-	cgogn::core
-	cgogn::ui
-	cgogn::rendering
-	${CMAKE_DL_LIBS} ${APPLE_LIBS}
-)
+#add_executable(test_topo_drawer test_topo_drawer.cpp)
+#target_link_libraries(test_topo_drawer
+#	cgogn::core
+#	cgogn::ui
+#	cgogn::rendering
+#	${CMAKE_DL_LIBS} ${APPLE_LIBS}
+#)
 
