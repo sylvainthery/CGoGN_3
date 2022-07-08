@@ -8,12 +8,11 @@ find_package(ImGUI REQUIRED)
 add_library(${PROJECT_NAME} STATIC "")
 add_library(cgogn::rendering ALIAS ${PROJECT_NAME})
 
-target_sources(${PROJECT_NAME}
-	PRIVATE
+set ( cgogn_src_rendering
 #		"${CMAKE_CURRENT_LIST_DIR}/drawer.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/drawer.cpp"
-#		"${CMAKE_CURRENT_LIST_DIR}/topo_drawer.h"
-#		"${CMAKE_CURRENT_LIST_DIR}/topo_drawer.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/topo_drawer.h"
+		"${CMAKE_CURRENT_LIST_DIR}/topo_drawer.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/volume_drawer.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/volume_drawer.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/mesh_render.h"
@@ -84,6 +83,9 @@ target_sources(${PROJECT_NAME}
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_point_sprite.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_point_sprite.cpp"
+		
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_round_point.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_round_point.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.cpp"
@@ -119,6 +121,11 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/shape_drawer.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shape_drawer.cpp"
 )
+
+source_group(PREFIX "" FILES ${cgogn_src_rendering} TREE ${CMAKE_CURRENT_LIST_DIR})
+
+target_sources(${PROJECT_NAME} PRIVATE ${cgogn_src_rendering} )
+
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	DEBUG_POSTFIX "_d"

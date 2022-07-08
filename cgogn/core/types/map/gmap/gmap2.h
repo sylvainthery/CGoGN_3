@@ -96,6 +96,11 @@ bool CGOGN_CORE_EXPORT edge_can_flip(const GMap2& m, GMap2::Edge e);
 
 bool CGOGN_CORE_EXPORT check_integrity(GMap2& m, bool verbose = true);
 
+GMap2::Face close_hole(GMap2& m, Dart d, bool set_indices);
+
+int32 close(GMap2& m, bool set_indices);
+
+
 
 inline Dart beta2(const GMap2& m, Dart d)
 {
