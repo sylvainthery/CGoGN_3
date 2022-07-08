@@ -29,6 +29,8 @@ namespace cgogn
 namespace rendering
 {
 
+std::unique_ptr <TopoDrawer> TopoDrawer::instance_ = nullptr;
+
 TopoDrawer::TopoDrawer()
 	: dart_color_(1, 1, 1, 1), phi2_color_(1, 0, 0, 1), phi3_color_(1, 1, 0, 1), shrink_v_(0.8f), shrink_f_(0.85f),
 	  shrink_e_(0.95f)
@@ -47,16 +49,19 @@ TopoDrawer::Renderer::Renderer(TopoDrawer* tr) : topo_drawer_data_(tr), width_(2
 	param_bl_ = ShaderBoldLineColor::generate_param();
 	param_bl_->set_vbos({tr->vbo_darts_.get(), tr->vbo_color_darts_.get()});
 
+	
+	param_bl1_ = ShaderBoldLine::generate_param();
+	param_bl1_->set_vbos({tr->vbo_darts_.get()});
+	param_bl1_->color_ = tr->dart_color_;
+
+
 	param_bl2_ = ShaderBoldLine::generate_param();
 	param_bl2_->set_vbos({tr->vbo_relations_.get()});
 	param_bl2_->color_ = tr->phi2_color_;
 
 	param_rp_ = ShaderRoundPointColor::generate_param();
 
-	param_rp_->bind_vao();
-	tr->vbo_darts_->associate(1, 2, 0);
-	tr->vbo_color_darts_->associate(2, 2, 0);
-	param_rp_->release_vao();
+	param_rp_->set_vbos_opt({tr->vbo_darts_.get(), tr->vbo_color_darts_.get()}, {2, 2}, {0u, 0u});
 }
 
 TopoDrawer::Renderer::~Renderer()
@@ -65,15 +70,19 @@ TopoDrawer::Renderer::~Renderer()
 
 void TopoDrawer::Renderer::draw(const GLMat4& projection, const GLMat4& modelview)
 {
-	param_bl_->width_ = width_;
-	param_bl2_->width_ = width_;
-	param_rp_->size_ = 2.0f * width_;
+	GLint vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
 
-	param_bl_->bind(projection, modelview);
+	param_bl_->width_ = width_;
+	param_bl1_->width_ = width_;
+	param_bl2_->width_ = width_;
+	param_rp_->point_size_ = 2.0f * width_/float(std::max(vp[2],vp[3]));
+
+	param_bl1_->bind(projection, modelview);
 
 	glDrawArrays(GL_LINES, 0, topo_drawer_data_->vbo_darts_->size());
 
-	param_bl_->release();
+	param_bl1_->release();
 
 	param_rp_->bind(projection, modelview);
 

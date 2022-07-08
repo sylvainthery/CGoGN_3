@@ -28,9 +28,8 @@
 #include <cgogn/rendering/cgogn_rendering_export.h>
 
 #include <cgogn/rendering/shaders/shader_bold_line.h>
-#include <cgogn/rendering/shaders/shader_bold_line_color.h>
 #include <cgogn/rendering/shaders/shader_no_illum.h>
-#include <cgogn/rendering/shaders/shader_round_point_color.h>
+#include <cgogn/rendering/shaders/shader_round_point.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/functions/distance.h>
@@ -63,6 +62,8 @@ class CGOGN_RENDERING_EXPORT TopoDrawer
 	using Vec3 = geometry::Vec3;
 	using Vec4 = geometry::Vec4;
 	using Scalar = geometry::Scalar;
+
+	static std::unique_ptr <TopoDrawer> instance_;
 
 protected:
 	std::unique_ptr<VBO> vbo_darts_;
@@ -108,11 +109,13 @@ public:
 		friend class TopoDrawer;
 
 		std::unique_ptr<ShaderBoldLineColor::Param> param_bl_;
+		std::unique_ptr<ShaderBoldLine::Param> param_bl1_;
 		std::unique_ptr<ShaderBoldLine::Param> param_bl2_;
 		std::unique_ptr<ShaderRoundPointColor::Param> param_rp_;
 		TopoDrawer* topo_drawer_data_;
 
 		Renderer(TopoDrawer* tr);
+
 
 	public:
 		float width_;
@@ -156,6 +159,14 @@ public:
 	{
 		return std::unique_ptr<Renderer>(new Renderer(this));
 	}
+
+	inline static TopoDrawer* instance()
+	{
+		if (instance_ == nullptr)
+			instance_ = std::make_unique<TopoDrawer>();
+		return instance_.get();
+	}
+
 
 	inline void set_explode_volume(float32 x)
 	{

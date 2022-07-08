@@ -387,16 +387,17 @@ GMap2::Face close_hole(GMap2& m, Dart d, bool set_indices)
 	Dart dd1; // to complete the face
 	do
 	{
-		d_next = beta0(m, d_next);
 		do
 		{
 			dd1 = beta1(m, d_next);
 			d_next = beta2(m, dd1);
-		} while (d_next != dd1 && dd1 != d);
-
-		if (dd1 != d)
-			vd.push_back(d);
-	} while (dd1 != d);
+		} while (d_next != dd1);
+		if (dd1 == d_next)
+		{
+			d_next = beta0(m, d_next);
+			vd.push_back(d_next);
+		}
+	} while (d_next != d);
 
 	GMap2::Face f = add_face(m, vd.size(), false);
 	Dart df = f.dart;

@@ -473,7 +473,11 @@ public:
 	 * @brief set vbos into the vao
 	 * @param all vbos in order of attribs
 	 */
-	virtual void set_vbos(const std::vector<VBO*>& vbos);
+	/*virtual*/ void set_vbos(const std::vector<VBO*>& vbos);
+
+
+	void set_vbos_opt(const std::vector<VBO*>& vbos, const std::vector<int32>& strides,
+					  const std::vector<uint32>& begins);
 
 	// /**
 	//  * @brief set one vbo into the vao

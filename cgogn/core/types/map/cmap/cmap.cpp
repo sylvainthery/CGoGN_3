@@ -22,12 +22,14 @@
  *******************************************************************************/
 
 #include <cgogn/core/types/map/cmap/cmap3.h>
+#include <cgogn/core/types/map/cmap/orbit_traversal.h>
+
 #include <cgogn/core/functions/cells.h>
 #include <cgogn/core/functions/mesh_info.h>
 
-#include <cgogn/core/types/map/cmap/orbit_traversal.h>
-#include <cgogn/core/functions/traversals/edge.h>
-#include <cgogn/core/functions/traversals/vertex.h>
+
+//#include <cgogn/core/functions/traversals/edge.h>
+//#include <cgogn/core/functions/traversals/vertex.h>
 
 namespace cgogn
 {

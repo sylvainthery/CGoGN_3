@@ -370,6 +370,43 @@ void ShaderParam::set_vbos(const std::vector<VBO*>& vbos)
 	}
 }
 
+void ShaderParam::set_vbos_opt(const std::vector<VBO*>& vbos, const std::vector<int32>& strides,
+							   const std::vector<uint32>& begins)
+{
+	//	assert(uint32(vbos.size()) == shader_->nb_attributes());
+
+	if (shader_->use_texture_buffer())
+	{
+		attributes_initialized_ = true;
+		for (uint32 i = 0; i < uint32(vbos.size()); ++i)
+		{
+			set_texture_buffer_vbo(i, vbos[i]);
+			if (!vbos[i])
+				attributes_initialized_ = false;
+		}
+		return;
+	}
+	else
+	{
+		attributes_initialized_ = true;
+		vao_->bind();
+		GLuint attrib = 1u;
+		for (auto* v : vbos)
+		{
+			if (v)
+				v->associate(attrib,strides[attrib-1],begins[attrib-1]);
+			else
+				attributes_initialized_ = false;
+			attrib++;
+		}
+		// if the last optional clipping attribute is not given, use the first vbo as the last attribute
+		// TODO: not very clean...
+		if (attributes_initialized_ && optional_clipping_attribute_ && uint32(vbos.size()) < shader_->nb_attributes())
+			vbos[0]->associate(attrib);
+		vao_->release();
+	}
+}
+
 } // namespace rendering
 
 } // namespace cgogn
