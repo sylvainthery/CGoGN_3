@@ -437,78 +437,91 @@ public:
 		for (auto& t : table_indices_v)
 			t.reserve(1024u);
 
-		switch (prim)
+		if constexpr (mesh_traits<MESH>::dimension == 0)
 		{
-		case POINTS:
-			init_points(m, table_indices);
-			func_update_ebo(POINTS, table_indices);
-			break;
-		case LINES:
-		case INDEX_EDGES:
-			if (is_indexed<typename mesh_traits<MESH>::Edge>(m))
+			if (prim == POINTS)
 			{
-				init_lines<true>(m, table_indices, table_indices_emb);
-				func_update_ebo(INDEX_EDGES, table_indices_emb);
+				init_points(m, table_indices);
+				func_update_ebo(POINTS, table_indices);
 			}
 			else
-			{
-				init_lines<false>(m, table_indices, table_indices_emb);
-				func_update_ebo2(INDEX_EDGES, table_indices_emb);
-			}
-			func_update_ebo(LINES, table_indices);
-			break;
-		case TRIANGLES:
-		case INDEX_FACES:
-			if constexpr (mesh_traits<MESH>::dimension >= 2)
-			{
-				if (is_indexed<typename mesh_traits<MESH>::Face>(m))
-				{
-					// if (position == nullptr)
-					init_triangles<true>(m, table_indices, table_indices_emb);
-					// else
-					// 	init_ear_triangles<true>(m, table_indices, table_indices_emb, position);
-					func_update_ebo(INDEX_FACES, table_indices_emb);
-				}
-				else
-				{
-					// if (position == nullptr)
-					init_triangles<false>(m, table_indices, table_indices_emb);
-					// else
-					// 	init_ear_triangles<false>(m, table_indices, table_indices_emb, position);
-					func_update_ebo2(INDEX_FACES, table_indices_emb);
-				}
-				func_update_ebo(TRIANGLES, table_indices);
-			}
-			break;
-		case VOLUMES_VERTICES:
-		case VOLUMES_EDGES:
-		case VOLUMES_FACES:
-		case INDEX_VOLUMES:
-			if constexpr (mesh_traits<MESH>::dimension >= 3)
-			{
-				if (is_indexed<typename mesh_traits<MESH>::Volume>(m))
-				{
-					init_volumes<true>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb, position);
-					func_update_ebo(VOLUMES_FACES, table_indices);
-					func_update_ebo(VOLUMES_EDGES, table_indices_e);
-					func_update_ebo(VOLUMES_VERTICES, table_indices_v);
-					func_update_ebo(INDEX_VOLUMES, table_indices_emb);
-				}
-				else
-				{
-					init_volumes<false>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb,
-										position);
-					func_update_ebo3(VOLUMES_FACES, table_indices, table_indices_emb, 4);
-					func_update_ebo3(VOLUMES_EDGES, table_indices_e, table_indices_emb, 3);
-					func_update_ebo3(VOLUMES_VERTICES, table_indices_v, table_indices_emb, 2);
-					func_update_ebo2(INDEX_VOLUMES, table_indices_emb);
-				}
-			}
-			break;
-		default:
-			break;
+				std::cerr << "primitive POINTS only supported for mesh of dimension 0" << std::endl;
 		}
-
+		else
+		{
+			switch (prim)
+			{
+			case POINTS:
+				init_points(m, table_indices);
+				func_update_ebo(POINTS, table_indices);
+				break;
+			case LINES:
+			case INDEX_EDGES:
+				if (is_indexed<typename mesh_traits<MESH>::Edge>(m))
+				{
+					init_lines<true>(m, table_indices, table_indices_emb);
+					func_update_ebo(INDEX_EDGES, table_indices_emb);
+				}
+				else
+				{
+					init_lines<false>(m, table_indices, table_indices_emb);
+					func_update_ebo2(INDEX_EDGES, table_indices_emb);
+				}
+				func_update_ebo(LINES, table_indices);
+				break;
+			case TRIANGLES:
+			case INDEX_FACES:
+				if constexpr (mesh_traits<MESH>::dimension >= 2)
+				{
+					if (is_indexed<typename mesh_traits<MESH>::Face>(m))
+					{
+						// if (position == nullptr)
+						init_triangles<true>(m, table_indices, table_indices_emb);
+						// else
+						// 	init_ear_triangles<true>(m, table_indices, table_indices_emb, position);
+						func_update_ebo(INDEX_FACES, table_indices_emb);
+					}
+					else
+					{
+						// if (position == nullptr)
+						init_triangles<false>(m, table_indices, table_indices_emb);
+						// else
+						// 	init_ear_triangles<false>(m, table_indices, table_indices_emb, position);
+						func_update_ebo2(INDEX_FACES, table_indices_emb);
+					}
+					func_update_ebo(TRIANGLES, table_indices);
+				}
+				break;
+			case VOLUMES_VERTICES:
+			case VOLUMES_EDGES:
+			case VOLUMES_FACES:
+			case INDEX_VOLUMES:
+				if constexpr (mesh_traits<MESH>::dimension >= 3)
+				{
+					if (is_indexed<typename mesh_traits<MESH>::Volume>(m))
+					{
+						init_volumes<true>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb,
+										   position);
+						func_update_ebo(VOLUMES_FACES, table_indices);
+						func_update_ebo(VOLUMES_EDGES, table_indices_e);
+						func_update_ebo(VOLUMES_VERTICES, table_indices_v);
+						func_update_ebo(INDEX_VOLUMES, table_indices_emb);
+					}
+					else
+					{
+						init_volumes<false>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb,
+											position);
+						func_update_ebo3(VOLUMES_FACES, table_indices, table_indices_emb, 4);
+						func_update_ebo3(VOLUMES_EDGES, table_indices_e, table_indices_emb, 3);
+						func_update_ebo3(VOLUMES_VERTICES, table_indices_v, table_indices_emb, 2);
+						func_update_ebo2(INDEX_VOLUMES, table_indices_emb);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
 		// auto end_timer = std::chrono::high_resolution_clock::now();
 		// std::chrono::duration<double> elapsed_seconds = end_timer - start_timer;
 		// std::cout << "init primitive " << prim << " in " << elapsed_seconds.count() << std::endl;

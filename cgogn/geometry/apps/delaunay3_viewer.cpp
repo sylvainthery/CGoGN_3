@@ -29,9 +29,6 @@
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/rendering/ui_modules/volume_render.h>
 
-#include <cgogn/rendering/ui_modules/points_cloud_render.h>
-
-
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/functions/distance.h>
 
@@ -49,7 +46,6 @@
 #include <random>
 #include <chrono>
 
-#include <cgogn/core/functions/cells.h>
 
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Vb = CGAL::Triangulation_vertex_base_with_info_3<uint32_t, K>;
@@ -70,14 +66,6 @@ using Volume = typename cgogn::mesh_traits<Mesh>::Volume;
 
 using Vec3 = cgogn::geometry::Vec3;
 using Scalar = cgogn::geometry::Scalar;
-
-using PointCloud =cgogn::CMap0;
-template <typename T>
-using PCAttribute = typename cgogn::mesh_traits<PointCloud>::Attribute<T>;
-using namespace cgogn::numerics;
-
-using PC_Vertex = typename cgogn::mesh_traits<PointCloud>::Vertex;
-
 
 //#define PERF_TEST
 
@@ -154,26 +142,13 @@ int main(int argc, char** argv)
 	app.set_window_size(1000, 800);
 
 	cgogn::ui::MeshProvider<Mesh> mp(app);
-	cgogn::ui::MeshProvider<PointCloud> mpc(app);
-
-	PointCloud pc;
-	std::shared_ptr<PCAttribute<Vec3>> pc_vertex_position = cgogn::add_attribute<Vec3, PC_Vertex>(pc, "position");
-	/*cgogn::init_cells_indexing<PC_Vertex>(pc);*/
-	cgogn::Dart d1 = add_dart(pc);
-	cgogn::value<Vec3>(pc, pc_vertex_position, PC_Vertex(d1)) = Vec3(1.5, 1.5, 1.5);
-	cgogn::Dart d2 = add_dart(pc);
-	cgogn::value<Vec3>(pc, pc_vertex_position, PC_Vertex(d2)) = Vec3(1.25, 1.25, 1.25);
-
 	cgogn::ui::VolumeRender<Mesh> vr(app);
-
-	cgogn::ui::PointsCloudRender<PointCloud> pcr(app);
 
 	app.init_modules();
 
 	cgogn::ui::View* v1 = app.current_view();
 	v1->link_module(&mp);
 	v1->link_module(&vr);
-	v1->link_module(&pcr);
 
 	Mesh* m = new Mesh{};
 	test_delaunay(m);

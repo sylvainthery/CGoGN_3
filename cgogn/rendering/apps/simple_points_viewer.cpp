@@ -52,15 +52,35 @@
 using Vec3 = cgogn::geometry::Vec3;
 using Scalar = cgogn::geometry::Scalar;
 
-using PointCloud =cgogn::CMap0;
+using PointsCloud =cgogn::CMap0;
 template <typename T>
-using PCAttribute = typename cgogn::mesh_traits<PointCloud>::Attribute<T>;
+using PCAttribute = typename cgogn::mesh_traits<PointsCloud>::Attribute<T>;
 using namespace cgogn::numerics;
 
-using PC_Vertex = typename cgogn::mesh_traits<PointCloud>::Vertex;
+using PC_Vertex = typename cgogn::mesh_traits<PointsCloud>::Vertex;
 
 
-//#define PERF_TEST
+
+void create_pointscloud(PointsCloud* pc, int32 nb)
+{
+	std::random_device rd;	// Will be used to obtain a seed for the random number engine
+	std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+	std::uniform_real_distribution<double> dis(-1.0, 1.0);
+
+	cgogn::init_cells_indexing<PC_Vertex>(*pc);
+	std::shared_ptr<PCAttribute<Vec3>> pc_vertex_position = cgogn::get_attribute<Vec3, PC_Vertex>(*pc, "position");
+
+	std::shared_ptr<PCAttribute<float64>> pc_vertex_radius = cgogn::add_attribute<float64, PC_Vertex>(*pc, "radius");
+
+
+	for (int32 i = 0; i < nb; ++i)
+	{
+		PC_Vertex v(cgogn::add_dart(*pc));
+		cgogn::set_index(*pc, v, cgogn::new_index<PC_Vertex>(*pc));
+		cgogn::value<Vec3>(*pc, pc_vertex_position, v ) = Vec3(dis(gen), dis(gen), dis(gen));
+		cgogn::value<float64>(*pc, pc_vertex_radius, v) = 0.05+0.01*dis(gen);
+	}
+}
 
 
 int main(int argc, char** argv)
@@ -69,22 +89,18 @@ int main(int argc, char** argv)
 	cgogn::thread_start();
 
 	cgogn::ui::App app;
-	app.set_window_title("Delaunay volume viewer");
+	app.set_window_title("pointq cloud viewer");
 	app.set_window_size(1000, 800);
 
-	cgogn::ui::MeshProvider<PointCloud> mpc(app);
+	cgogn::ui::MeshProvider<PointsCloud> mpc(app);
 
-	PointCloud pc;
-	std::shared_ptr<PCAttribute<Vec3>> pc_vertex_position = cgogn::add_attribute<Vec3, PC_Vertex>(pc, "position");
-	/*cgogn::init_cells_indexing<PC_Vertex>(pc);*/
-	cgogn::Dart d1 = add_dart(pc);
-	cgogn::value<Vec3>(pc, pc_vertex_position, PC_Vertex(d1)) = Vec3(1.5, 1.5, 1.5);
-	cgogn::Dart d2 = add_dart(pc);
-	cgogn::value<Vec3>(pc, pc_vertex_position, PC_Vertex(d2)) = Vec3(1.25, 1.25, 1.25);
+	PointsCloud *pc = new PointsCloud;
+	mpc.register_mesh(pc,"points cloud");
+	std::shared_ptr<PCAttribute<Vec3>> pc_vertex_position = cgogn::add_attribute<Vec3, PC_Vertex>(*pc, "position");
 
-	cgogn::ui::VolumeRender<Mesh> vr(app);
+	create_pointscloud(pc, 1000);
 
-	cgogn::ui::PointsCloudRender<PointCloud> pcr(app);
+	cgogn::ui::PointsCloudRender<PointsCloud> pcr(app);
 
 	app.init_modules();
 
@@ -92,8 +108,8 @@ int main(int argc, char** argv)
 	v1->link_module(&mpc);
 	v1->link_module(&pcr);
 
-	mpc.set_mesh_bb_vertex_position(*m, vertex_position);
-	mpc.set_vertex_position(*v1, *m, vertex_position);
+	mpc.set_mesh_bb_vertex_position(*pc, pc_vertex_position);
+	pcr.set_vertex_position(*v1, *pc, pc_vertex_position);
 
 	return app.launch();
 }

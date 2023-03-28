@@ -161,13 +161,9 @@ private:
 				boost::synapse::connect<typename MeshProvider<MESH>::connectivity_changed>(m, [this, v, m]() {
 					Parameters& p = parameters_[v][m];
 					if (p.vertex_position_)
-					// TODO: ???
-						p.vertex_base_size_ = 0.0; // float32(geometry::mean_edge_length(m, p.vertex_position_.get()) / 7.0);
-
-					if (p.vertex_base_size_ == 0.0)
 					{
 						MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
-						p.vertex_base_size_ = float32((md.bb_max_ - md.bb_min_).norm() / 20.0);
+						p.vertex_base_size_ = float32((md.bb_max_ - md.bb_min_).norm() / (100.0 * md.nb_cells<Vertex>()));
 					}
 					v->request_update();
 				}));
@@ -177,15 +173,8 @@ private:
 						Parameters& p = parameters_[v][m];
 						if (p.vertex_position_.get() == attribute)
 						{
-							// TODO: ???
-							p.vertex_base_size_ = 0.0; // float32(geometry::mean_edge_length(m, p.vertex_position_.get()) / 7.0);
-
-							p.vertex_base_size_ = 0.0;
-							if (p.vertex_base_size_ == 0.0)
-							{
-								MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
-								p.vertex_base_size_ = float32((md.bb_max_ - md.bb_min_).norm() / 20.0);
-							}
+							MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
+							p.vertex_base_size_ = float32((md.bb_max_ - md.bb_min_).norm() / (100.0*md.nb_cells<Vertex>()));
 						}
 						v->request_update();
 					}));
@@ -212,10 +201,14 @@ public:
 		{
 			MeshData<MESH>& md = mesh_provider_->mesh_data(m);
 			p.vertex_position_vbo_ = md.update_vbo(p.vertex_position_.get(), true);
-			//TODO: ???
-			p.vertex_base_size_ = 0.0; // float32(geometry::mean_edge_length(m, p.vertex_position_.get()) / 7.0);
-			if (p.vertex_base_size_ == 0.0)
-				p.vertex_base_size_ = float32((md.bb_max_ - md.bb_min_).norm() / 20.0);
+			uint32 nbv = md.nb_cells<Vertex>();
+			if (nbv == 0)
+			{
+				md.update_nb_cells();
+				nbv = md.nb_cells<Vertex>();
+			}
+			p.vertex_base_size_ = float32((md.bb_max_ - md.bb_min_).norm() / (10.0 * std::sqrt(float32(nbv))));
+
 		}
 		else
 			p.vertex_position_vbo_ = nullptr;
