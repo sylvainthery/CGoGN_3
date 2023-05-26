@@ -26,6 +26,7 @@
 
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/ui/app.h>
+#include <cgogn/ui/imgui_helpers.h>
 #include <cgogn/ui/module.h>
 #include <cgogn/ui/view.h>
 
@@ -160,53 +161,26 @@ protected:
 	{
 		bool need_update = false;
 
-		ImGui::Begin(name_.c_str(), nullptr, ImGuiWindowFlags_NoSavedSettings);
-		ImGui::SetWindowSize({0, 0});
-		if (ImGui::BeginCombo("View", selected_view_->name().c_str()))
-		{
-			for (View* v : linked_views_)
-			{
-				bool is_selected = v == selected_view_;
-				if (ImGui::Selectable(v->name().c_str(), is_selected))
-					selected_view_ = v;
-				if (is_selected)
-					ImGui::SetItemDefaultFocus();
-			}
-			ImGui::EndCombo();
-		}
+		if (app_.nb_views() > 1)
+			imgui_view_selector(this, selected_view_, [&](View* v) { selected_view_ = v; });
 
-		if (ImGui::ListBoxHeader("Mesh"))
-		{
-			mesh_provider_->foreach_mesh([this](MESH* m, const std::string& name) {
-				if (ImGui::Selectable(name.c_str(), m == selected_mesh_))
-					selected_mesh_ = m;
-			});
-			ImGui::ListBoxFooter();
-		}
-
+		imgui_mesh_selector(mesh_provider_, selected_mesh_, "Volume", [&](MESH& m) {
+			selected_mesh_ = &m;
+			mesh_provider_->mesh_data(m).outlined_until_ = App::frame_time_ + 1.0;
+		});
 		if (selected_view_ && selected_mesh_)
 		{
 			float X_button_width = ImGui::CalcTextSize("X").x + ImGui::GetStyle().FramePadding.x * 2;
 
 			Parameters& p = parameters_[selected_view_][selected_mesh_];
 
+			ImGui::Separator();
 			if (ImGui::BeginCombo("Position", p.vertex_position_ ? p.vertex_position_->name().c_str() : "-- select --"))
 			{
-				foreach_attribute<Vec3, Vertex>(
-					*selected_mesh_, [&](const std::shared_ptr<Attribute<Vec3>>& attribute) {
-						bool is_selected = attribute == p.vertex_position_;
-						if (ImGui::Selectable(attribute->name().c_str(), is_selected))
-							set_vertex_position(*selected_view_, *selected_mesh_, attribute);
-						if (is_selected)
-							ImGui::SetItemDefaultFocus();
-					});
-				ImGui::EndCombo();
-			}
-			if (p.vertex_position_)
-			{
-				ImGui::SameLine(ImGui::GetWindowContentRegionMax().x - X_button_width);
-				if (ImGui::Button("X##position"))
-					set_vertex_position(*selected_view_, *selected_mesh_, nullptr);
+				imgui_combo_attribute<Vertex, Vec3>(*selected_mesh_, p.vertex_position_, "Clipping Position",
+													[&](const std::shared_ptr<Attribute<Vec3>>& attribute) {
+													set_vertex_position(*selected_view_, *selected_mesh_, attribute);
+													});
 			}
 
 			ImGui::Separator();
@@ -235,7 +209,9 @@ protected:
 				p.update_topo(*selected_mesh_);
 		}
 
-		ImGui::End();
+		float64 remain = mesh_provider_->mesh_data(*selected_mesh_).outlined_until_ - App::frame_time_;
+		if (remain > 0)
+			need_update = true;
 
 		if (need_update)
 		{

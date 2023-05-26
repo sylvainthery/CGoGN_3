@@ -28,9 +28,8 @@
 #include <cgogn/rendering/cgogn_rendering_export.h>
 
 #include <cgogn/rendering/shaders/shader_bold_line.h>
-#include <cgogn/rendering/shaders/shader_bold_line_color.h>
 #include <cgogn/rendering/shaders/shader_no_illum.h>
-#include <cgogn/rendering/shaders/shader_round_point_color.h>
+#include <cgogn/rendering/shaders_unused/shader_round_point.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/functions/distance.h>
@@ -100,16 +99,16 @@ public:
 	template <typename MESH>
 	inline void update3D(const MESH& m, const typename mesh_traits<MESH>::template Attribute<geometry::Vec3>* position)
 	{
-		update3D_vbo<false>(m, position);
+		update3D_vbo<true>(m, position);
 	}
 
 	class CGOGN_RENDERING_EXPORT Renderer
 	{
 		friend class TopoDrawer;
 
-		std::unique_ptr<ShaderBoldLineColor::Param> param_bl_;
+		std::unique_ptr<ShaderBoldLine::Param> param_bl_;
 		std::unique_ptr<ShaderBoldLine::Param> param_bl2_;
-		std::unique_ptr<ShaderRoundPointColor::Param> param_rp_;
+		std::unique_ptr<ShaderRoundPoint::Param> param_rp_;
 		TopoDrawer* topo_drawer_data_;
 
 		Renderer(TopoDrawer* tr);
@@ -598,7 +597,6 @@ void TopoDrawer::update3D_vbo(const MESH& m,
 	for (const auto& dp : thdarts_pos)
 		if (!dp.empty())
 		{
-
 			vbo_darts_->copy_data(beg * 12, uint32(dp.size()) * 12, dp[0].data());
 			beg += uint32(dp.size());
 		}

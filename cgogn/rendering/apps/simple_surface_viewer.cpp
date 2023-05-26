@@ -29,6 +29,7 @@
 #include <cgogn/core/ui_modules/mesh_provider.h>
 #include <cgogn/geometry/ui_modules/surface_differential_properties.h>
 #include <cgogn/rendering/ui_modules/surface_render.h>
+#include <cgogn/rendering/ui_modules/topo_render.h>
 
 #define DEFAULT_MESH_PATH CGOGN_STR(CGOGN_DATA_PATH) "/meshes/"
 
@@ -60,11 +61,13 @@ int main(int argc, char** argv)
 	cgogn::ui::MeshProvider<Mesh> mp(app);
 	cgogn::ui::SurfaceRender<Mesh> sr(app);
 	cgogn::ui::SurfaceDifferentialProperties<Mesh> sdp(app);
+	cgogn::ui::TopoRender<Mesh> tpr(app);
 
 	app.init_modules();
 
 	cgogn::ui::View* v1 = app.current_view();
 	v1->link_module(&mp);
+	v1->link_module(&sr);
 	v1->link_module(&sr);
 
 	if (filename.length() > 0)

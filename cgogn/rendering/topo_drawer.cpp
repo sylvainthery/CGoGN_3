@@ -44,19 +44,17 @@ TopoDrawer::~TopoDrawer()
 
 TopoDrawer::Renderer::Renderer(TopoDrawer* tr) : topo_drawer_data_(tr), width_(2.0f)
 {
-	param_bl_ = ShaderBoldLineColor::generate_param();
-	param_bl_->set_vbos({tr->vbo_darts_.get(), tr->vbo_color_darts_.get()});
+	param_bl_ = ShaderBoldLine::generate_param();
+	param_bl_->set_vbos({tr->vbo_darts_.get()});
+	// tr->vbo_color_darts_.get()});
 
 	param_bl2_ = ShaderBoldLine::generate_param();
 	param_bl2_->set_vbos({tr->vbo_relations_.get()});
 	param_bl2_->color_ = tr->phi2_color_;
 
-	param_rp_ = ShaderRoundPointColor::generate_param();
-
-	param_rp_->bind_vao();
-	tr->vbo_darts_->associate(1, 2, 0);
-	tr->vbo_color_darts_->associate(2, 2, 0);
-	param_rp_->release_vao();
+	param_rp_ = ShaderRoundPoint::generate_param();
+	param_rp_->size_ = 3.0f;
+	param_rp_->set_vbos_stride({{tr->vbo_darts_.get(), 2, 0}});
 }
 
 TopoDrawer::Renderer::~Renderer()
@@ -67,16 +65,16 @@ void TopoDrawer::Renderer::draw(const GLMat4& projection, const GLMat4& modelvie
 {
 	param_bl_->width_ = width_;
 	param_bl2_->width_ = width_;
-	param_rp_->size_ = 2.0f * width_;
+	param_rp_->size_ = 3.0f * width_;
+
 
 	param_bl_->bind(projection, modelview);
-
+	param_bl_->color_ = topo_drawer_data_->dart_color_;
 	glDrawArrays(GL_LINES, 0, topo_drawer_data_->vbo_darts_->size());
-
 	param_bl_->release();
 
-	param_rp_->bind(projection, modelview);
 
+	param_rp_->bind(projection, modelview);
 	glDrawArrays(GL_POINTS, 0, topo_drawer_data_->vbo_darts_->size() / 2);
 	param_rp_->release();
 
