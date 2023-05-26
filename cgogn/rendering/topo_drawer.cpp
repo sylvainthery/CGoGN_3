@@ -52,9 +52,9 @@ TopoDrawer::Renderer::Renderer(TopoDrawer* tr) : topo_drawer_data_(tr), width_(2
 	param_bl2_->set_vbos({tr->vbo_relations_.get()});
 	param_bl2_->color_ = tr->phi2_color_;
 
-	param_rp_ = ShaderRoundPoint::generate_param();
+	param_rp_ = ShaderRoundPointColor::generate_param();
 	param_rp_->size_ = 3.0f;
-	param_rp_->set_vbos_stride({{tr->vbo_darts_.get(), 2, 0}});
+	param_rp_->set_vbos_stride({{tr->vbo_darts_.get(), 2, 0},{tr->vbo_color_darts_.get(), 2, 0}});
 }
 
 TopoDrawer::Renderer::~Renderer()
@@ -144,6 +144,18 @@ void TopoDrawer::update_color(Dart d, const Vec3& rgb)
 		vbo_color_darts_->copy_data(uint32(x) * 24u, 24u, rgbf);
 		vbo_color_darts_->release();
 	}
+}
+
+void TopoDrawer::reset_all_colors(const GLVec3& rgb)
+{
+	float* ptr = vbo_color_darts_->lock_pointer();
+	for(int i =0; i<vbo_color_darts_->size();++i)
+	{
+		*ptr++ = rgb[0];
+		*ptr++ = rgb[1];
+		*ptr++ = rgb[2];
+	}
+	vbo_color_darts_->release_pointer();
 }
 
 Dart TopoDrawer::pick(const Vec3& A, const Vec3& B, const Vec4& plane, Vec3* dp1, Vec3* dp2)

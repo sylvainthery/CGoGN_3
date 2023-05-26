@@ -98,7 +98,10 @@ private:
 	{
 		for (View* v : linked_views_)
 		{
-			parameters_[v][m];
+			auto& p = parameters_[v][m];
+
+			p.topo_drawer_->reset_all_colors(rendering::GLVec3(1.0f,1.0f,1.0f));
+std::cout<< "RESET" << std::endl;
 			std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
 			if (vertex_position)
 				set_vertex_position(*v, *m, vertex_position);
@@ -190,8 +193,12 @@ protected:
 			{
 				ImGui::Separator();
 				ImGui::TextUnformatted("Volume parameters");
-				need_update |=
-					ImGui::ColorEdit3("colorDarts", p.topo_drawer_->dart_color_.data(), ImGuiColorEditFlags_NoInputs);
+				if (ImGui::ColorEdit3("colorDarts", p.topo_drawer_->dart_color_.data(), ImGuiColorEditFlags_NoInputs))
+				{
+					const auto& col = p.topo_drawer_->dart_color_;
+					p.topo_drawer_->reset_all_colors(rendering::GLVec3(col[0],	col[1],col[2]));
+					need_update = true;
+				}
 				if (mesh_traits<MESH>::dimension >= 2)
 					need_update |= ImGui::ColorEdit3("colorPhi2", p.topo_drawer_->phi2_color_.data(),
 													 ImGuiColorEditFlags_NoInputs);

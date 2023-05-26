@@ -29,7 +29,7 @@
 
 #include <cgogn/rendering/shaders/shader_bold_line.h>
 #include <cgogn/rendering/shaders/shader_no_illum.h>
-#include <cgogn/rendering/shaders_unused/shader_round_point.h>
+#include <cgogn/rendering/shaders_unused/shader_round_point_color.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/functions/distance.h>
@@ -108,7 +108,7 @@ public:
 
 		std::unique_ptr<ShaderBoldLine::Param> param_bl_;
 		std::unique_ptr<ShaderBoldLine::Param> param_bl2_;
-		std::unique_ptr<ShaderRoundPoint::Param> param_rp_;
+		std::unique_ptr<ShaderRoundPointColor::Param> param_rp_;
 		TopoDrawer* topo_drawer_data_;
 
 		Renderer(TopoDrawer* tr);
@@ -130,6 +130,7 @@ public:
 		void set_clipping_plane2(const GLVec4& p);
 
 		void set_thick_clipping_plane(const GLVec4& p, float32 th);
+
 	};
 
 	using Self = TopoDrawer;
@@ -195,6 +196,7 @@ public:
 	 */
 	void update_color(Dart d, const GLColor& rgb);
 
+	void reset_all_colors(const GLVec3& rgb);
 	/**
 	 * @brief pick the closest dart to a given ray
 	 * @param A ray first point
