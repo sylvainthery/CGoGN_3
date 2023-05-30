@@ -106,14 +106,18 @@ public:
 	{
 		friend class TopoDrawer;
 
-		std::unique_ptr<ShaderBoldLine::Param> param_bl_;
+		std::unique_ptr<ShaderBoldLineColorNoTB::Param> param_bl_;
 		std::unique_ptr<ShaderBoldLine::Param> param_bl2_;
 		std::unique_ptr<ShaderRoundPointColor::Param> param_rp_;
 		TopoDrawer* topo_drawer_data_;
 
+
 		Renderer(TopoDrawer* tr);
 
 	public:
+		bool render_darts_;
+		bool render_phi2_;
+		bool render_phi3_;
 		float width_;
 		~Renderer();
 
@@ -589,7 +593,8 @@ void TopoDrawer::update3D_vbo(const MESH& m,
 		darts_pos_.reserve(nbvec);
 		for (const auto& dp : thdarts_pos)
 			darts_pos_.insert(darts_pos_.end(), dp.begin(), dp.end());
-	}
+		for (const auto& di : thdarts_id)
+			darts_id_.insert(darts_id_.end(), di.begin(), di.end());	}
 
 	std::vector<Vec3f> darts_col(nbvec, {dart_color_.x(), dart_color_.y(), dart_color_.z()});
 

@@ -37,14 +37,14 @@ namespace rendering
 		int viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
 		GLVec2 wd(size_ / float32(viewport[2]), size_ / float32(viewport[3]));
-		shader_->set_uniforms_values(color_, wd, plane_clip_, plane_clip2_);
+		shader_->set_uniforms_values(wd, plane_clip_, plane_clip2_);
 	}
 
 static const char* vertex_shader_source = 
 	"#version 150\n"
 	"in vec3 vertex_pos;\n"
 	"in vec3 vertex_color;\n"
-	"out vec3 color;\n"
+	"flat out vec3 color;\n"
 	"void main()\n"
 	"{\n"
 	"   color = vertex_color;\n"
@@ -55,14 +55,14 @@ static const char* geometry_shader_source =
 	"#version 150\n"
 	"layout (points) in;\n"
 	"layout (triangle_strip, max_vertices=4) out;\n"
-	"in vec3 color[];\n"
+	"flat in vec3 color[];\n"
 	"uniform mat4 projection_matrix;\n"
 	"uniform mat4 model_view_matrix;\n"
 	"uniform vec2 pointSizes;\n"
 	"uniform vec4 plane_clip;\n"
 	"uniform vec4 plane_clip2;\n"
 	"out vec2 local;\n"
-	"out vec3 col;\n"
+	"flat out vec3 col;\n"
 	"void main()\n"
 	"{\n"
 	"	float d = dot(plane_clip,gl_in[0].gl_Position);\n"
@@ -91,14 +91,14 @@ static const char* geometry_shader_source =
 static const char* fragment_shader_source = 
 	"#version 150\n"
 	"in vec2 local;\n"
-	"in vec3 col;\n"
+	"flat in vec3 col;\n"
 	"out vec4 fragColor;\n"
 	"void main()\n"
 	"{\n"
 
 	"	float r2 = dot(local,local);\n"
 	"   if (r2 > 1.0) discard;\n"
-	"   fragColor = vec4(0.5,1.0,0.5,1);\n"
+	"   fragColor = vec4(col,1);\n"
 	"//(1.0-r2*r2));\n"
 	"}\n";
 
@@ -106,7 +106,7 @@ ShaderRoundPointColor* ShaderRoundPointColor::instance_ = nullptr;
 
 ShaderRoundPointColor::ShaderRoundPointColor()
 {
-	load3_bind(vertex_shader_source, fragment_shader_source, geometry_shader_source, "vertex_pos");
+	load3_bind(vertex_shader_source, fragment_shader_source, geometry_shader_source, "vertex_pos", "vertex_color");
 	get_uniforms("pointSizes", "plane_clip", "plane_clip2");
 }
 

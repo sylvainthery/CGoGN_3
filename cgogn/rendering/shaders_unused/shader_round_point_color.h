@@ -40,7 +40,6 @@ class CGOGN_RENDERING_EXPORT ShaderParamRoundPointColor : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	GLColor color_;
 	float32 size_;
 	GLVec4 plane_clip_;
 	GLVec4 plane_clip2_;
@@ -48,7 +47,7 @@ public:
 	using ShaderType = ShaderRoundPointColor;
 
 	ShaderParamRoundPointColor(ShaderType* sh)
-		: ShaderParam(sh), color_(1.0f,1.0f,1.0f,1.0f), size_(2), plane_clip_(0, 0, 0, 0), plane_clip2_(0, 0, 0, 0)
+		: ShaderParam(sh), size_(2), plane_clip_(0, 0, 0, 0), plane_clip2_(0, 0, 0, 0)
 	{
 	}
 
