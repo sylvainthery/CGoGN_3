@@ -412,15 +412,25 @@ public:
 
 
 	template <typename FUNC>
-	void append_3indices(std::vector<uint32>& table_indices, const FUNC& post_func)
+	void append_3indices(std::vector<uint32>& table_indices,
+						 const typename mesh_traits<MESH>::template Attribute<Vec3>* position, const FUNC& post_func)
 	{
 		if (nb_verts_ < 3)
 			return;
 
 		auto addIndices = [&](Vertex x) {
 			table_indices.push_back(index_of(m_, x));
-			table_indices.push_back(index_of(m_, Vertex(phi_1(m_,x.dart))));
-			table_indices.push_back(index_of(m_, Vertex(phi1(m_,x.dart))));
+			Dart dp = phi_1(m_, x.dart);
+			Dart dn = phi1(m_, x.dart);
+			Vec3 Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
+			while (Vp.cross((value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized())
+					   .norm() <= 0.0001)
+			{
+				dn = phi1(m_, dn);
+			}
+
+			table_indices.push_back(index_of(m_, Vertex(dp)));
+			table_indices.push_back(index_of(m_, Vertex(dn)));
 		};
 
 		if (nb_verts_ == 3)
@@ -537,7 +547,7 @@ void append_ear_triangulation3(const MESH& mesh, const typename mesh_traits<MESH
 							  std::vector<uint32>& table_indices, const FUNC& post_func)
 {
 	EarTriangulation tri(const_cast<MESH&>(mesh), f, position);
-	tri.append_3indices(table_indices, post_func);
+	tri.append_3indices(table_indices,position, post_func);
 }
 
 /**
