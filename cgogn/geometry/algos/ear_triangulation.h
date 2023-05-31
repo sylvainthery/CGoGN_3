@@ -423,11 +423,19 @@ public:
 			Dart dp = phi_1(m_, x.dart);
 			Dart dn = phi1(m_, x.dart);
 			Vec3 Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
-			while (Vp.cross((value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized())
-					   .norm() <= 0.0001)
+			Vec3 Vn = (value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized();
+			Vec3 N = Vn.cross(Vp);
+			while ((N.dot(normalPoly_)<0.3) && (dn!=dp))
 			{
 				dn = phi1(m_, dn);
+				dp = phi_1(m_, dp);
+				Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
+				Vn = (value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized();
+				N = Vn.cross(Vp);
+
 			}
+			if (dn==dp)
+				dn = phi_1(m_, dn);
 
 			table_indices.push_back(index_of(m_, Vertex(dp)));
 			table_indices.push_back(index_of(m_, Vertex(dn)));
