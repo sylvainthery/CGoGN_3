@@ -153,7 +153,7 @@ public:
 
 		cgogn::cut_volume(*mesh_, vp);
 
-		for (int j = 0; j < 2; ++j)
+		for (int j = 0; j < 1; ++j)
 		{
 			ve.clear();
 
@@ -170,6 +170,9 @@ public:
 				cgogn::value<Vec3>(*mesh_, vertex_position_, v3) = (cgogn::value<Vec3>(*mesh_, vertex_position_, v1) +
 																	cgogn::value<Vec3>(*mesh_, vertex_position_, v2)) /
 																   2.0;
+				auto z = cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z();
+				cgogn::value<Vec3>(*mesh_, vertex_position_, v3) *= 0.95;
+				cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z() = z;
 			}
 		}
 
