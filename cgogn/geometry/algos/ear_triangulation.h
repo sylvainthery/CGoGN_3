@@ -185,13 +185,13 @@ class EarTriangulation
 		v1.normalize();
 		v2.normalize();
 
-		Scalar dotpr = std::acos(v1.dot(v2)) / Scalar(M_PI_2);
+		Scalar angle = std::acos(v1.dot(v2)) / Scalar(M_PI_2);
 
-		Vec3 vn = v1.cross(v2);
-		if (vn.dot(normalPoly_) > Scalar(0))
-			dotpr = Scalar(10) - dotpr; // not an ear (concave, store at the end for optimized use for intersections)
+		Vec3 vn = v2.cross(v1);
+		if (vn.dot(normalPoly_) < Scalar(0.2))
+			angle = Scalar(10) - angle; // not an ear (concave, store at the end for optimized use for intersections)
 
-		return dotpr;
+		return angle;
 	}
 
 	bool ear_intersection(VertexPoly* vp)
@@ -238,6 +238,11 @@ class EarTriangulation
 			const Vec3& P3 = POSITION(Vertex(c));
 
 			Scalar val = ear_angle(P1, P2, P3);
+
+			// do not use remove ears from vertices of valence 2
+			if ((phi2(m_, phi1(m_, phi2(m_, b))) == a))
+				val = 10.0;
+
 			VertexPoly* vp = new VertexPoly(Vertex(b), val, Scalar((P3 - P1).squaredNorm()), vpp);
 
 			if (vp->value_ > Scalar(5)) // concav angle
@@ -425,14 +430,13 @@ public:
 			Vec3 Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
 			Vec3 Vn = (value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized();
 			Vec3 N = Vn.cross(Vp);
-			while ((N.dot(normalPoly_)<0.3) && (dn!=dp))
+			while ((N.dot(normalPoly_) < 0.2) && (dn != dp))
 			{
 				dn = phi1(m_, dn);
 				dp = phi_1(m_, dp);
 				Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
 				Vn = (value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized();
 				N = Vn.cross(Vp);
-
 			}
 			if (dn==dp)
 				dn = phi_1(m_, dn);
