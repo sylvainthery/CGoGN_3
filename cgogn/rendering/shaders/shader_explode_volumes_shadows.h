@@ -1,0 +1,140 @@
+/*******************************************************************************
+ * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
+ * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
+ *                                                                              *
+ * This library is free software; you can redistribute it and/or modify it      *
+ * under the terms of the GNU Lesser General Public License as published by the *
+ * Free Software Foundation; either version 2.1 of the License, or (at your     *
+ * option) any later version.                                                   *
+ *                                                                              *
+ * This library is distributed in the hope that it will be useful, but WITHOUT  *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
+ * for more details.                                                            *
+ *                                                                              *
+ * You should have received a copy of the GNU Lesser General Public License     *
+ * along with this library; if not, write to the Free Software Foundation,      *
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+ *                                                                              *
+ * Web site: http://cgogn.unistra.fr/                                           *
+ * Contact information: cgogn@unistra.fr                                        *
+ *                                                                              *
+ *******************************************************************************/
+
+#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SMOOTH_H_
+#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SMOOTH_H_
+
+#include <cgogn/rendering/cgogn_rendering_export.h>
+#include <cgogn/rendering/shader_program.h>
+
+namespace cgogn
+{
+
+namespace rendering
+{
+
+// a mettre dans un fichier .h à part ?
+//data of shader (can be shared between flat/smooth version)
+struct ExplodeVolumeDataShadow
+{
+	GLColor color_;
+	GLVec3 light_position_;
+	float32 explode_;
+	GLVec4 plane_clip_;
+	GLVec4 plane_clip2_;
+	int TUshadow;
+	GLMat4 matrix_shadow;
+
+	inline ExplodeVolumeDataShadow()
+		: color_(0.9f, 0, 0, 1), light_position_(100, 1000, 5000), explode_(0.9f), plane_clip_(0, 0, 0, 0),
+		  plane_clip2_(0, 0, 0, 0)
+	{}
+
+};
+
+
+DECLARE_SHADER_CLASS(ExplodeVolumesShadows, true, CGOGN_STR(ExplodeVolumes))
+
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesShadows : public ShaderParam
+{
+	void set_uniforms() override;
+
+	std::array<VBO*, 3> vbos_;
+	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
+	{
+		vbos_[i] = vbo;
+	}
+	void bind_texture_buffers() override;
+	void release_texture_buffers() override;
+
+	enum VBOName : int32
+	{
+		VERTEX_POSITION = 0,
+		VOLUME_CENTER,
+		VOLUME_CLIPPING
+	};
+
+public:
+	std::shared_ptr<ExplodeVolumeDataShadow> data_;
+
+	using ShaderType = ShaderExplodeVolumesShadaows;
+
+	inline ShaderParamExplodeVolumesShadows(ShaderType* sh)
+		: ShaderParam(sh)
+	{
+		data_ = std::make_shared<ExplodeVolumeDataShadow>();
+		for (auto& v : vbos_)
+			v = nullptr;
+	}
+
+	inline ~ShaderParamExplodeVolumesShadows() override
+	{
+	}
+};
+
+DECLARE_SHADER_CLASS(ExplodeVolumesSmoothShadows, true, CGOGN_STR(ExplodeVolumesSmoothShadows))
+
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesSmoothShadows : public ShaderParam
+{
+	void set_uniforms() override;
+
+	std::array<VBO*, 3> vbos_;
+	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
+	{
+		vbos_[i] = vbo;
+	}
+	void bind_texture_buffers() override;
+	void release_texture_buffers() override;
+
+	enum VBOName : int32
+	{
+		VERTEX_POSITION = 0,
+		VOLUME_CENTER,
+		VOLUME_CLIPPING
+	};
+
+public:
+	std::shared_ptr<ExplodeVolumeDataShadow> data_;
+
+	using ShaderType = ShaderExplodeVolumesSmoothShadows;
+
+	inline ShaderParamExplodeVolumesSmoothShadows(ShaderType* sh)
+		: ShaderParam(sh)
+	{
+		data_ = std::make_shared<ExplodeVolumeDataShadow>();
+		for (auto& v : vbos_)
+			v = nullptr;
+	}
+
+	inline ~ShaderParamExplodeVolumesSmoothShadwos() override
+	{
+	}
+};
+
+
+
+} // namespace rendering
+
+} // namespace cgogn
+
+#endif

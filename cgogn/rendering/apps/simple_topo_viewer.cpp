@@ -171,7 +171,7 @@ public:
 																	cgogn::value<Vec3>(*mesh_, vertex_position_, v2)) /
 																   2.0;
 				auto z = cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z();
-				cgogn::value<Vec3>(*mesh_, vertex_position_, v3) *= 0.95;
+				cgogn::value<Vec3>(*mesh_, vertex_position_, v3) *= 0.8;
 				cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z() = z;
 			}
 		}
