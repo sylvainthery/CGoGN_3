@@ -71,7 +71,7 @@ class CGOGN_RENDERING_EXPORT ShaderParamComputeCenter2 : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	Texture2D* tex_;
+	std::shared_ptr<Texture2D> tex_;
 
 	using ShaderType = ShaderComputeCenter2;
 

@@ -113,9 +113,9 @@ ComputeNormalEngine::ComputeNormalEngine()
 {
 	param1_ = ShaderComputeNormal1::generate_param();
 	param2_ = ShaderComputeNormal2::generate_param();
-	param2_->tex_ = new Texture2D();
+	param2_->tex_ = std::make_shared<Texture2D>();
 	param2_->tex_->alloc(0, 0, GL_RGB32F, GL_RGB, nullptr, GL_FLOAT);
-	fbo_ = new FBO(std::vector<Texture2D*>{param2_->tex_}, false, nullptr);
+	fbo_ = new FBO({param2_->tex_}, false, nullptr);
 	tfb_ = new TFB_ComputeNormal(*(param2_.get()));
 }
 

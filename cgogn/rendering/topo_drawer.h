@@ -227,9 +227,12 @@ void TopoDrawer::update2D(const MESH& m, const typename mesh_traits<MESH>::templ
 	Scalar opp_shrink_f = Scalar(1.0f - shrink_f_);
 
 	darts_pos_.clear();
+	darts_pos_.shrink_to_fit();
+	darts_id_.clear();
+	darts_id_.shrink_to_fit();
+
 	darts_pos_.reserve(1024 * 1024);
 
-	darts_id_.clear();
 	darts_id_.reserve(1024 * 1024);
 
 	std::vector<Vec3f> out_pos2;
@@ -450,6 +453,11 @@ template <typename MESH, typename CELL>
 void TopoDrawer::update_colors(const MESH& m,
 							   const typename mesh_traits<MESH>::template Attribute<geometry::Vec3>* color)
 {
+	darts_pos_.clear();
+	darts_pos_.shrink_to_fit();
+	darts_id_.clear();
+	darts_id_.shrink_to_fit();
+
 	std::vector<Vec3f> darts_col;
 	darts_col.reserve(2 * uint32(darts_id_.size()));
 	//	darts_col.clear();

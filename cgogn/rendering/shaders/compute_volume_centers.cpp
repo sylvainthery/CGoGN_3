@@ -131,7 +131,7 @@ ComputeVolumeCenterEngine::ComputeVolumeCenterEngine()
 {
 	param1_ = compute_center_shaders::ShaderComputeCenter1::generate_param();
 	param2_ = compute_center_shaders::ShaderComputeCenter2::generate_param();
-	param2_->tex_ = new Texture2D();
+	param2_->tex_ = std::make_shared<Texture2D>();
 	param2_->tex_->allocate(0, 0, GL_RGBA32F, GL_RGBA, nullptr, GL_FLOAT);
 	fbo_ = new FBO({param2_->tex_}, false, nullptr);
 	tfb_ = new TFB_ComputeCenter(*(param2_.get()));
@@ -141,7 +141,6 @@ ComputeVolumeCenterEngine::~ComputeVolumeCenterEngine()
 {
 	delete fbo_;
 	delete tfb_;
-	delete param2_->tex_;
 }
 
 void ComputeVolumeCenterEngine::compute(VBO* vertex_position, MeshRender* renderer, VBO* volume_center)

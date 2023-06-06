@@ -44,15 +44,15 @@ class CGOGN_RENDERING_EXPORT ShaderParamHisto : public ShaderParam
 	}
 
 public:
-	Texture2D* tex_fbo_;
+	std::shared_ptr<Texture2D> tex_fbo_;
 	FBO* fbo_;
-	Texture2D* texture_;
+	std::shared_ptr<Texture2D> texture_;
 
 	using ShaderType = ShaderHisto;
 
 	inline ShaderParamHisto(ShaderType* sh) : ShaderParam(sh)
 	{
-		tex_fbo_ = new Texture2D();
+		tex_fbo_ = std::make_shared<Texture2D>();
 		tex_fbo_->alloc(1, 1, GL_R32F, GL_RED, nullptr, GL_FLOAT);
 		fbo_ = new FBO({tex_fbo_}, false, nullptr);
 	}

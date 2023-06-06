@@ -33,7 +33,7 @@ namespace cgogn
 namespace rendering
 {
 
-// a mettre dans un fichier .h à part ?
+// a mettre dans un fichier .h ï¿½ part ?
 //data of shader (can be shared between flat/smooth version)
 struct ExplodeVolumeDataShadow
 {
@@ -53,7 +53,48 @@ struct ExplodeVolumeDataShadow
 };
 
 
-DECLARE_SHADER_CLASS(ExplodeVolumesShadows, true, CGOGN_STR(ExplodeVolumes))
+DECLARE_SHADER_CLASS(ExplodeVolumesGenerateShadows, true, CGOGN_STR(ExplodeVolumesGenerateShadows))
+
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesGenerateShadows : public ShaderParam
+{
+	void set_uniforms() override;
+
+	std::array<VBO*, 3> vbos_;
+	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
+	{
+		vbos_[i] = vbo;
+	}
+	void bind_texture_buffers() override;
+	void release_texture_buffers() override;
+
+	enum VBOName : int32
+	{
+		VERTEX_POSITION = 0,
+		VOLUME_CENTER,
+		VOLUME_CLIPPING
+	};
+
+public:
+	std::shared_ptr<ExplodeVolumeDataShadow> data_;
+
+	using ShaderType = ShaderExplodeVolumesShadaows;
+
+	inline ShaderParamExplodeVolumesGenerateShadows(ShaderType* sh)
+		: ShaderParam(sh)
+	{
+		data_ = std::make_shared<ExplodeVolumeDataShadow>();
+		for (auto& v : vbos_)
+			v = nullptr;
+	}
+
+	inline ~ShaderParamExplodeVolumesGenerateShadows() override
+	{
+	}
+};
+
+
+
+DECLARE_SHADER_CLASS(ExplodeVolumesShadows, true, CGOGN_STR(ExplodeVolumesShadows))
 
 class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesShadows : public ShaderParam
 {

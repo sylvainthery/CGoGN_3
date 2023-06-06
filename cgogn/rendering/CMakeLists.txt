@@ -88,6 +88,9 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.cpp"
 
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_shadows.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_shadows.cpp"
+
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_color.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_color.cpp"
 
@@ -110,8 +113,8 @@ target_sources(${PROJECT_NAME}
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/transform_feedback.h"
 
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.h"
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.cpp"
+		# "${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.h"
+		# "${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_normals.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_normals.cpp"
 

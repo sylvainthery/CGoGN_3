@@ -1,4 +1,4 @@
-/*******************************************************************************
+ /*******************************************************************************
  * CGoGN                                                                        *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -83,6 +83,16 @@ class VolumeRender : public ViewModule
 	using Vec3 = geometry::Vec3;
 	using Scalar = geometry::Scalar;
 
+	struct ViewParameters
+	{
+		ViewParameters(): use_shadow_(false), fbo_shadows_(nullptr)
+		{}
+		bool use_shadow_;
+		std::shared_ptr<FBO> fbo_shadows_;
+		
+	}
+
+
 	struct Parameters
 	{
 		Parameters()
@@ -105,7 +115,9 @@ class VolumeRender : public ViewModule
 			param_volume_ = rendering::ShaderExplodeVolumes::generate_param();
 			param_volume_smooth_ = rendering::ShaderExplodeVolumesSmooth::generate_param();
 			param_volume_smooth_->data_ = param_volume_->data_;
-			param_volume_gen_ = param_volume_.get();
+			param_volume_smooth_shadow_ = rendering::ShaderExplodeVolumesSmooth::generate_param();
+			param_volume_smooth_shadow_->data_ = param_volume_->data_;
+			param_volume_gen_ = param_volume_smooth_shadow_.get();
 
 			param_volume_->data_->color_ = {0.4f, 0.8f, 1.0f, 1.0f};
 
@@ -158,14 +170,20 @@ class VolumeRender : public ViewModule
 		std::unique_ptr<rendering::ShaderExplodeVolumesSmooth::Param> param_volume_smooth_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesColorSmooth::Param> param_volume_color_smooth_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesScalarSmooth::Param> param_volume_scalar_smooth_;
+		
+		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volume_shadows_;
+//		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volumesShadows_;
+		
 		rendering::ShaderParam* param_volume_gen_;
+		rendering::ShaderParam* param_volume_gen_shadows_;
 		rendering::ShaderParam* param_volume_color_gen_;
 		rendering::ShaderParam* param_volume_scalar_gen_;
-
+	
 		bool render_vertices_;
 		bool render_edges_;
 		bool render_volumes_;
 		bool render_volume_lines_;
+		bool render_shadow_;
 
 		AttributePerCell color_per_cell_;
 		ColorType color_type_;
@@ -435,6 +453,31 @@ public:
 		md.mesh_render()->set_primitive_dirty(rendering::DrawingType::VOLUMES_FACES);
 	}
 
+	void set_light_dir(const MESH& m, const Eigen::Vector3f& LD)
+	{
+		Parameters& p = parameters_[current_view][&m];
+		p.light_dir = LD;
+	}
+
+	void use_shadow(View* view, bool on_off)
+	{
+		if (on_off)
+		{
+			fbo_shadow_ = std::make_shared<FBO>({},true);
+			fbo_shadow_->depth_texture()->bind();
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_LINEAR);
+			fbo_shadow_->depth_texture()->unbind();
+		}
+		else
+		{
+			fbo_shadow_ = null_ptr;
+		}
+	}
+
+	
+
 protected:
 	void update_volume_scalar_min_max_values(Parameters& p)
 	{
@@ -490,6 +533,30 @@ protected:
 
 	void draw(View* view) override
 	{
+		if (use_shadow)
+		{
+			GLMat4d proj_shadow = Camera::orthographic(float64 znear, float64 zfar)
+			GLMat4d view_shadow = cam->look_dir(p.light_dir, cam->scene_center()-p.light_dir, Vec3(0,0,1));
+
+			fbo_shadow_.bind(proj_shadow, view_shadow);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+
+			auto* cam = app_.current_view()->camera();
+			double wh = cam->scene_radius();	
+			GLMat4d shm = ortho*look;
+
+			for (auto& [m, p] : parameters_[view])
+			{
+				p.shadow_matrix = shm;
+				p.param_volume_gen_shadow_gen_->bind(proj_matrix, view_matrix);
+				mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+			}
+			fbo_shadow_.unbind();
+		}
+		
 		for (auto& [m, p] : parameters_[view])
 		{
 			MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
@@ -505,6 +572,32 @@ protected:
 				switch (p.color_per_cell_)
 				{
 				case GLOBAL: {
+					if (p.render_shadow)
+					{
+						// FBO depth
+						
+
+						glClear(   GL_DEPTH_BUFFER_BIT);
+						glEnable(  GL_DEPTH_TEST);
+						glEnable(  GL_CULL_FACE);
+						glCullFace(GL_BACK);
+	
+						p.param_volume_gen_shadow_gen_->bind(proj_matrix, view_matrix);
+						auto* cam = app_.current_view()->camera();
+						double wh = cam->scene_radius();
+					 	rendering::GLMat4d ortho = Camera::orthographic(float64 znear, float64 zfar)
+						rendering::GLMat4d look = cam->look_dir(p.light_dir, cam->scene_center()-p.light_dir, Vec3(0,0,1));
+						
+						p.param_volume_gen_shadow_gen_->bind(proj_matrix, view_matrix);
+						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
+						// 
+						p.param_volume_gen_shadow_->bind(proj_matrix, view_matrix);
+						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
+						p.param_volume_gen_shadow_->bind(proj_matrix, view_matrix);
+
+
+					}
+					else
 					if (p.param_volume_gen_->attributes_initialized())
 					{
 						p.param_volume_gen_->bind(proj_matrix, view_matrix);

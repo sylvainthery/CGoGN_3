@@ -148,6 +148,14 @@ public:
 		update_matrices();
 	}
 
+	inline void look_dir(const GLVec3& eye, const GLVec3& dir, const GLVec3& up)
+	{
+		Eigen::Affine3d m = Eigen::Affine3d(Transfo::look_dir(eye, dir, up).cast<double>());
+		this->frame_ = Eigen::Translation3d(0.0, 0.0, focal_dist_) * m;//*Eigen::Translation3d(pivot_point_);
+	}
+
+
+
 	inline void show_entire_scene()
 	{
 		frame_.matrix().block<3, 1>(0, 3).setZero();

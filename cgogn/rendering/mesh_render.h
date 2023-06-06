@@ -63,8 +63,8 @@ enum DrawingType : uint32
 	INDEX_FACES,
 	INDEX_VOLUMES,
 
-	INDEX_VOLUMES_VERTICES,
-	INDEX_BEGIN_VOLUMES_VERTICES, // NOT DRAWABLE
+//	INDEX_VOLUMES_VERTICES,
+//	INDEX_BEGIN_VOLUMES_VERTICES, // NOT DRAWABLE
 
 	POINTS_TB,
 	LINES_TB,
@@ -267,7 +267,7 @@ protected:
 	//			foreach_cell(m, [&](Face f) -> bool
 	//			{
 	//				foreach_incident_vertex(m, f, [&](Vertex v) -> bool
-	//				{
+	//					{
 	//					table_indices.push_back(index_of(m, v));
 	//					table_indices.push_back(emb ? index_of(m,f) : last);
 	//					return true;
@@ -278,7 +278,7 @@ protected:
 	//		}
 	//	}
 
-
+/*
 	template <typename MESH>
 	inline void init_volumes_vertices(const MESH& m, TablesIndices& table_indices, TablesIndices& table_indices_begins)
 	{
@@ -293,7 +293,7 @@ protected:
 		});
 		table_indices_begins.push(table_indices.size());
 	}
-
+*/
 	template <bool EMB, typename MESH>
 	inline void init_volumes(const MESH& m, TablesIndices& table_indices_f, TablesIndices& table_indices_e,
 							 TablesIndices& table_indices_v, TablesIndices& table_emb_vol,
@@ -544,31 +544,31 @@ public:
 				func_update_ebo(TRIANGLES, table_indices);
 			}
 			break;
-		//case VOLUMES_VERTICES:
-		//case VOLUMES_EDGES:
-		//case VOLUMES_FACES:
-		//case INDEX_VOLUMES:
-		//	if constexpr (mesh_traits<MESH>::dimension >= 3)
-		//	{
-		//		if (is_indexed<typename mesh_traits<MESH>::Volume>(m))
-		//		{
-		//			init_volumes<true>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb, position);
-		//			func_update_ebo(VOLUMES_FACES, table_indices);
-		//			func_update_ebo(VOLUMES_EDGES, table_indices_e);
-		//			func_update_ebo(VOLUMES_VERTICES, table_indices_v);
-		//			func_update_ebo(INDEX_VOLUMES, table_indices_emb);
-		//		}
-		//		else
-		//		{
-		//			init_volumes<false>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb,
-		//								position);
-		//			func_update_ebo3(VOLUMES_FACES, table_indices, table_indices_emb, 4);
-		//			func_update_ebo3(VOLUMES_EDGES, table_indices_e, table_indices_emb, 3);
-		//			func_update_ebo3(VOLUMES_VERTICES, table_indices_v, table_indices_emb, 2);
-		//			func_update_ebo2(INDEX_VOLUMES, table_indices_emb);
-		//		}
-		//	}
-		//	break;
+		case VOLUMES_VERTICES:
+		case VOLUMES_EDGES:
+		case VOLUMES_FACES:
+		case INDEX_VOLUMES:
+			if constexpr (mesh_traits<MESH>::dimension >= 3)
+			{
+				if (is_indexed<typename mesh_traits<MESH>::Volume>(m))
+				{
+					init_volumes<true>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb, position);
+					func_update_ebo(VOLUMES_FACES, table_indices);
+					func_update_ebo(VOLUMES_EDGES, table_indices_e);
+					func_update_ebo(VOLUMES_VERTICES, table_indices_v);
+					func_update_ebo(INDEX_VOLUMES, table_indices_emb);
+				}
+				else
+				{
+					init_volumes<false>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb,
+										position);
+					func_update_ebo3(VOLUMES_FACES, table_indices, table_indices_emb, 4);
+					func_update_ebo3(VOLUMES_EDGES, table_indices_e, table_indices_emb, 3);
+					func_update_ebo3(VOLUMES_VERTICES, table_indices_v, table_indices_emb, 2);
+					func_update_ebo2(INDEX_VOLUMES, table_indices_emb);
+				}
+			}
+			break;
 		default:
 			break;
 		}

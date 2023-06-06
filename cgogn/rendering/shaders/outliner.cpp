@@ -232,26 +232,23 @@ Outliner::Outliner()
 	param_blur_ = outline_shaders::ShaderBlur::generate_param();
 	param_colorize_ = outline_shaders::ShaderColorize::generate_param();
 
-	Texture2D* t1 = new Texture2D();
+	std::shared_ptr<Texture2D> t1 = std::make_shared<Texture2D>();
 	t1->allocate(0, 0, GL_R8, GL_RED, nullptr, GL_UNSIGNED_BYTE);
-	fbo_mask_ = new FBO({t1}, false, nullptr);
+	fbo_mask_ = new FBO(t1, false, nullptr);
 
-	Texture2D* t2 = new Texture2D();
+	std::shared_ptr<Texture2D> t2 = std::make_shared<Texture2D>();
 	t2->allocate(0, 0, GL_R8, GL_RED, nullptr, GL_UNSIGNED_BYTE);
-	fbo_blur1_ = new FBO({t2}, false, nullptr);
+	fbo_blur1_ = new FBO(t2, false, nullptr);
 
-	Texture2D* t3 = new Texture2D();
+	std::shared_ptr<Texture2D> t3 = std::make_shared<Texture2D>();
 	t3->allocate(0, 0, GL_R8, GL_RED, nullptr, GL_UNSIGNED_BYTE);
-	fbo_blur2_ = new FBO({t3}, false, nullptr);
+	fbo_blur2_ = new FBO(t3, false, nullptr);
 }
 
 Outliner::~Outliner()
 {
-	delete fbo_mask_->texture(0);
 	delete fbo_mask_;
-	delete fbo_blur1_->texture(0);
 	delete fbo_blur1_;
-	delete fbo_blur2_->texture(0);
 	delete fbo_blur2_;
 }
 

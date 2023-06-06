@@ -85,31 +85,24 @@ void MeshRender::draw(DrawingType prim)
 		indices_buffers_[INDEX_FACES]->release_texture_buffer(11);
 		indices_buffers_[TRIANGLES]->release_texture_buffer(10);
 		break;
-	//case VOLUMES_VERTICES:
-	//	indices_buffers_[INDEX_VOLUMES_VERTICES]->bind_texture_buffer(10);
-	//	indices_buffers_[INDEX_BEGIN_VOLUMES_VERTICES]->bind_texture_buffer(11);
-	//	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, nb_indices / 3);
-	//	indices_buffers_[INDEX_FACES]->release_texture_buffer(11);
-	//	indices_buffers_[TRIANGLES]->release_texture_buffer(10);
-	//	break;
-
-	//case VOLUMES_VERTICES_TB:
-	//	indices_buffers_[prim]->bind_texture_buffer(10);
-	//	glDrawArrays(GL_POINTS, 0, nb_indices / 2);
-	//	indices_buffers_[prim]->release_texture_buffer(10);
-	//	break;
-	//case VOLUMES_EDGES:
-	//case VOLUMES_EDGES_TB:
-	//	indices_buffers_[prim]->bind_texture_buffer(10);
-	//	glDrawArraysInstanced(GL_LINES, 0, 2, nb_indices / 3);
-	//	indices_buffers_[prim]->release_texture_buffer(10);
-	//	break;
-	//case VOLUMES_FACES:
-	//case VOLUMES_FACES_TB:
-	//	indices_buffers_[prim]->bind_texture_buffer(10);
-	//	glDrawArraysInstanced(GL_TRIANGLES, 0, 3, nb_indices / 4);
-	//	indices_buffers_[prim]->release_texture_buffer(10);
-	//	break;
+	case VOLUMES_VERTICES:
+	case VOLUMES_VERTICES_TB:
+		indices_buffers_[prim]->bind_texture_buffer(10);
+		glDrawArrays(GL_POINTS, 0, nb_indices / 2);
+		indices_buffers_[prim]->release_texture_buffer(10);
+		break;
+	case VOLUMES_EDGES:
+	case VOLUMES_EDGES_TB:
+		indices_buffers_[prim]->bind_texture_buffer(10);
+		glDrawArraysInstanced(GL_LINES, 0, 2, nb_indices / 3);
+		indices_buffers_[prim]->release_texture_buffer(10);
+		break;
+	case VOLUMES_FACES:
+	case VOLUMES_FACES_TB:
+		indices_buffers_[prim]->bind_texture_buffer(10);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, nb_indices / 4);
+		indices_buffers_[prim]->release_texture_buffer(10);
+		break;
 	default:
 		break;
 	}

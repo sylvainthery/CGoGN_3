@@ -64,7 +64,7 @@ class CGOGN_RENDERING_EXPORT ShaderParamSobel : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	Texture2D* texture_;
+	std::shared_ptr<Texture2D> texture_;
 
 	using ShaderType = ShaderSobel;
 
@@ -84,7 +84,7 @@ class CGOGN_RENDERING_EXPORT ShaderParamBlur : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	Texture2D* texture_;
+	std::shared_ptr<Texture2D> texture_;
 	GLuint pass_;
 
 	using ShaderType = ShaderBlur;
@@ -105,8 +105,8 @@ class CGOGN_RENDERING_EXPORT ShaderParamColorize : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	Texture2D* texture_blur_;
-	Texture2D* texture_mask_;
+	std::shared_ptr<Texture2D> texture_blur_;
+	std::shared_ptr<Texture2D> texture_mask_;
 	GLColor color_;
 
 	using ShaderType = ShaderColorize;
@@ -133,7 +133,7 @@ class Outliner
 {
 	static Outliner* instance_;
 
-	Texture2D* tex_;
+	std::shared_ptr<Texture2D> tex_;
 	FBO* fbo_mask_;
 	FBO* fbo_blur1_;
 	FBO* fbo_blur2_;

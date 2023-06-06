@@ -32,6 +32,7 @@
 #include <cgogn/rendering/texture.h>
 
 #include <vector>
+#include <memory>
 
 namespace cgogn
 {
@@ -45,7 +46,9 @@ class CGOGN_RENDERING_EXPORT FBO
 	GLint prev_viewport[4];
 
 public:
-	FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from);
+	FBO(const std::vector<std::shared_ptr<Texture2D>>& textures, bool add_depth, FBO* from);
+
+	FBO(const std::shared_ptr<Texture2D>& textures, bool add_depth, FBO* from);
 
 	inline void bind()
 	{
@@ -81,7 +84,7 @@ public:
 
 	void resize(int w, int h);
 
-	inline Texture2D* texture(std::size_t i)
+	inline std::shared_ptr<Texture2D>& texture(std::size_t i)
 	{
 		return tex_[i];
 	}
@@ -100,11 +103,23 @@ public:
 		return tex_.front()->height();
 	}
 
+	inline std::shared_ptr<Texture2D>& getTexture(int i) 
+	{
+		return tex_[i];
+	}
+
+	inline std::shared_ptr<Texture2D>& getDepthTexture(int i) 
+	{
+		return depth_tex_;
+	}
+
 protected:
+	void init(const std::vector<std::shared_ptr<Texture2D>>& textures, bool add_depth, FBO* from);
+
 	GLuint id_;
 	GLuint depth_render_buffer_;
-	Texture2D* depth_tex_;
-	std::vector<Texture2D*> tex_;
+	std::shared_ptr<Texture2D> depth_tex_;
+	std::vector<std::shared_ptr<Texture2D>> tex_;
 };
 
 } // namespace rendering

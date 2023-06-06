@@ -25,6 +25,7 @@
 #define CGOGN_RENDERING_VOLUME_DRAWER_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
+#include <cgogn/rendering/fbo.h>
 
 #include <cgogn/rendering/shaders/shader_explode_volumes.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_color.h>
@@ -77,6 +78,7 @@ protected:
 
 	float32 shrink_v_;
 	float32 shrink_f_;
+	GLVec3 world_pos_lum;
 
 	void init_with_color();
 	void init_without_color();
@@ -90,6 +92,8 @@ public:
 		std::unique_ptr<ShaderExplodeVolumes::Param> param_expl_vol_;
 		std::unique_ptr<ShaderExplodeVolumesColor::Param> param_expl_vol_col_;
 		std::unique_ptr<ShaderExplodeVolumesLine::Param> param_expl_vol_line_;
+
+		std::unique_ptr<ShaderExplodeVolumes::Param> param_expl_vol_sha_;
 		VolumeDrawerGen* volume_drawer_data_;
 
 		Renderer(VolumeDrawerGen* tr);
@@ -104,6 +108,10 @@ public:
 		void set_clipping_plane(const GLVec4& pl);
 		void set_clipping_plane2(const GLVec4& pl);
 		void set_thick_clipping_plane(const GLVec4& p, float32 th);
+
+		void set LightDir(const GLVec3& LD)
+		void render shadow_map(FBO::)
+		void draw_faces_shadow(const GLMat4& projection, const GLMat4& modelview);
 	};
 
 	using Self = VolumeDrawerGen;

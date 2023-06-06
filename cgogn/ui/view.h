@@ -113,7 +113,7 @@ protected:
 
 	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
 	std::unique_ptr<rendering::FBO> fbo_;
-	std::unique_ptr<rendering::Texture2D> tex_;
+	std::shared_ptr<rendering::Texture2D> tex_;
 
 	std::vector<ViewModule*> linked_view_modules_;
 	std::vector<ProviderModule*> linked_provider_modules_;

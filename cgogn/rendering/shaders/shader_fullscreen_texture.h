@@ -41,7 +41,7 @@ class CGOGN_RENDERING_EXPORT ShaderParamFullScreenTexture : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	Texture2D* texture_;
+	std::shared_ptr<Texture2D> texture_;
 	GLint unit_;
 	GLfloat alpha_;
 
