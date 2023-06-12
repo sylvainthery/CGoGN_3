@@ -26,6 +26,8 @@
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
+
 
 namespace cgogn
 {
@@ -33,19 +35,7 @@ namespace cgogn
 namespace rendering
 {
 	
-//data of shader (can be shared between flat/smooth version)
-struct ExplodeVolumeColorData
-{
-	GLVec3 light_position_;
-	float32 explode_;
-	GLVec4 plane_clip_;
-	GLVec4 plane_clip2_;
-	inline ExplodeVolumeColorData()
-		: light_position_(100, 1000, 5000), explode_(0.9f), plane_clip_(0, 0, 0, 0),
-		  plane_clip2_(0, 0, 0, 0)
-	{}
 
-};
 
 
 DECLARE_SHADER_CLASS(ExplodeVolumesColor, true, CGOGN_STR(ExplodeVolumesColor))
@@ -71,14 +61,12 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesColor : public ShaderParam
 	};
 
 public:
-	std::shared_ptr<ExplodeVolumeColorData> data_;
+	ExplodeVolumeData* data_;
 
 	using ShaderType = ShaderExplodeVolumesColor;
 
-	ShaderParamExplodeVolumesColor(ShaderType* sh)
-		: ShaderParam(sh)
+	ShaderParamExplodeVolumesColor(ShaderType* sh) : ShaderParam(sh), data_(nullptr)
 	{
-		data_ = std::make_shared<ExplodeVolumeColorData>();
 		for (auto& v : vbos_)
 			v = nullptr;
 	}
@@ -113,14 +101,12 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesColorSmooth : public Shade
 	};
 
 public:
-	std::shared_ptr<ExplodeVolumeColorData> data_;
+	ExplodeVolumeData* data_;
 
 	using ShaderType = ShaderExplodeVolumesColorSmooth;
 
-	ShaderParamExplodeVolumesColorSmooth(ShaderType* sh)
-		: ShaderParam(sh)
+	ShaderParamExplodeVolumesColorSmooth(ShaderType* sh) : ShaderParam(sh), data_(nullptr)
 	{
-		data_ = std::make_shared<ExplodeVolumeColorData>();
 		for (auto& v : vbos_)
 			v = nullptr;
 	}

@@ -43,12 +43,25 @@ rendering::GLMat4d Camera::perspective(float64 znear, float64 zfar) const
 rendering::GLMat4d Camera::orthographic(float64 znear, float64 zfar) const
 {
 	float64 range_inv = 1.0 / (znear - zfar);
-	auto m05 =
-		(aspect_ratio_ < 1) ? std::make_pair(1.0 / aspect_ratio_, 1.0) : std::make_pair(1.0, 1.0 / aspect_ratio_);
+	float64 hw = 1.414 / scene_radius_;
+	auto m05 = std::make_pair(hw,hw);
+//		(aspect_ratio_ < 1) ? std::make_pair(1.0 / aspect_ratio_, 1.0) : std::make_pair(1.0, 1.0 / aspect_ratio_);
 	rendering::GLMat4d m;
-	m << m05.first, 0, 0, 0, 0, m05.second, 0, 0, 0, 0, 2 * range_inv, 0, 0, 0, (znear + zfar) * range_inv, 0;
+	m << m05.first, 0, 0, 0, 0, m05.second, 0, 0, 0, 0, 2 * range_inv, 0, 0, 0, (znear + zfar) * range_inv, 1;	
 	return m;
 }
+
+//rendering::GLMat4d Camera::orthographic() const
+//{
+//	float64 znear = -scene_radius();
+//	float64 zfar = scene_radius();
+//	float64 range_inv = 1.0 / (znear - zfar);
+//	auto m05 =
+//		(aspect_ratio_ < 1) ? std::make_pair(1.0 / aspect_ratio_, 1.0) : std::make_pair(1.0, 1.0 / aspect_ratio_);
+//	rendering::GLMat4d m;
+//	m << m05.first, 0, 0, 0, 0, m05.second, 0, 0, 0, 0, 2 * range_inv, 0, 0, 0, (znear + zfar) * range_inv, 0;
+//	return m;
+//}
 
 } // namespace ui
 

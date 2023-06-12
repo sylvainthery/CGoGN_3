@@ -225,6 +225,47 @@ public:
 		glUniform1i(uniforms_[i], int32(v));
 	}
 
+	inline void set_uniform_value(std::size_t i, const GLMat4& m)
+	{
+		glUniformMatrix4fv(uniforms_[i], 1, false, m.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLMat3& m)
+	{
+		glUniformMatrix3fv(uniforms_[i], 1, false, m.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLVec2d& v)
+	{
+		GLVec2 vf = v.cast<float>();
+		glUniform2fv(uniforms_[i], 1, vf.data());
+	}
+	inline void set_uniform_value(std::size_t i, const GLVec3d& v)
+	{
+		GLVec3 vf = v.cast<float>();
+		glUniform3fv(uniforms_[i], 1, vf.data());
+	}
+	inline void set_uniform_value(std::size_t i, const GLVec4d& v)
+	{
+		GLVec4 vf = v.cast<float>();
+		glUniform4fv(uniforms_[i], 1, vf.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLMat4d& m)
+	{
+		GLMat4 mf = m.cast<float>();
+		glUniformMatrix4fv(uniforms_[i], 1, false, mf.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLMat3d& m)
+	{
+		GLMat3 mf = m.cast<float>();
+		glUniformMatrix3fv(uniforms_[i], 1, false, mf.data());
+	}
+
+
+
+
 	template <typename T>
 	void set_uniforms_values(T v)
 	{

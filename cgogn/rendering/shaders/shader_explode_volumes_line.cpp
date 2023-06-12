@@ -89,7 +89,8 @@ ShaderExplodeVolumesLine::ShaderExplodeVolumesLine()
 
 void ShaderParamExplodeVolumesLine::set_uniforms()
 {
-	shader_->set_uniforms_values(10, 11, 12, 13, color_, explode_, plane_clip_, plane_clip2_);
+	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_line_, data_->explode_, data_->plane_clip_,
+								 data_->plane_clip2_);
 }
 
 void ShaderParamExplodeVolumesLine::bind_texture_buffers()

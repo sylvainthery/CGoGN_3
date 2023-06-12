@@ -73,6 +73,14 @@ public:
 	{
 	}
 
+	inline Camera(Type tp)
+		: type_(tp), field_of_view_(0.65), aspect_ratio_(1.0), pivot_point_initialized_(false),
+		  scene_radius_initialized_(false)
+	{
+	}
+
+	//rendering::GLMat4d orthographic() const;
+
 	inline float64 width() const
 	{
 		return (aspect_ratio_ > 1.0) ? aspect_ratio_ : 1.0;
@@ -90,8 +98,10 @@ public:
 		proj_d_ = ((type_ == PERSPECTIVE) ? perspective(znear, zfar) : orthographic(znear, zfar));
 		proj_ = proj_d_.cast<float32>();
 
-		rendering::Transfo3d m = Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) * frame_ *
-								 Eigen::Translation3d(-pivot_point_);
+		rendering::Transfo3d m = (type_ == PERSPECTIVE)
+										? Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) *
+											frame_ * Eigen::Translation3d(-pivot_point_)
+										: frame_ ;
 		mv_d_ = m.matrix();
 		mv_ = mv_d_.cast<float32>();
 	}
@@ -124,7 +134,7 @@ public:
 		scene_radius_ = radius;
 		if (!scene_radius_initialized_)
 		{
-			focal_distance_ = scene_radius_ / std::tan(field_of_view_ / 2.0);
+			focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ / std::tan(field_of_view_ / 2.0) : 0.0;
 			frame_.translation().z() -= focal_distance_;
 			scene_radius_initialized_ = true;
 		}
@@ -148,10 +158,26 @@ public:
 		update_matrices();
 	}
 
-	inline void look_dir(const GLVec3& eye, const GLVec3& dir, const GLVec3& up)
+
+	
+
+	inline void look_dir(const rendering::GLVec3d& eye, const rendering::GLVec3d& dir, const rendering::GLVec3d& up)  
 	{
-		Eigen::Affine3d m = Eigen::Affine3d(Transfo::look_dir(eye, dir, up).cast<double>());
-		this->frame_ = Eigen::Translation3d(0.0, 0.0, focal_dist_) * m;//*Eigen::Translation3d(pivot_point_);
+		rendering::GLVec3d zAxis = -dir.normalized();
+		rendering::GLVec3d xAxis = up.normalized().cross(zAxis).normalized();
+		rendering::GLVec3d yAxis = zAxis.cross(xAxis).normalized();
+
+		rendering::GLMat4d trf;
+		trf.block<1, 3>(0, 0) = xAxis.transpose();
+		trf.block<1, 3>(1, 0) = yAxis.transpose();
+		trf.block<1, 3>(2, 0) = zAxis.transpose();
+
+		trf.block<3, 1>(0, 3) = rendering::GLVec3d(-xAxis.dot(eye), -yAxis.dot(eye), -zAxis.dot(eye));
+		trf.block<1, 4>(3, 0) = rendering::GLVec4d(0, 0, 0, 1).transpose();
+		if (type_ == PERSPECTIVE)
+			this->frame_ = Eigen::Translation3d(0.0, 0.0, focal_distance_) * Eigen::Affine3d(trf);
+		else
+			this->frame_ = Eigen::Affine3d(trf);
 	}
 
 

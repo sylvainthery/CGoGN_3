@@ -21,37 +21,18 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SMOOTH_H_
-#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SMOOTH_H_
+#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SHADOWS_H_
+#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SHADOWS_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
 
 namespace cgogn
 {
 
 namespace rendering
 {
-
-// a mettre dans un fichier .h � part ?
-//data of shader (can be shared between flat/smooth version)
-struct ExplodeVolumeDataShadow
-{
-	GLColor color_;
-	GLVec3 light_position_;
-	float32 explode_;
-	GLVec4 plane_clip_;
-	GLVec4 plane_clip2_;
-	int TUshadow;
-	GLMat4 matrix_shadow;
-
-	inline ExplodeVolumeDataShadow()
-		: color_(0.9f, 0, 0, 1), light_position_(100, 1000, 5000), explode_(0.9f), plane_clip_(0, 0, 0, 0),
-		  plane_clip2_(0, 0, 0, 0)
-	{}
-
-};
-
 
 DECLARE_SHADER_CLASS(ExplodeVolumesGenerateShadows, true, CGOGN_STR(ExplodeVolumesGenerateShadows))
 
@@ -60,10 +41,12 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesGenerateShadows : public S
 	void set_uniforms() override;
 
 	std::array<VBO*, 3> vbos_;
+
 	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
 	{
 		vbos_[i] = vbo;
 	}
+
 	void bind_texture_buffers() override;
 	void release_texture_buffers() override;
 
@@ -75,14 +58,14 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesGenerateShadows : public S
 	};
 
 public:
-	std::shared_ptr<ExplodeVolumeDataShadow> data_;
+	//std::shared_ptr<ExplodeVolumeData> data_;
+	ExplodeVolumeData* data_;
 
-	using ShaderType = ShaderExplodeVolumesShadaows;
 
-	inline ShaderParamExplodeVolumesGenerateShadows(ShaderType* sh)
-		: ShaderParam(sh)
+	using ShaderType = ShaderExplodeVolumesGenerateShadows;
+
+	inline ShaderParamExplodeVolumesGenerateShadows(ShaderType* sh) : ShaderParam(sh), data_(nullptr)
 	{
-		data_ = std::make_shared<ExplodeVolumeDataShadow>();
 		for (auto& v : vbos_)
 			v = nullptr;
 	}
@@ -90,6 +73,7 @@ public:
 	inline ~ShaderParamExplodeVolumesGenerateShadows() override
 	{
 	}
+
 };
 
 
@@ -101,10 +85,12 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesShadows : public ShaderPar
 	void set_uniforms() override;
 
 	std::array<VBO*, 3> vbos_;
+
 	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
 	{
 		vbos_[i] = vbo;
 	}
+
 	void bind_texture_buffers() override;
 	void release_texture_buffers() override;
 
@@ -116,14 +102,13 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesShadows : public ShaderPar
 	};
 
 public:
-	std::shared_ptr<ExplodeVolumeDataShadow> data_;
+	ExplodeVolumeData* data_;
+	std::shared_ptr<ShadowData> sha_data_;
 
-	using ShaderType = ShaderExplodeVolumesShadaows;
+	using ShaderType = ShaderExplodeVolumesShadows;
 
-	inline ShaderParamExplodeVolumesShadows(ShaderType* sh)
-		: ShaderParam(sh)
+	inline ShaderParamExplodeVolumesShadows(ShaderType* sh) : ShaderParam(sh), data_(nullptr), sha_data_(nullptr)
 	{
-		data_ = std::make_shared<ExplodeVolumeDataShadow>();
 		for (auto& v : vbos_)
 			v = nullptr;
 	}
@@ -132,47 +117,6 @@ public:
 	{
 	}
 };
-
-DECLARE_SHADER_CLASS(ExplodeVolumesSmoothShadows, true, CGOGN_STR(ExplodeVolumesSmoothShadows))
-
-class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesSmoothShadows : public ShaderParam
-{
-	void set_uniforms() override;
-
-	std::array<VBO*, 3> vbos_;
-	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
-	{
-		vbos_[i] = vbo;
-	}
-	void bind_texture_buffers() override;
-	void release_texture_buffers() override;
-
-	enum VBOName : int32
-	{
-		VERTEX_POSITION = 0,
-		VOLUME_CENTER,
-		VOLUME_CLIPPING
-	};
-
-public:
-	std::shared_ptr<ExplodeVolumeDataShadow> data_;
-
-	using ShaderType = ShaderExplodeVolumesSmoothShadows;
-
-	inline ShaderParamExplodeVolumesSmoothShadows(ShaderType* sh)
-		: ShaderParam(sh)
-	{
-		data_ = std::make_shared<ExplodeVolumeDataShadow>();
-		for (auto& v : vbos_)
-			v = nullptr;
-	}
-
-	inline ~ShaderParamExplodeVolumesSmoothShadwos() override
-	{
-	}
-};
-
-
 
 } // namespace rendering
 

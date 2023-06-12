@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
-#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
+#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SMOOTH_H_
+#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_SMOOTH_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
@@ -34,10 +34,9 @@ namespace cgogn
 namespace rendering
 {
 
+DECLARE_SHADER_CLASS(ExplodeVolumesSmooth, true, CGOGN_STR(ExplodeVolumesSmooth))
 
-DECLARE_SHADER_CLASS(ExplodeVolumes, true, CGOGN_STR(ExplodeVolumes))
-
-class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesSmooth : public ShaderParam
 {
 	void set_uniforms() override;
 
@@ -57,23 +56,23 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
 	};
 
 public:
-//	std::shared_ptr<ExplodeVolumeData> data_;
+	//std::shared_ptr<ExplodeVolumeData> data_;
 	ExplodeVolumeData* data_;
 
-	using ShaderType = ShaderExplodeVolumes;
+	using ShaderType = ShaderExplodeVolumesSmooth;
 
-	inline ShaderParamExplodeVolumes(ShaderType* sh)
-		: ShaderParam(sh), data_(nullptr)
+	inline ShaderParamExplodeVolumesSmooth(ShaderType* sh) : ShaderParam(sh), data_(nullptr)
 	{
-//		data_ = std::make_shared<ExplodeVolumeData>();
+		//data_ = std::make_shared<ExplodeVolumeData>();
 		for (auto& v : vbos_)
 			v = nullptr;
 	}
 
-	inline ~ShaderParamExplodeVolumes() override
+	inline ~ShaderParamExplodeVolumesSmooth() override
 	{
 	}
 };
+
 } // namespace rendering
 
 } // namespace cgogn

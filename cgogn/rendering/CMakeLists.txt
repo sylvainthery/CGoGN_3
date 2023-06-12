@@ -25,6 +25,7 @@ target_sources(${PROJECT_NAME}
 #		"${CMAKE_CURRENT_LIST_DIR}/text_drawer.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/text_drawer.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types.h"
+
 		"${CMAKE_CURRENT_LIST_DIR}/gl_image.h"
 		"${CMAKE_CURRENT_LIST_DIR}/gl_image.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/vbo.h"
@@ -85,8 +86,12 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_point_sprite.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_point_sprite.cpp"
 
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_data.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.cpp"
+
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_smooth.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_smooth.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_shadows.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_shadows.cpp"
@@ -97,7 +102,6 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_scalar.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_scalar.cpp"
 
-
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_line.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_line.cpp"
 
@@ -106,6 +110,9 @@ target_sources(${PROJECT_NAME}
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders_unused/shader_round_point_color.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders_unused/shader_round_point_color.cpp"
+
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.cpp"
 
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_frame2d.h"

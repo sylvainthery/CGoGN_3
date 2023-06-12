@@ -21,8 +21,8 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
-#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
+#ifndef CGOGN_RENDERING_SHADERS_PLANE_SHA_H_
+#define CGOGN_RENDERING_SHADERS_PLANE_SHA_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
@@ -34,48 +34,37 @@ namespace cgogn
 namespace rendering
 {
 
+DECLARE_SHADER_CLASS(PlaneShadow, false, CGOGN_STR(PlaneShadow))
 
-DECLARE_SHADER_CLASS(ExplodeVolumes, true, CGOGN_STR(ExplodeVolumes))
-
-class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
+class CGOGN_RENDERING_EXPORT ShaderParamPlaneShadow : public ShaderParam
 {
 	void set_uniforms() override;
 
-	std::array<VBO*, 3> vbos_;
-	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
-	{
-		vbos_[i] = vbo;
-	}
-	void bind_texture_buffers() override;
-	void release_texture_buffers() override;
-
-	enum VBOName : int32
-	{
-		VERTEX_POSITION = 0,
-		VOLUME_CENTER,
-		VOLUME_CLIPPING
-	};
-
 public:
-//	std::shared_ptr<ExplodeVolumeData> data_;
-	ExplodeVolumeData* data_;
+	std::shared_ptr<ShadowData> sha_data_;
+	GLMat4 transfo_;
+	GLVec4 color_;
 
-	using ShaderType = ShaderExplodeVolumes;
+	using ShaderType = ShaderPlaneShadow;
 
-	inline ShaderParamExplodeVolumes(ShaderType* sh)
-		: ShaderParam(sh), data_(nullptr)
+	inline ShaderParamPlaneShadow(ShaderType* sh) : ShaderParam(sh), color_{0.9f, 0.9f, 0.9f,1.0f}, sha_data_(nullptr)
 	{
-//		data_ = std::make_shared<ExplodeVolumeData>();
-		for (auto& v : vbos_)
-			v = nullptr;
 	}
 
-	inline ~ShaderParamExplodeVolumes() override
+	inline ~ShaderParamPlaneShadow() override
 	{
+	}
+
+	inline void draw(const GLMat4& proj, const GLMat4& view )
+	{
+		bind(proj,view);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		release();
 	}
 };
+
 } // namespace rendering
 
 } // namespace cgogn
 
-#endif
+#endif // CGOGN_RENDERING_SHADERS_FULL_SCREEN_TEXTURE_H_

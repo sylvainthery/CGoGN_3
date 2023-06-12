@@ -55,11 +55,14 @@ public:
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prev_id_);
 		glGetIntegerv(GL_VIEWPORT, prev_viewport);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id_);
-		glViewport(0, 0, tex_[0]->width(), tex_[0]->height());
+		if (depth_tex_ != nullptr)
+			glViewport(0, 0, depth_tex_->width(), depth_tex_->height());
+		else
+			glViewport(0, 0, tex_[0]->width(), tex_[0]->height());
 	}
 
 	/**
-	 * do no save prceeding fbo & viewport
+	 * do no save preceeding fbo & viewport
 	 */
 	inline void bind_no_release()
 	{
@@ -108,7 +111,7 @@ public:
 		return tex_[i];
 	}
 
-	inline std::shared_ptr<Texture2D>& getDepthTexture(int i) 
+	inline std::shared_ptr<Texture2D>& getDepthTexture() 
 	{
 		return depth_tex_;
 	}

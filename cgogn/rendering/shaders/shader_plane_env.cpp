@@ -21,12 +21,7 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
-#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
-
-#include <cgogn/rendering/cgogn_rendering_export.h>
-#include <cgogn/rendering/shader_program.h>
-#include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
+#include <cgogn/rendering/shaders/shader_plane_env.h>
 
 namespace cgogn
 {
@@ -34,48 +29,73 @@ namespace cgogn
 namespace rendering
 {
 
+ShaderPlaneShadow* ShaderPlaneShadow::instance_ = nullptr;
 
-DECLARE_SHADER_CLASS(ExplodeVolumes, true, CGOGN_STR(ExplodeVolumes))
-
-class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
+ShaderPlaneShadow::ShaderPlaneShadow()
 {
-	void set_uniforms() override;
+	const char* vertex_shader_source = R"(
+		#version 330
+		uniform mat4 projection_matrix;
+		uniform mat4 model_view_matrix;
+		uniform mat4 shadow_matrix;
+		uniform mat4 transfo;
 
-	std::array<VBO*, 3> vbos_;
-	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
-	{
-		vbos_[i] = vbo;
-	}
-	void bind_texture_buffers() override;
-	void release_texture_buffers() override;
+		out vec3 ShCoord;
+		out vec3 position;
 
-	enum VBOName : int32
-	{
-		VERTEX_POSITION = 0,
-		VOLUME_CENTER,
-		VOLUME_CLIPPING
-	};
+		void main()
+		{
+			vec2 p = vec2(gl_VertexID % 2, gl_VertexID / 2);
+			//tc = p;
+			vec4 pt = transfo*vec4((2.0 * p - 1.0),0.0,1.0);
+			vec4 shc4 = shadow_matrix * pt;
+			ShCoord = shc4.xyz/shc4.w;
+			pt =  model_view_matrix*pt;
+			position = pt.xyz;
+			gl_Position = projection_matrix * pt; 
+		}
+	)";
 
-public:
-//	std::shared_ptr<ExplodeVolumeData> data_;
-	ExplodeVolumeData* data_;
+	const char* fragment_shader_source = R"(
+		#version 330
+		uniform vec4 color;;
+		uniform sampler2DShadow TUshadow;
+		uniform vec3 light_position;
+		
+		in vec3 position;
+		in vec3 ShCoord;
+		out vec4 frag_out;
 
-	using ShaderType = ShaderExplodeVolumes;
+		float compute_shadow(float dnl)
+		{
+			return dnl*texture(TUshadow, ShCoord);
+		}
+		
+		void main()
+		{
+			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
+			vec3 L = normalize(light_position-position);
+			float dnl = max(0.0, dot(N, L));
+			float shadow = dnl*texture(TUshadow, ShCoord);
+			float lambert = 0.1 + 0.2*max(0.0,N.z) + 0.6 * shadow;
 
-	inline ShaderParamExplodeVolumes(ShaderType* sh)
-		: ShaderParam(sh), data_(nullptr)
-	{
-//		data_ = std::make_shared<ExplodeVolumeData>();
-		for (auto& v : vbos_)
-			v = nullptr;
-	}
+			frag_out = vec4(lambert * color.rgb, color.a);
+		}
+	)";
 
-	inline ~ShaderParamExplodeVolumes() override
-	{
-	}
-};
+
+	load(vertex_shader_source, fragment_shader_source);
+	get_uniforms("transfo", "shadow_matrix", "color", "TUshadow", "light_position");
+	nb_attributes_ = 0;
+}
+
+void ShaderParamPlaneShadow::set_uniforms()
+{
+	shader_->set_uniforms_values(transfo_,sha_data_->shadow_matrix_, color_,
+										   sha_data_->fbo_shadows_->getDepthTexture()->bind(0),
+								 sha_data_->light_position_);
+}
+
 } // namespace rendering
 
 } // namespace cgogn
-
-#endif

@@ -67,6 +67,127 @@ public:
 	{
 	}
 
+	//void create()
+	//{
+	//	mesh_ = mesh_provider_->add_mesh("pyra_and_hexa");
+	//	vertex_position_ = cgogn::add_attribute<Vec3, Vertex>(*mesh_, "position");
+
+	//	d_pyra_ = cgogn::add_pyramid(*mesh_, 4, false).dart;
+	//	d_hexa_ = cgogn::add_prism(*mesh_, 4, false).dart;
+
+	//	auto setPosV = [&](cgogn::Dart d, const Vec3& P) { cgogn::value<Vec3>(*mesh_, vertex_position_, Vertex(d)) = P; };
+	//	cgogn::Dart dp = d_pyra_;
+	//	cgogn::Dart dh = d_hexa_;
+	//	for (int i = 0; i < 4; ++i)
+	//	{
+	//		cgogn::phi3_sew(*mesh_, dp, dh);
+	//		dp = cgogn::phi1(*mesh_, dp);
+	//		dh = cgogn::phi_1(*mesh_, dh);
+	//	}
+
+	//	cgogn::close(*mesh_, false);
+
+	//	cgogn::index_cells<Vertex>(*mesh_);
+	//	setPosV(dp, Vec3(-1, -1, -1));
+	//	dp = cgogn::phi1(*mesh_, dp);
+	//	setPosV(dp, Vec3(-1.4, 1.4, -1));
+	//	//setPosV(dp, Vec3(-1, 1, -1));
+
+	//	dp = cgogn::phi1(*mesh_, dp);
+	//	setPosV(dp, Vec3(1, 1, -1));
+	//	dp = cgogn::phi1(*mesh_, dp);
+	//	setPosV(dp, Vec3(1.4, -1.4, -1));
+	//	//setPosV(dp, Vec3(1, -1, -1));
+
+	//	setPosV(cgogn::phi<2, -1>(*mesh_, dp), Vec3(0, 0, 1));
+
+	//	dh = cgogn::phi<2, 1, 1, 2>(*mesh_, dh);
+	//	setPosV(dh, Vec3(-1.2, -1.2, -3));
+	//	//setPosV(dh, Vec3(-1, -1, -3));
+
+	//	dh = cgogn::phi1(*mesh_, dh);
+	//	setPosV(dh, Vec3(-1, 1, -3));
+	//	dh = cgogn::phi1(*mesh_, dh);
+	//	setPosV(dh, Vec3(1.2, 1.2, -3));
+	//	//setPosV(dh, Vec3(1, 1, -3));
+
+	//	dh = cgogn::phi1(*mesh_, dh);
+	//	setPosV(dh, Vec3(1, -1, -3));
+
+	//	std::vector<Edge> ve;
+	//	ve.reserve(1024);
+	//	cgogn::foreach_cell(*mesh_, [&](Edge e) {
+	//		ve.push_back(e);
+	//		return true;
+	//	});
+
+	//	for (Edge e : ve)
+	//	{
+	//		Vertex v1(e.dart);
+	//		Vertex v2(cgogn::phi1(*mesh_, e.dart));
+	//		Vertex v3 = cgogn::cut_edge(*mesh_, e);
+	//		cgogn::value<Vec3>(*mesh_, vertex_position_, v3) = (cgogn::value<Vec3>(*mesh_, vertex_position_, v1) +
+	//															cgogn::value<Vec3>(*mesh_, vertex_position_, v2)) /
+	//															2.0;
+	//	}
+
+
+	//	dh = d_pyra_;
+	//	for (int i = 0; i < 4; ++i)
+	//	{
+	//		cgogn::Dart dv1 = cgogn::phi<2, 1, 1>(*mesh_, dh);
+	//		cgogn::Dart dv2 = cgogn::phi<1, 1>(*mesh_, dv1);
+	//		cgogn::cut_face(*mesh_, Vertex(dv1), Vertex(dv2));
+	//		dh = cgogn::phi<1, 1>(*mesh_, dh);
+	//	}
+
+	//	std::vector<cgogn::Dart> vp;
+	//	dh = cgogn::phi<2, 1, 1>(*mesh_, d_pyra_);
+	//	vp.push_back(dh);
+	//	dh = cgogn::phi<1, 2, 1>(*mesh_, dh);
+	//	vp.push_back(dh);
+	//	dh = cgogn::phi<1, 2, 1>(*mesh_, dh);
+	//	vp.push_back(dh);
+	//	dh = cgogn::phi<1, 2, 1>(*mesh_, dh);
+	//	vp.push_back(dh);
+
+	//	cgogn::cut_volume(*mesh_, vp);
+
+	//	for (int j = 0; j < 1; ++j)
+	//	{
+	//		ve.clear();
+
+	//		cgogn::foreach_cell(*mesh_, [&](Edge e) {
+	//			ve.push_back(e);
+	//			return true;
+	//		});
+
+	//		for (Edge e : ve)
+	//		{
+	//			Vertex v1(e.dart);
+	//			Vertex v2(cgogn::phi1(*mesh_, e.dart));
+	//			Vertex v3 = cgogn::cut_edge(*mesh_, e);
+	//			cgogn::value<Vec3>(*mesh_, vertex_position_, v3) = (cgogn::value<Vec3>(*mesh_, vertex_position_, v1) +
+	//																cgogn::value<Vec3>(*mesh_, vertex_position_, v2)) /
+	//															   2.0;
+	//			auto z = cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z();
+	//			cgogn::value<Vec3>(*mesh_, vertex_position_, v3) *= 0.8;
+	//			cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z() = z;
+	//		}
+	//	}
+
+	//	cgogn::index_cells<Volume>(*mesh_);
+
+	//	vol_render_->set_vertex_position(*app_.current_view(), *mesh_, vertex_position_);
+	//	
+	//	topo_render_->set_selected_mesh(*mesh_);
+	//	topo_render_->set_vertex_position(*app_.current_view(), *mesh_, vertex_position_);
+	//	topo_render_->set_dart_color(d_pyra_, {1.0f, 0.0f, 1.0f, 1.0f});
+	//	mesh_provider_->set_mesh_bb_vertex_position(*mesh_, vertex_position_);
+
+
+	//	mesh_provider_->emit_connectivity_changed(*mesh_);
+	//}
 	void create()
 	{
 		mesh_ = mesh_provider_->add_mesh("pyra_and_hexa");
@@ -75,7 +196,9 @@ public:
 		d_pyra_ = cgogn::add_pyramid(*mesh_, 4, false).dart;
 		d_hexa_ = cgogn::add_prism(*mesh_, 4, false).dart;
 
-		auto setPosV = [&](cgogn::Dart d, const Vec3& P) { cgogn::value<Vec3>(*mesh_, vertex_position_, Vertex(d)) = P; };
+		auto setPosV = [&](cgogn::Dart d, const Vec3& P) {
+			cgogn::value<Vec3>(*mesh_, vertex_position_, Vertex(d)) = P;
+		};
 		cgogn::Dart dp = d_pyra_;
 		cgogn::Dart dh = d_hexa_;
 		for (int i = 0; i < 4; ++i)
@@ -90,101 +213,36 @@ public:
 		cgogn::index_cells<Vertex>(*mesh_);
 		setPosV(dp, Vec3(-1, -1, -1));
 		dp = cgogn::phi1(*mesh_, dp);
-		setPosV(dp, Vec3(-1.4, 1.4, -1));
-		//setPosV(dp, Vec3(-1, 1, -1));
+		setPosV(dp, Vec3(-1, 1, -1));
 
 		dp = cgogn::phi1(*mesh_, dp);
 		setPosV(dp, Vec3(1, 1, -1));
 		dp = cgogn::phi1(*mesh_, dp);
-		setPosV(dp, Vec3(1.4, -1.4, -1));
-		//setPosV(dp, Vec3(1, -1, -1));
+		setPosV(dp, Vec3(1, -1, -1));
 
 		setPosV(cgogn::phi<2, -1>(*mesh_, dp), Vec3(0, 0, 1));
 
 		dh = cgogn::phi<2, 1, 1, 2>(*mesh_, dh);
-		setPosV(dh, Vec3(-1.2, -1.2, -3));
-		//setPosV(dh, Vec3(-1, -1, -3));
+		setPosV(dh, Vec3(-1, -1, -3));
 
 		dh = cgogn::phi1(*mesh_, dh);
 		setPosV(dh, Vec3(-1, 1, -3));
 		dh = cgogn::phi1(*mesh_, dh);
-		setPosV(dh, Vec3(1.2, 1.2, -3));
-		//setPosV(dh, Vec3(1, 1, -3));
+		setPosV(dh, Vec3(1, 1, -3));
+
 
 		dh = cgogn::phi1(*mesh_, dh);
 		setPosV(dh, Vec3(1, -1, -3));
 
-		std::vector<Edge> ve;
-		ve.reserve(1024);
-		cgogn::foreach_cell(*mesh_, [&](Edge e) {
-			ve.push_back(e);
-			return true;
-		});
-
-		for (Edge e : ve)
-		{
-			Vertex v1(e.dart);
-			Vertex v2(cgogn::phi1(*mesh_, e.dart));
-			Vertex v3 = cgogn::cut_edge(*mesh_, e);
-			cgogn::value<Vec3>(*mesh_, vertex_position_, v3) = (cgogn::value<Vec3>(*mesh_, vertex_position_, v1) +
-																cgogn::value<Vec3>(*mesh_, vertex_position_, v2)) /
-																2.0;
-		}
-
-
-		dh = d_pyra_;
-		for (int i = 0; i < 4; ++i)
-		{
-			cgogn::Dart dv1 = cgogn::phi<2, 1, 1>(*mesh_, dh);
-			cgogn::Dart dv2 = cgogn::phi<1, 1>(*mesh_, dv1);
-			cgogn::cut_face(*mesh_, Vertex(dv1), Vertex(dv2));
-			dh = cgogn::phi<1, 1>(*mesh_, dh);
-		}
-
-		std::vector<cgogn::Dart> vp;
-		dh = cgogn::phi<2, 1, 1>(*mesh_, d_pyra_);
-		vp.push_back(dh);
-		dh = cgogn::phi<1, 2, 1>(*mesh_, dh);
-		vp.push_back(dh);
-		dh = cgogn::phi<1, 2, 1>(*mesh_, dh);
-		vp.push_back(dh);
-		dh = cgogn::phi<1, 2, 1>(*mesh_, dh);
-		vp.push_back(dh);
-
-		cgogn::cut_volume(*mesh_, vp);
-
-		for (int j = 0; j < 1; ++j)
-		{
-			ve.clear();
-
-			cgogn::foreach_cell(*mesh_, [&](Edge e) {
-				ve.push_back(e);
-				return true;
-			});
-
-			for (Edge e : ve)
-			{
-				Vertex v1(e.dart);
-				Vertex v2(cgogn::phi1(*mesh_, e.dart));
-				Vertex v3 = cgogn::cut_edge(*mesh_, e);
-				cgogn::value<Vec3>(*mesh_, vertex_position_, v3) = (cgogn::value<Vec3>(*mesh_, vertex_position_, v1) +
-																	cgogn::value<Vec3>(*mesh_, vertex_position_, v2)) /
-																   2.0;
-				auto z = cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z();
-				cgogn::value<Vec3>(*mesh_, vertex_position_, v3) *= 0.8;
-				cgogn::value<Vec3>(*mesh_, vertex_position_, v3).z() = z;
-			}
-		}
 
 		cgogn::index_cells<Volume>(*mesh_);
 
 		vol_render_->set_vertex_position(*app_.current_view(), *mesh_, vertex_position_);
-		
+
 		topo_render_->set_selected_mesh(*mesh_);
 		topo_render_->set_vertex_position(*app_.current_view(), *mesh_, vertex_position_);
 		topo_render_->set_dart_color(d_pyra_, {1.0f, 0.0f, 1.0f, 1.0f});
 		mesh_provider_->set_mesh_bb_vertex_position(*mesh_, vertex_position_);
-
 
 		mesh_provider_->emit_connectivity_changed(*mesh_);
 	}
@@ -273,6 +331,7 @@ private:
 
 int main(int argc, char** argv)
 {
+	std::cout << "Etrange" << std::endl;
 	cgogn::thread_start();
 
 	cgogn::ui::App app;

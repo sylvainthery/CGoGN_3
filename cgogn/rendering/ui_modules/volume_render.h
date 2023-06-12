@@ -37,11 +37,15 @@
 #include <cgogn/rendering/shaders/outliner.h>
 #include <cgogn/rendering/shaders/shader_bold_line.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_smooth.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_color.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_line.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_scalar.h>
-
+#include <cgogn/rendering/shaders/shader_explode_volumes_shadows.h>
+#include <cgogn/rendering/fbo.h>
 #include <cgogn/rendering/shaders/shader_point_sprite.h>
+#include <cgogn/rendering/shaders/shader_plane_env.h>
+#include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/algos/length.h>
@@ -85,12 +89,28 @@ class VolumeRender : public ViewModule
 
 	struct ViewParameters
 	{
-		ViewParameters(): use_shadow_(false), fbo_shadows_(nullptr)
-		{}
-		bool use_shadow_;
-		std::shared_ptr<FBO> fbo_shadows_;
+		std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_FS_;
+
+		std::shared_ptr<rendering::ShadowData> sha_data_;
+		rendering::GLVec3d norm_light_dir_;
+		//Camera light_cam_;
+		bool use_shadows_;
+		std::unique_ptr<rendering::ShaderPlaneShadow::Param> param_plane_;
+
+		ViewParameters() : use_shadows_(false)
+		{
+			norm_light_dir_ = rendering::GLVec3d{30.0, 10.0, 50.0}.normalized();
+			sha_data_ = std::make_shared<rendering::ShadowData>();
+			param_plane_ = rendering::ShaderPlaneShadow::generate_param();
+			param_plane_->sha_data_ = sha_data_;
+
+			Eigen::Transform<float, 3, Eigen::Affine> trf =
+				Eigen::Translation3f(Eigen::Vector3f(0, 0, -4)) * Eigen::Scaling(4.0f);
+			param_plane_->transfo_ = trf.matrix();
+
+		}
 		
-	}
+	};
 
 
 	struct Parameters
@@ -101,7 +121,8 @@ class VolumeRender : public ViewModule
 			  volume_clipping_position_(nullptr), volume_clipping_position_vbo_(nullptr), volume_scalar_(nullptr),
 			  volume_scalar_vbo_(nullptr), volume_color_(nullptr), volume_color_vbo_(nullptr), volume_center_(nullptr),
 			  volume_center_vbo_(nullptr), render_vertices_(false), render_edges_(false), render_volumes_(true),
-			  render_volume_lines_(true), color_per_cell_(GLOBAL), color_type_(SCALAR), vertex_scale_factor_(1.0),
+			  render_volume_lines_(true), render_shadow_(false), color_per_cell_(GLOBAL), color_type_(SCALAR),
+			  vertex_scale_factor_(1.0),
 			  auto_update_volume_scalar_min_max_(true), clipping_plane_(false), clip_only_volumes_(true),
 			  show_frame_manipulator_(false), manipulating_frame_(false)
 		{
@@ -114,30 +135,26 @@ class VolumeRender : public ViewModule
 
 			param_volume_ = rendering::ShaderExplodeVolumes::generate_param();
 			param_volume_smooth_ = rendering::ShaderExplodeVolumesSmooth::generate_param();
-			param_volume_smooth_->data_ = param_volume_->data_;
-			param_volume_smooth_shadow_ = rendering::ShaderExplodeVolumesSmooth::generate_param();
-			param_volume_smooth_shadow_->data_ = param_volume_->data_;
-			param_volume_gen_ = param_volume_smooth_shadow_.get();
-
-			param_volume_->data_->color_ = {0.4f, 0.8f, 1.0f, 1.0f};
-
-			param_volume_line_ = rendering::ShaderExplodeVolumesLine::generate_param();
-			param_volume_line_->color_ = {0.0f, 0.0f, 0.0f, 1.0f};
-			param_volume_line_->explode_ = param_volume_->data_->explode_;
-
+			param_volume_generate_shadows_ = rendering::ShaderExplodeVolumesGenerateShadows::generate_param();
+			param_volume_shadows_ = rendering::ShaderExplodeVolumesShadows::generate_param();
 			param_volume_color_ = rendering::ShaderExplodeVolumesColor::generate_param();
 			param_volume_color_smooth_ = rendering::ShaderExplodeVolumesColorSmooth::generate_param();
-			param_volume_color_smooth_->data_ = param_volume_color_->data_;
-			param_volume_color_gen_ = param_volume_color_.get();
-			param_volume_color_->data_->explode_ = param_volume_->data_->explode_;
-
 			param_volume_scalar_ = rendering::ShaderExplodeVolumesScalar::generate_param();
 			param_volume_scalar_smooth_ = rendering::ShaderExplodeVolumesScalarSmooth::generate_param();
-			param_volume_scalar_smooth_->data_ = param_volume_scalar_->data_;
-			param_volume_scalar_gen_ = param_volume_scalar_.get();
-			param_volume_scalar_->data_->explode_ = param_volume_->data_->explode_;
+			param_volume_line_ = rendering::ShaderExplodeVolumesLine::generate_param();
 
+			param_volume_->data_ = &data_;
+			param_volume_smooth_->data_ = &data_;
+			param_volume_generate_shadows_->data_ = &data_;
+			param_volume_shadows_->data_ = &data_;
+			param_volume_color_->data_ = &data_;
+			param_volume_color_smooth_->data_ = &data_;
+			param_volume_line_->data_ = &data_;
+	
+			data_.color_ = {0.4f, 0.8f, 1.0f, 1.0f};
+			data_.color_line_ = {0.0f, 0.0f, 0.0f, 1.0f};
 
+			param_volume_gen_ = param_volume_.get();
 			param_volume_color_gen_ = param_volume_color_.get();
 			param_volume_scalar_gen_ = param_volume_scalar_.get();
 		}
@@ -155,11 +172,14 @@ class VolumeRender : public ViewModule
 
 		std::shared_ptr<Attribute<Scalar>> volume_scalar_;
 		rendering::VBO* volume_scalar_vbo_;
+
 		std::shared_ptr<Attribute<Vec3>> volume_color_;
 		rendering::VBO* volume_color_vbo_;
 
 		std::shared_ptr<Attribute<Vec3>> volume_center_;
 		rendering::VBO* volume_center_vbo_;
+
+		rendering::ExplodeVolumeData data_;
 
 		std::unique_ptr<rendering::ShaderPointSprite::Param> param_point_sprite_;
 		std::unique_ptr<rendering::ShaderBoldLine::Param> param_bold_line_;
@@ -170,9 +190,10 @@ class VolumeRender : public ViewModule
 		std::unique_ptr<rendering::ShaderExplodeVolumesSmooth::Param> param_volume_smooth_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesColorSmooth::Param> param_volume_color_smooth_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesScalarSmooth::Param> param_volume_scalar_smooth_;
+
 		
 		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volume_shadows_;
-//		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volumesShadows_;
+		std::unique_ptr<rendering::ShaderExplodeVolumesGenerateShadows::Param> param_volume_generate_shadows_;
 		
 		rendering::ShaderParam* param_volume_gen_;
 		rendering::ShaderParam* param_volume_gen_shadows_;
@@ -206,8 +227,6 @@ public:
 		  selected_view_(app.current_view()), selected_mesh_(nullptr)
 	{
 		outline_engine_ = rendering::Outliner::instance();
-		// compute_volume_center_engine_ = std::make_unique<rendering::ComputeVolumeCenterEngine>();
-	
 	}
 
 	~VolumeRender()
@@ -220,6 +239,16 @@ private:
 		for (View* v : linked_views_)
 		{
 			Parameters& p = parameters_[v][m];
+			ViewParameters& vp = view_parameters_[v];
+			if (vp.sha_data_ == nullptr)
+			{
+
+				vp.norm_light_dir_ = rendering::GLVec3d{10.0, 1.0, 50.0}.normalized();
+				vp.sha_data_ = std::make_shared<rendering::ShadowData>();
+				//vp.param_FS_ = rendering::ShaderFullScreenTexture::generate_param();
+			}
+				
+			p.param_volume_shadows_->sha_data_ = vp.sha_data_;
 
 			p.volume_center_ = add_attribute<Vec3, Volume>(*m, "__volume_center");
 			p.volume_clipping_position_ = add_attribute<Vec3, Volume>(*m, "__volume_clipping_position");
@@ -303,6 +332,11 @@ public:
 
 		p.param_volume_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 		p.param_volume_smooth_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
+
+		p.param_volume_shadows_->set_vbos(
+			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
+		p.param_volume_generate_shadows_->set_vbos(
+			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
 		p.param_volume_line_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 		p.param_volume_color_->set_vbos(
@@ -421,13 +455,13 @@ public:
 	void set_volume_explode(View& v, const MESH& m, float expl)
 	{
 		Parameters& p = parameters_[&v][&m];
-		p.param_volume_->data_->explode_ = expl;
-		p.param_volume_line_->explode_ = expl;
-		p.param_volume_color_->data_->explode_ = expl;
-		p.param_volume_scalar_->data_->explode_ = expl;
-		p.param_volume_smooth_->data_->explode_ = expl;
-		p.param_volume_color_smooth_->data_->explode_ = expl;
-		p.param_volume_scalar_smooth_->data_->explode_ = expl;
+		p.data_.explode_ = expl;
+		//p.param_volume_line_->explode_ = expl;
+		//p.param_volume_color_->data_->explode_ = expl;
+		//p.param_volume_scalar_->data_->explode_ = expl;
+		//p.param_volume_smooth_->data_->explode_ = expl;
+		//p.param_volume_color_smooth_->data_->explode_ = expl;
+		//p.param_volume_scalar_smooth_->data_->explode_ = expl;
 	}
 
 	void set_smoothing(const MESH& m, bool smo)
@@ -453,27 +487,25 @@ public:
 		md.mesh_render()->set_primitive_dirty(rendering::DrawingType::VOLUMES_FACES);
 	}
 
-	void set_light_dir(const MESH& m, const Eigen::Vector3f& LD)
-	{
-		Parameters& p = parameters_[current_view][&m];
-		p.light_dir = LD;
-	}
+	//void set_light_dir(const MESH& m, const Eigen::Vector3f& LD)
+	//{
+	//	parameters_[current_view][&m].light_dir = LD;
+	//	view_parameters_[current_view].data_.light_dir = LD;
+	//}
 
-	void use_shadow(View* view, bool on_off)
+	void set_shadows(View* view, bool on_off)
 	{
 		if (on_off)
 		{
-			fbo_shadow_ = std::make_shared<FBO>({},true);
-			fbo_shadow_->depth_texture()->bind();
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_LINEAR);
-			fbo_shadow_->depth_texture()->unbind();
+			//view->camera().set_type(Camera::Type::ORTHOGRAPHIC);
+			view_parameters_[view].sha_data_->start(2048);
 		}
 		else
 		{
-			fbo_shadow_ = null_ptr;
+			//view->camera().set_type(Camera::Type::PERSPECTIVE);
+			view_parameters_[view].sha_data_->stop();
 		}
+			
 	}
 
 	
@@ -490,11 +522,8 @@ protected:
 			if (v > max)
 				max = v;
 		}
-		p.param_volume_scalar_->data_->color_map_.min_value_ = min;
-		p.param_volume_scalar_->data_->color_map_.max_value_ = max;
-		p.param_volume_scalar_smooth_->data_->color_map_.min_value_ = min;
-		p.param_volume_scalar_smooth_->data_->color_map_.max_value_ = max;
-
+		p.data_.color_map_.min_value_ = min;
+		p.data_.color_map_.max_value_ = max;
 	}
 
 	void update_volume_center(View& v, const MESH& m)
@@ -529,34 +558,99 @@ protected:
 		mesh_provider_->foreach_mesh([this](MESH& m, const std::string&) { init_mesh(&m); });
 		connections_.push_back(boost::synapse::connect<typename MeshProvider<MESH>::mesh_added>(
 			mesh_provider_, this, &VolumeRender<MESH>::init_mesh));
+
+
 	}
 
 	void draw(View* view) override
 	{
-		if (use_shadow)
+		ViewParameters& vp = view_parameters_[app_.current_view()];
+		if (vp.use_shadows_)
 		{
-			GLMat4d proj_shadow = Camera::orthographic(float64 znear, float64 zfar)
-			GLMat4d view_shadow = cam->look_dir(p.light_dir, cam->scene_center()-p.light_dir, Vec3(0,0,1));
+			const Camera& cam = app_.current_view()->camera();
+			float64 sd = 64.0 * cam.scene_radius(); 
+			float64 sr = cam.scene_radius(); //*0.9 ?
 
-			fbo_shadow_.bind(proj_shadow, view_shadow);
+			rendering::GLVec3d light_position = cam.pivot_point() + sd * vp.norm_light_dir_;
+
+			auto orthographic = [&]() {
+				float64 hw = 1.0 / sr;
+				rendering::GLMat4d m;
+				m << hw, 0, 0, 0, 0, hw, 0, 0, 0, 0, -hw, -sd*hw, 0, 0, 0, 1;
+				return m;
+			};
+
+			rendering::GLMat4d light_projection_matrix = orthographic();
+
+			// warning dir & up mus be normalized
+			auto look_dir = [](const rendering::GLVec3d& eye, const rendering::GLVec3d& dir,
+							   const rendering::GLVec3d& up) {
+				rendering::GLVec3d zAxis = -dir; //.normalized();
+				//rendering::GLVec3d xAxis = up.normalized().cross(zAxis).normalized();
+				rendering::GLVec3d xAxis = up.cross(zAxis).normalized();
+				rendering::GLVec3d yAxis = zAxis.cross(xAxis).normalized();
+
+				rendering::GLMat4d trf;
+				trf.block<1, 3>(0, 0) = xAxis.transpose();
+				trf.block<1, 3>(1, 0) = yAxis.transpose();
+				trf.block<1, 3>(2, 0) = zAxis.transpose();
+
+				trf.block<3, 1>(0, 3) = rendering::GLVec3d(-xAxis.dot(eye), -yAxis.dot(eye), -zAxis.dot(eye));
+				trf.block<1, 4>(3, 0) = rendering::GLVec4d(0, 0, 0, 1).transpose();
+
+				return trf;
+			};
+
+			rendering::GLMat4d light_view_matrix =
+				look_dir(light_position, - vp.norm_light_dir_, rendering::GLVec3d(0, 0, 1));
+			
+			vp.sha_data_->fbo_shadows_->bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
 
-			auto* cam = app_.current_view()->camera();
-			double wh = cam->scene_radius();	
-			GLMat4d shm = ortho*look;
+			double wh = cam.scene_radius();	
+
+			rendering::GLMat4d biasmat;
+			biasmat << 0.5 , 0.0 , 0.0 , 0.5 ,
+				0.0 , 0.5 , 0.0 , 0.5 ,
+				0.0 , 0.0 , 0.5 , 0.5 ,
+				0.0 , 0.0 , 0.0 , 1.0;
+
+			vp.sha_data_->shadow_matrix_ =
+				biasmat * light_projection_matrix * light_view_matrix;
+
+			rendering::GLVec3d lpv = (view->modelview_matrix_d() *
+									  rendering::GLVec4d(light_position[0], light_position[1], light_position[2], 1.0))
+										 .block<3, 1>(0, 0);
+
+			//std::cout << lpv.transpose() << std::endl;
+			vp.sha_data_->light_position_ = lpv;
 
 			for (auto& [m, p] : parameters_[view])
 			{
-				p.shadow_matrix = shm;
-				p.param_volume_gen_shadow_gen_->bind(proj_matrix, view_matrix);
-				mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+				if (p.render_volumes_)
+				{
+					p.data_.light_position_ = lpv.cast<float>();
+					glEnable(GL_POLYGON_OFFSET_FILL);
+					glPolygonOffset(1.0f, 1.5f);
+
+					p.param_volume_generate_shadows_->bind(light_projection_matrix.cast<float>(),
+														   light_view_matrix.cast<float>());
+					mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+					p.param_volume_generate_shadows_->release();
+				}
 			}
-			fbo_shadow_.unbind();
+			vp.sha_data_->fbo_shadows_->release();
+
+			glDisable(GL_CULL_FACE);
+		// IF  USEPLANE ...
+			vp.param_plane_->draw(view->projection_matrix(), view->modelview_matrix());
+
 		}
-		
+
+
 		for (auto& [m, p] : parameters_[view])
 		{
 			MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
@@ -572,37 +666,26 @@ protected:
 				switch (p.color_per_cell_)
 				{
 				case GLOBAL: {
-					if (p.render_shadow)
+					if (vp.use_shadows_)
 					{
-						// FBO depth
-						
+						if (p.param_volume_shadows_->attributes_initialized())
+						{
+							std::cout << "======= BIAS MAT ======" << std::endl;
+							std::cout << vp.sha_data_->shadow_matrix_ << std::endl;
 
-						glClear(   GL_DEPTH_BUFFER_BIT);
-						glEnable(  GL_DEPTH_TEST);
-						glEnable(  GL_CULL_FACE);
-						glCullFace(GL_BACK);
-	
-						p.param_volume_gen_shadow_gen_->bind(proj_matrix, view_matrix);
-						auto* cam = app_.current_view()->camera();
-						double wh = cam->scene_radius();
-					 	rendering::GLMat4d ortho = Camera::orthographic(float64 znear, float64 zfar)
-						rendering::GLMat4d look = cam->look_dir(p.light_dir, cam->scene_center()-p.light_dir, Vec3(0,0,1));
-						
-						p.param_volume_gen_shadow_gen_->bind(proj_matrix, view_matrix);
-						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
-						// 
-						p.param_volume_gen_shadow_->bind(proj_matrix, view_matrix);
-						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
-						p.param_volume_gen_shadow_->bind(proj_matrix, view_matrix);
-
-
+							p.param_volume_shadows_->bind(proj_matrix, view_matrix);
+							md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
+							p.param_volume_shadows_->release();
+						}
 					}
 					else
-					if (p.param_volume_gen_->attributes_initialized())
 					{
-						p.param_volume_gen_->bind(proj_matrix, view_matrix);
-						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
-						p.param_volume_gen_->release();
+						if (p.param_volume_gen_->attributes_initialized())
+						{
+							p.param_volume_gen_->bind(proj_matrix, view_matrix);
+							md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
+							p.param_volume_gen_->release();
+						}
 					}
 				}
 				break;
@@ -739,10 +822,7 @@ protected:
 					p.frame_manipulator_.get_axis(rendering::FrameManipulator::Zt, axis_z);
 					float32 d = -(position.dot(axis_z));
 					rendering::GLVec4 plane = rendering::construct_GLVec4(axis_z.x(), axis_z.y(), axis_z.z(), d);
-					p.param_volume_->data_->plane_clip_ = plane;
-					p.param_volume_line_->plane_clip_ = plane;
-					p.param_volume_color_->data_->plane_clip_ = plane;
-					p.param_volume_scalar_->data_->plane_clip_ = plane;
+					p.data_.plane_clip_ = plane;
 				}
 				view->stop_event();
 				view->request_update();
@@ -799,17 +879,21 @@ protected:
 					set_smoothing(*selected_mesh_, svf);
 					need_update = true;
 				}
-				if (ImGui::SliderFloat("Explode", &p.param_volume_->data_->explode_, 0.01f, 1.0f))
+				if (ImGui::SliderFloat("Explode", &p.data_.explode_, 0.01f, 1.0f))
 				{
 					need_update = true;
-					p.param_volume_line_->explode_ = p.param_volume_->data_->explode_;
-					p.param_volume_color_->data_->explode_ = p.param_volume_->data_->explode_;
-					p.param_volume_scalar_->data_->explode_ = p.param_volume_->data_->explode_;
 				}
 
+				View* view = app_.current_view();
+				ViewParameters& vp = view_parameters_[view];
+				if (ImGui::Checkbox("Shadows", &vp.use_shadows_))
+				{
+					set_shadows(view, vp.use_shadows_);
+					need_update = true;
+				}
 				need_update |= ImGui::Checkbox("Volume lines", &p.render_volume_lines_);
 				if (p.render_volume_lines_)
-					need_update |= ImGui::ColorEdit3("Volume lines color", p.param_volume_line_->color_.data(),
+					need_update |= ImGui::ColorEdit3("Volume lines color", p.data_.color_line_.data(),
 													 ImGuiColorEditFlags_NoInputs);
 
 				need_update |= ImGui::Checkbox("Apply clipping plane", &p.clipping_plane_);
@@ -840,19 +924,13 @@ protected:
 						p.param_point_sprite_->plane_clip_ = plane;
 						p.param_bold_line_->plane_clip_ = plane;
 					}
-					p.param_volume_->data_->plane_clip_ = plane;
-					p.param_volume_line_->plane_clip_ = plane;
-					p.param_volume_color_->data_->plane_clip_ = plane;
-					p.param_volume_scalar_->data_->plane_clip_ = plane;
+					p.data_.plane_clip_ = plane;
 				}
 				else
 				{
 					p.param_point_sprite_->plane_clip_ = {0, 0, 0, 0};
 					p.param_bold_line_->plane_clip_ = {0, 0, 0, 0};
-					p.param_volume_->data_->plane_clip_ = {0, 0, 0, 0};
-					p.param_volume_line_->plane_clip_ = {0, 0, 0, 0};
-					p.param_volume_color_->data_->plane_clip_ = {0, 0, 0, 0};
-					p.param_volume_scalar_->data_->plane_clip_ = {0, 0, 0, 0};
+					p.data_.plane_clip_ = {0, 0, 0, 0};
 				}
 
 				need_update |= ImGui::Checkbox("Show clipping plane", &p.show_frame_manipulator_);
@@ -902,10 +980,10 @@ protected:
 								set_volume_scalar(*selected_view_, *selected_mesh_, attribute);
 							});
 						need_update |= ImGui::InputFloat("Scalar min##volumecolor",
-														 &p.param_volume_scalar_->data_->color_map_.min_value_,
+														 &p.data_.color_map_.min_value_,
 											  0.01f, 1.0f, "%.3f");
 						need_update |= ImGui::InputFloat("Scalar max##volumecolor",
-														 &p.param_volume_scalar_->data_->color_map_.max_value_,
+														 &p.data_.color_map_.max_value_,
 											  0.01f, 1.0f, "%.3f");
 						if (ImGui::Checkbox("Auto update min/max##volumecolor", &p.auto_update_volume_scalar_min_max_))
 						{
@@ -942,6 +1020,7 @@ private:
 	View* selected_view_;
 	const MESH* selected_mesh_;
 	std::unordered_map<View*, std::unordered_map<const MESH*, Parameters>> parameters_;
+	std::unordered_map<View*, ViewParameters> view_parameters_;
 	std::vector<std::shared_ptr<boost::synapse::connection>> connections_;
 	std::unordered_map<const MESH*, std::vector<std::shared_ptr<boost::synapse::connection>>> mesh_connections_;
 	MeshProvider<MESH>* mesh_provider_;
