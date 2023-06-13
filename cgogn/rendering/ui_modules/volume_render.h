@@ -105,8 +105,11 @@ class VolumeRender : public ViewModule
 			param_plane_->sha_data_ = sha_data_;
 
 			Eigen::Transform<float, 3, Eigen::Affine> trf =
-				Eigen::Translation3f(Eigen::Vector3f(0, 0, -4)) * Eigen::Scaling(4.0f);
+				Eigen::Translation3f(Eigen::Vector3f(0, 0, -4)) * Eigen::Scaling(2000.0f);
 			param_plane_->transfo_ = trf.matrix();
+			param_plane_->scale_xy_ = 1000.0f;
+
+			//sha_data_->start(2048);
 
 		}
 		
@@ -633,8 +636,11 @@ protected:
 				if (p.render_volumes_)
 				{
 					p.data_.light_position_ = lpv.cast<float>();
+//					glPolygonOffset(0.0f, 0.0f);
 					glEnable(GL_POLYGON_OFFSET_FILL);
-					glPolygonOffset(1.0f, 1.5f);
+					glPolygonOffset(poff1, poff2);
+					std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
+
 
 					p.param_volume_generate_shadows_->bind(light_projection_matrix.cast<float>(),
 														   light_view_matrix.cast<float>());
@@ -646,8 +652,9 @@ protected:
 
 			glDisable(GL_CULL_FACE);
 		// IF  USEPLANE ...
+			glDisable(GL_DEPTH_TEST);
 			vp.param_plane_->draw(view->projection_matrix(), view->modelview_matrix());
-
+			glEnable(GL_DEPTH_TEST);
 		}
 
 
@@ -661,7 +668,9 @@ protected:
 			if (p.render_volumes_)
 			{
 				glEnable(GL_POLYGON_OFFSET_FILL);
-				glPolygonOffset(1.0f, 1.5f);
+				glPolygonOffset(poff1, poff2);
+				std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
+				// glPolygonOffset(0.0f, 0.0f);
 
 				switch (p.color_per_cell_)
 				{
@@ -715,10 +724,15 @@ protected:
 				break;
 				}
 
-				glDisable(GL_POLYGON_OFFSET_FILL);
+//				glEnable(GL_POLYGON_OFFSET_LINE);
+				//glPolygonOffset(0.9f, -1.0f);
+//				glDisable(GL_POLYGON_OFFSET_FILL);
 
 				if (p.render_volume_lines_ && p.param_volume_line_->attributes_initialized())
 				{
+					//glEnable(GL_POLYGON_OFFSET_LINE);
+					//glPolygonOffset(poff1, poff2);
+					glDisable(GL_POLYGON_OFFSET_LINE);
 					p.param_volume_line_->bind(proj_matrix, view_matrix);
 					md.draw(rendering::VOLUMES_EDGES);
 					p.param_volume_line_->release();
@@ -727,6 +741,10 @@ protected:
 
 			if (p.render_edges_ && p.param_bold_line_->attributes_initialized())
 			{
+				//glEnable(GL_POLYGON_OFFSET_FILL);
+				//glPolygonOffset(poff1, poff2);
+				//std::cout << "glPolygonOffset" << poff1 << " , " <<poff2<< std::endl;
+				glDisable(GL_POLYGON_OFFSET_FILL);
 				p.param_bold_line_->bind(proj_matrix, view_matrix);
 				md.draw(rendering::LINES);
 				p.param_bold_line_->release();
@@ -734,6 +752,7 @@ protected:
 
 			if (p.render_vertices_ && p.param_point_sprite_->attributes_initialized())
 			{
+				glDisable(GL_POLYGON_OFFSET_FILL);
 				p.param_point_sprite_->point_size_ = p.vertex_base_size_ * p.vertex_scale_factor_;
 				p.param_point_sprite_->bind(proj_matrix, view_matrix);
 				md.draw(rendering::POINTS);
@@ -1004,6 +1023,8 @@ protected:
 					}
 				}
 				ImGui::EndGroup();
+				need_update |= ImGui::SliderFloat("POFF1", &poff1, -3.0f, 3.0f, "%.3f");
+				need_update |= ImGui::SliderFloat("POFF2", &poff2, - 3.0f, 3.0f, "%.3f");
 			}
 
 			float64 remain = mesh_provider_->mesh_data(*selected_mesh_).outlined_until_ - App::frame_time_;
@@ -1017,6 +1038,8 @@ protected:
 	}
 
 private:
+	float poff1 = -1.0;
+	float poff2 = -1.0;
 	View* selected_view_;
 	const MESH* selected_mesh_;
 	std::unordered_map<View*, std::unordered_map<const MESH*, Parameters>> parameters_;

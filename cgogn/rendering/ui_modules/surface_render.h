@@ -576,8 +576,8 @@ protected:
 					glEnable(GL_BLEND);
 					glBlendFunc(GL_ONE, GL_ONE);
 				}
-				glEnable(GL_POLYGON_OFFSET_FILL);
-				glPolygonOffset(1.0f, 1.5f);
+				//glEnable(GL_POLYGON_OFFSET_FILL);
+				//glPolygonOffset(1.0f, 1.5f);
 
 				switch (p.normal_per_cell_)
 				{
@@ -715,7 +715,7 @@ protected:
 					cgogn_assert_not_reached("");
 				}
 
-				glDisable(GL_POLYGON_OFFSET_FILL);
+				//glDisable(GL_POLYGON_OFFSET_FILL);
 				if (p.ghost_mode_)
 				{
 					glDisable(GL_BLEND);
@@ -725,6 +725,7 @@ protected:
 
 			if (p.render_edges_)
 			{
+				glPolygonOffset(-1.0f, -1.5f);
 				switch (p.edge_color_per_cell_)
 				{
 				case GLOBAL: {
@@ -752,6 +753,7 @@ protected:
 
 			if (p.render_vertices_)
 			{
+				glPolygonOffset(-1.0f, -1.5f);
 				if (p.vertex_radius_)
 				{
 					switch (p.point_color_per_cell_)

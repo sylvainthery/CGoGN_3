@@ -164,6 +164,8 @@ void View::draw()
 			fbo_->bind();
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			glEnable(GL_POLYGON_OFFSET_LINE);
 			GLenum idbuf = GL_COLOR_ATTACHMENT0;
 			glDrawBuffers(1, &idbuf);
 			for (ViewModule* m : linked_view_modules_)

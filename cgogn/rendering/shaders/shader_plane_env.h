@@ -42,12 +42,14 @@ class CGOGN_RENDERING_EXPORT ShaderParamPlaneShadow : public ShaderParam
 
 public:
 	std::shared_ptr<ShadowData> sha_data_;
+	GLMat4 proj_;
 	GLMat4 transfo_;
+	float scale_xy_;
 	GLVec4 color_;
 
 	using ShaderType = ShaderPlaneShadow;
 
-	inline ShaderParamPlaneShadow(ShaderType* sh) : ShaderParam(sh), color_{0.9f, 0.9f, 0.9f,1.0f}, sha_data_(nullptr)
+	inline ShaderParamPlaneShadow(ShaderType* sh) : ShaderParam(sh), sha_data_(nullptr), scale_xy_(1.0f), color_{0.9f, 0.9f, 0.9f, 1.0f}
 	{
 	}
 

@@ -146,6 +146,7 @@ protected:
 
 	void draw(View* view) override
 	{
+		glPolygonOffset(-3.0f, -1.5f);
 		for (auto& [m, p] : parameters_[view])
 		{
 
