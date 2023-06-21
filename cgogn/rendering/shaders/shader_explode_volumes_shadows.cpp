@@ -71,8 +71,10 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 
 	const char* fragment_shader_source = R"(
 		#version 330
+		////out vec3 frago;
 		void main()
 		{
+			//frago =vec3(gl_FragCoord.z);
 		}
 	)";
 
@@ -129,7 +131,7 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		uniform vec4 plane_clip2;
 
 		out vec3 position;
-		out vec3 ShCoord;
+		out vec4 ShCoord;
 
 		void main()
 		{
@@ -148,8 +150,7 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				position = position4.xyz;
 				gl_Position = projection_matrix * position4;
-				vec4 shc4 = shadow_matrix * vec4(explode_position, 1.0);
-				ShCoord = shc4.xyz/shc4.w;
+				ShCoord = shadow_matrix * vec4(explode_position, 1.0);
 			}
 			else
 			{
@@ -161,11 +162,11 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 	const char* fragment_shader_source = R"(
 		#version 330
 		uniform vec4 color;
-		uniform vec3 light_position;
+		uniform vec3 light_dir;
 		uniform sampler2DShadow TUshadow;
 		
 		in vec3 position;
-		in vec3 ShCoord;
+		in vec4 ShCoord;
 
 		out vec4 frag_out;
 
@@ -173,22 +174,23 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		float compute_shadow(float dnl)
 		{
 			float bias_shd = 0.001+0.001*tan(acos(dnl));
-			float shcz = ShCoord.z-bias_shd;
-			return dnl*texture(TUshadow, vec3(ShCoord.xy,shcz));
+			
+			float shcz = ShCoord.z/ShCoord.w+bias_shd;
+			return dnl*texture(TUshadow, vec3(ShCoord.xy/ShCoord.w,shcz));
 		}
 		
 		void main()
 		{
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
-			vec3 L = normalize(light_position - position);
+			vec3 L = normalize(light_dir);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2*max(0.0,N.z) + 0.7 * compute_shadow(dnl);
+			float lambert = 0.1*max(0.0,N.z) + 0.8 * compute_shadow(dnl);
 			frag_out = vec4(lambert * color.rgb, color.a);
 		}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_position",
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_dir",
 				 "explode", "plane_clip", "plane_clip2", "shadow_matrix", "TUshadow");
 
 	nb_attributes_ = 2;
@@ -196,7 +198,7 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 
 void ShaderParamExplodeVolumesShadows::set_uniforms()
 {
-	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, sha_data_->light_position_,
+	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, sha_data_->light_dir_,
 								 data_->explode_, data_->plane_clip_, data_->plane_clip2_,
 								 sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0));
 }

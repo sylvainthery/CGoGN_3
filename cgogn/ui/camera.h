@@ -60,6 +60,7 @@ private:
 	float64 focal_distance_;
 	mutable rendering::GLMat4d proj_d_;
 	mutable rendering::GLMat4d mv_d_;
+
 	mutable rendering::GLMat4 proj_;
 	mutable rendering::GLMat4 mv_;
 
@@ -79,7 +80,8 @@ public:
 	{
 	}
 
-	//rendering::GLMat4d orthographic() const;
+
+	static rendering::GLMat4d Camera::orthographic(double l, double r, double b, double t, double zfar, double znear);
 
 	inline float64 width() const
 	{
@@ -93,15 +95,15 @@ public:
 	inline void update_matrices()
 	{
 		float64 d = focal_distance_ - frame_.translation().z();
-		float64 znear = std::max(0.0001, d - scene_radius_);
+		//float64 znear = std::max(0.05, d - scene_radius_);
+		float64 znear = std::max(scene_radius_ / 16.0, d - scene_radius_);
 		float64 zfar = d + scene_radius_;
 		proj_d_ = ((type_ == PERSPECTIVE) ? perspective(znear, zfar) : orthographic(znear, zfar));
-		proj_ = proj_d_.cast<float32>();
+		proj_ = proj_d_.cast<float32>();	
 
-		rendering::Transfo3d m = (type_ == PERSPECTIVE)
-										? Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) *
-											frame_ * Eigen::Translation3d(-pivot_point_)
-										: frame_ ;
+		rendering::Transfo3d m = (type_ == PERSPECTIVE) ? 
+			Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) * frame_ * Eigen::Translation3d(-pivot_point_) 
+						: frame_;
 		mv_d_ = m.matrix();
 		mv_ = mv_d_.cast<float32>();
 	}

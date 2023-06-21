@@ -44,13 +44,14 @@ struct ExplodeVolumeData
 	GLColor color_line_;
 	shader_function::ColorMap::Uniforms color_map_;
 	GLMat4 shadow_matrix_;
+	GLVec3 light_dir_;
 	std::shared_ptr<FBO> fbo_shadows_;
 	GLVec3 light_position_;
 	float32 explode_;
 
 	inline ExplodeVolumeData()
 		: plane_clip_(0, 0, 0, 0), plane_clip2_(0, 0, 0, 0), color_(0.9f, 0, 0, 1),
-		  light_position_(0,0,0), fbo_shadows_(nullptr), explode_(0.9f)
+		  light_dir_(0,0,0), fbo_shadows_(nullptr), explode_(0.9f)
 	{}
 };
 
@@ -58,6 +59,7 @@ struct ShadowData
 {
 	GLMat4d shadow_matrix_;
 	GLVec3d light_position_;
+	GLVec3d light_dir_;
 	std::shared_ptr<FBO> fbo_shadows_;
 	bool use_shadows_;
 

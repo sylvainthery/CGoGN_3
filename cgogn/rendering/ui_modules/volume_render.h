@@ -99,10 +99,33 @@ class VolumeRender : public ViewModule
 
 		ViewParameters() : use_shadows_(false)
 		{
-			norm_light_dir_ = rendering::GLVec3d{30.0, 10.0, 50.0}.normalized();
+			norm_light_dir_ = rendering::GLVec3d{400.0, 400.0, 1500.0}.normalized();
 			sha_data_ = std::make_shared<rendering::ShadowData>();
+			
 			param_plane_ = rendering::ShaderPlaneShadow::generate_param();
 			param_plane_->sha_data_ = sha_data_;
+			param_plane_->tex_col_ = std::make_shared<rendering::Texture2D>();
+
+			std::vector < uint8 > tex_data;
+			const uint32 tex_sz = 256;
+			tex_data.reserve(tex_sz * tex_sz);
+			for (int i = 0; i < tex_sz; ++i)
+				tex_data.push_back(0);
+			for (int j = 1; j < tex_sz; ++j)
+			{
+				tex_data.push_back(0);
+				for (int i = 1; i < tex_sz; ++i)
+					tex_data.push_back(240);
+			}
+			param_plane_->tex_col_->allocate(tex_sz, tex_sz, GL_R8, GL_RED, tex_data.data(), GL_UNSIGNED_BYTE);
+			param_plane_->tex_col_->bind();
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			param_plane_->tex_col_->release();
+
 
 			Eigen::Transform<float, 3, Eigen::Affine> trf =
 				Eigen::Translation3f(Eigen::Vector3f(0, 0, -4)) * Eigen::Scaling(2000.0f);
@@ -501,7 +524,7 @@ public:
 		if (on_off)
 		{
 			//view->camera().set_type(Camera::Type::ORTHOGRAPHIC);
-			view_parameters_[view].sha_data_->start(2048);
+			view_parameters_[view].sha_data_->start(16384);
 		}
 		else
 		{
@@ -571,10 +594,9 @@ protected:
 		if (vp.use_shadows_)
 		{
 			const Camera& cam = app_.current_view()->camera();
-			float64 sd = 64.0 * cam.scene_radius(); 
-			float64 sr = cam.scene_radius(); //*0.9 ?
-
-			rendering::GLVec3d light_position = cam.pivot_point() + sd * vp.norm_light_dir_;
+						
+			float64 sd = 2.0 * cam.scene_radius(); 
+			float64 sr = cam.scene_radius();// *0.9 ?;//			rendering::GLVec3d light_position = cam.pivot_point() + sd * vp.norm_light_dir_;
 
 			auto orthographic = [&]() {
 				float64 hw = 1.0 / sr;
@@ -584,6 +606,7 @@ protected:
 			};
 
 			rendering::GLMat4d light_projection_matrix = orthographic();
+			//rendering::GLMat4d light_projection_matrix = Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr);
 
 			// warning dir & up mus be normalized
 			auto look_dir = [](const rendering::GLVec3d& eye, const rendering::GLVec3d& dir,
@@ -591,7 +614,7 @@ protected:
 				rendering::GLVec3d zAxis = -dir; //.normalized();
 				//rendering::GLVec3d xAxis = up.normalized().cross(zAxis).normalized();
 				rendering::GLVec3d xAxis = up.cross(zAxis).normalized();
-				rendering::GLVec3d yAxis = zAxis.cross(xAxis).normalized();
+				rendering::GLVec3d yAxis = zAxis.cross(xAxis); //.normalized();
 
 				rendering::GLMat4d trf;
 				trf.block<1, 3>(0, 0) = xAxis.transpose();
@@ -605,13 +628,14 @@ protected:
 			};
 
 			rendering::GLMat4d light_view_matrix =
-				look_dir(light_position, - vp.norm_light_dir_, rendering::GLVec3d(0, 0, 1));
+				look_dir(cam.pivot_point() + 2.0* sr * vp.norm_light_dir_, - vp.norm_light_dir_, rendering::GLVec3d(0, 0, 1));
 			
 			vp.sha_data_->fbo_shadows_->bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			glCullFace(GL_FRONT);
 
 			double wh = cam.scene_radius();	
 
@@ -624,22 +648,26 @@ protected:
 			vp.sha_data_->shadow_matrix_ =
 				biasmat * light_projection_matrix * light_view_matrix;
 
-			rendering::GLVec3d lpv = (view->modelview_matrix_d() *
-									  rendering::GLVec4d(light_position[0], light_position[1], light_position[2], 1.0))
-										 .block<3, 1>(0, 0);
+			//rendering::GLVec3d light_position_render = cam.pivot_point() + 4.0 * sd * vp.norm_light_dir_;
+			//
+			//rendering::GLVec3d lpv = (view->modelview_matrix_d(). *
+			//						  rendering::GLVec4d(light_position_render[0], light_position_render[1], light_position_render[2], 1.0))
+			//							 .block<3, 1>(0, 0);
 
-			//std::cout << lpv.transpose() << std::endl;
-			vp.sha_data_->light_position_ = lpv;
+			rendering::GLVec3d ldv = Eigen::Affine3d(view->modelview_matrix_d()).linear().inverse().transpose().matrix() *
+						  vp.norm_light_dir_;
+			vp.sha_data_->light_dir_ = ldv;
+				
 
 			for (auto& [m, p] : parameters_[view])
 			{
 				if (p.render_volumes_)
 				{
-					p.data_.light_position_ = lpv.cast<float>();
+					p.data_.light_dir_ = ldv.cast<float>();
 //					glPolygonOffset(0.0f, 0.0f);
-					glEnable(GL_POLYGON_OFFSET_FILL);
-					glPolygonOffset(poff1, poff2);
-					std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
+					//glEnable(GL_POLYGON_OFFSET_FILL);
+					//glPolygonOffset(poff1, poff2);
+					//std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
 
 
 					p.param_volume_generate_shadows_->bind(light_projection_matrix.cast<float>(),
@@ -667,9 +695,9 @@ protected:
 
 			if (p.render_volumes_)
 			{
-				glEnable(GL_POLYGON_OFFSET_FILL);
-				glPolygonOffset(poff1, poff2);
-				std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
+				//glEnable(GL_POLYGON_OFFSET_FILL);
+				//glPolygonOffset(poff1, poff2);
+				//std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
 				// glPolygonOffset(0.0f, 0.0f);
 
 				switch (p.color_per_cell_)
@@ -679,8 +707,8 @@ protected:
 					{
 						if (p.param_volume_shadows_->attributes_initialized())
 						{
-							std::cout << "======= BIAS MAT ======" << std::endl;
-							std::cout << vp.sha_data_->shadow_matrix_ << std::endl;
+							//std::cout << "======= BIAS MAT ======" << std::endl;
+							//std::cout << vp.sha_data_->shadow_matrix_ << std::endl;
 
 							p.param_volume_shadows_->bind(proj_matrix, view_matrix);
 							md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
@@ -732,7 +760,7 @@ protected:
 				{
 					//glEnable(GL_POLYGON_OFFSET_LINE);
 					//glPolygonOffset(poff1, poff2);
-					glDisable(GL_POLYGON_OFFSET_LINE);
+					//glDisable(GL_POLYGON_OFFSET_LINE);
 					p.param_volume_line_->bind(proj_matrix, view_matrix);
 					md.draw(rendering::VOLUMES_EDGES);
 					p.param_volume_line_->release();

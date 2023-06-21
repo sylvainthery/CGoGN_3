@@ -51,17 +51,18 @@ rendering::GLMat4d Camera::orthographic(float64 znear, float64 zfar) const
 	return m;
 }
 
-//rendering::GLMat4d Camera::orthographic() const
-//{
-//	float64 znear = -scene_radius();
-//	float64 zfar = scene_radius();
-//	float64 range_inv = 1.0 / (znear - zfar);
-//	auto m05 =
-//		(aspect_ratio_ < 1) ? std::make_pair(1.0 / aspect_ratio_, 1.0) : std::make_pair(1.0, 1.0 / aspect_ratio_);
-//	rendering::GLMat4d m;
-//	m << m05.first, 0, 0, 0, 0, m05.second, 0, 0, 0, 0, 2 * range_inv, 0, 0, 0, (znear + zfar) * range_inv, 0;
-//	return m;
-//}
+rendering::GLMat4d Camera::orthographic(double l, double r, double b, double t, double zfar, double znear) 
+{
+	float64 inv_w = 1.0 / (r - l);
+	float64 inv_h = 1.0 / (t- b);
+	float64 inv_z = 1.0 / (znear - zfar);
+	rendering::GLMat4d m;
+	m << 2.0 * inv_w, 0.0, 0.0, -(r + l) * inv_w,
+		0.0, 2.0 * inv_h, 0.0, -(t + b) * inv_h, 
+		0.0, 0.0, 0.0, 2.0 * inv_z, (znear + zfar) * inv_z,
+		0.0, 0.0, 0.0, 1.0;
+	return m;
+}
 
 } // namespace ui
 

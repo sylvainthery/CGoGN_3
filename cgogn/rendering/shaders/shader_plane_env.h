@@ -27,6 +27,7 @@
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
+#include <cgogn/rendering/texture.h>
 
 namespace cgogn
 {
@@ -45,11 +46,11 @@ public:
 	GLMat4 proj_;
 	GLMat4 transfo_;
 	float scale_xy_;
-	GLVec4 color_;
-
+	std::shared_ptr<Texture2D> tex_col_;
+	
 	using ShaderType = ShaderPlaneShadow;
 
-	inline ShaderParamPlaneShadow(ShaderType* sh) : ShaderParam(sh), sha_data_(nullptr), scale_xy_(1.0f), color_{0.9f, 0.9f, 0.9f, 1.0f}
+	inline ShaderParamPlaneShadow(ShaderType* sh) : ShaderParam(sh), sha_data_(nullptr), scale_xy_(1.0f), tex_col_(nullptr)
 	{
 	}
 
