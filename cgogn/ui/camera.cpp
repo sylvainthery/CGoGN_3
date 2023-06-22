@@ -51,16 +51,20 @@ rendering::GLMat4d Camera::orthographic(float64 znear, float64 zfar) const
 	return m;
 }
 
-rendering::GLMat4d Camera::orthographic(double l, double r, double b, double t, double zfar, double znear) 
+rendering::GLMat4d Camera::orthographic(double l, double r, double b, double t, double znear, double zfar) 
 {
 	float64 inv_w = 1.0 / (r - l);
 	float64 inv_h = 1.0 / (t- b);
-	float64 inv_z = 1.0 / (znear - zfar);
+	float64 inv_z = 1.0 / (zfar - znear);
 	rendering::GLMat4d m;
 	m << 2.0 * inv_w, 0.0, 0.0, -(r + l) * inv_w,
 		0.0, 2.0 * inv_h, 0.0, -(t + b) * inv_h, 
-		0.0, 0.0, 0.0, 2.0 * inv_z, (znear + zfar) * inv_z,
+		0.0, 0.0, -2.0 * inv_z, -(znear + zfar) * inv_z,
 		0.0, 0.0, 0.0, 1.0;
+	//m << 2.0 * inv_w, 0.0, 0.0, 0.0,
+	//	0.0, 2.0 * inv_w, 0.0, 0.0,
+	//	0.0, 0.0, 2.0 * inv_z,0.0,
+	//	0.0, 0.0, (znear + zfar) * inv_z, 1.0;
 	return m;
 }
 

@@ -93,7 +93,7 @@ class VolumeRender : public ViewModule
 
 		std::shared_ptr<rendering::ShadowData> sha_data_;
 		rendering::GLVec3d norm_light_dir_;
-		//Camera light_cam_;
+		// Camera light_cam_;
 		bool use_shadows_;
 		std::unique_ptr<rendering::ShaderPlaneShadow::Param> param_plane_;
 
@@ -101,12 +101,12 @@ class VolumeRender : public ViewModule
 		{
 			norm_light_dir_ = rendering::GLVec3d{400.0, 400.0, 1500.0}.normalized();
 			sha_data_ = std::make_shared<rendering::ShadowData>();
-			
+
 			param_plane_ = rendering::ShaderPlaneShadow::generate_param();
 			param_plane_->sha_data_ = sha_data_;
 			param_plane_->tex_col_ = std::make_shared<rendering::Texture2D>();
 
-			std::vector < uint8 > tex_data;
+			std::vector<uint8> tex_data;
 			const uint32 tex_sz = 256;
 			tex_data.reserve(tex_sz * tex_sz);
 			for (int i = 0; i < tex_sz; ++i)
@@ -126,31 +126,25 @@ class VolumeRender : public ViewModule
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			param_plane_->tex_col_->release();
 
-
 			Eigen::Transform<float, 3, Eigen::Affine> trf =
 				Eigen::Translation3f(Eigen::Vector3f(0, 0, -4)) * Eigen::Scaling(2000.0f);
 			param_plane_->transfo_ = trf.matrix();
 			param_plane_->scale_xy_ = 1000.0f;
 
-			//sha_data_->start(2048);
-
+			// sha_data_->start(2048);
 		}
-		
 	};
-
 
 	struct Parameters
 	{
 		Parameters()
-			: vertex_position_(nullptr),
-			  vertex_position_vbo_(nullptr), vertex_clipping_position_(nullptr),
+			: vertex_position_(nullptr), vertex_position_vbo_(nullptr), vertex_clipping_position_(nullptr),
 			  volume_clipping_position_(nullptr), volume_clipping_position_vbo_(nullptr), volume_scalar_(nullptr),
 			  volume_scalar_vbo_(nullptr), volume_color_(nullptr), volume_color_vbo_(nullptr), volume_center_(nullptr),
 			  volume_center_vbo_(nullptr), render_vertices_(false), render_edges_(false), render_volumes_(true),
 			  render_volume_lines_(true), render_shadow_(false), color_per_cell_(GLOBAL), color_type_(SCALAR),
-			  vertex_scale_factor_(1.0),
-			  auto_update_volume_scalar_min_max_(true), clipping_plane_(false), clip_only_volumes_(true),
-			  show_frame_manipulator_(false), manipulating_frame_(false)
+			  vertex_scale_factor_(1.0), auto_update_volume_scalar_min_max_(true), clipping_plane_(false),
+			  clip_only_volumes_(true), show_frame_manipulator_(false), manipulating_frame_(false)
 		{
 			param_point_sprite_ = rendering::ShaderPointSprite::generate_param();
 			param_point_sprite_->color_ = rendering::GLColor(1, 0.5f, 0, 1);
@@ -176,7 +170,7 @@ class VolumeRender : public ViewModule
 			param_volume_color_->data_ = &data_;
 			param_volume_color_smooth_->data_ = &data_;
 			param_volume_line_->data_ = &data_;
-	
+
 			data_.color_ = {0.4f, 0.8f, 1.0f, 1.0f};
 			data_.color_line_ = {0.0f, 0.0f, 0.0f, 1.0f};
 
@@ -217,15 +211,14 @@ class VolumeRender : public ViewModule
 		std::unique_ptr<rendering::ShaderExplodeVolumesColorSmooth::Param> param_volume_color_smooth_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesScalarSmooth::Param> param_volume_scalar_smooth_;
 
-		
 		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volume_shadows_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesGenerateShadows::Param> param_volume_generate_shadows_;
-		
+
 		rendering::ShaderParam* param_volume_gen_;
 		rendering::ShaderParam* param_volume_gen_shadows_;
 		rendering::ShaderParam* param_volume_color_gen_;
 		rendering::ShaderParam* param_volume_scalar_gen_;
-	
+
 		bool render_vertices_;
 		bool render_edges_;
 		bool render_volumes_;
@@ -271,9 +264,9 @@ private:
 
 				vp.norm_light_dir_ = rendering::GLVec3d{10.0, 1.0, 50.0}.normalized();
 				vp.sha_data_ = std::make_shared<rendering::ShadowData>();
-				//vp.param_FS_ = rendering::ShaderFullScreenTexture::generate_param();
+				// vp.param_FS_ = rendering::ShaderFullScreenTexture::generate_param();
 			}
-				
+
 			p.param_volume_shadows_->sha_data_ = vp.sha_data_;
 
 			p.volume_center_ = add_attribute<Vec3, Volume>(*m, "__volume_center");
@@ -357,7 +350,8 @@ public:
 		p.param_bold_line_->set_vbos({p.vertex_position_vbo_, p.vertex_clipping_position_vbo_});
 
 		p.param_volume_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
-		p.param_volume_smooth_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
+		p.param_volume_smooth_->set_vbos(
+			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
 		p.param_volume_shadows_->set_vbos(
 			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
@@ -414,13 +408,14 @@ public:
 		p.param_bold_line_->set_vbos({p.vertex_position_vbo_, p.vertex_clipping_position_vbo_});
 
 		p.param_volume_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
-		p.param_volume_smooth_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
+		p.param_volume_smooth_->set_vbos(
+			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
 		p.param_volume_line_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
-		p.param_volume_color_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
-		p.param_volume_color_smooth_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
-
-
+		p.param_volume_color_->set_vbos(
+			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
+		p.param_volume_color_smooth_->set_vbos(
+			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
 
 		p.param_volume_scalar_->set_vbos(
 			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_, p.volume_clipping_position_vbo_});
@@ -482,25 +477,25 @@ public:
 	{
 		Parameters& p = parameters_[&v][&m];
 		p.data_.explode_ = expl;
-		//p.param_volume_line_->explode_ = expl;
-		//p.param_volume_color_->data_->explode_ = expl;
-		//p.param_volume_scalar_->data_->explode_ = expl;
-		//p.param_volume_smooth_->data_->explode_ = expl;
-		//p.param_volume_color_smooth_->data_->explode_ = expl;
-		//p.param_volume_scalar_smooth_->data_->explode_ = expl;
+		// p.param_volume_line_->explode_ = expl;
+		// p.param_volume_color_->data_->explode_ = expl;
+		// p.param_volume_scalar_->data_->explode_ = expl;
+		// p.param_volume_smooth_->data_->explode_ = expl;
+		// p.param_volume_color_smooth_->data_->explode_ = expl;
+		// p.param_volume_scalar_smooth_->data_->explode_ = expl;
 	}
 
 	void set_smoothing(const MESH& m, bool smo)
 	{
 		MeshData<MESH>& md = mesh_provider_->mesh_data(m);
-		if(smo)
+		if (smo)
 			for (auto& vp : parameters_)
 			{
 				vp.second[&m].param_volume_gen_ = vp.second[&m].param_volume_smooth_.get();
 				vp.second[&m].param_volume_color_gen_ = vp.second[&m].param_volume_color_smooth_.get();
 				vp.second[&m].param_volume_scalar_gen_ = vp.second[&m].param_volume_scalar_smooth_.get();
 			}
-				
+
 		else
 			for (auto& vp : parameters_)
 			{
@@ -513,7 +508,7 @@ public:
 		md.mesh_render()->set_primitive_dirty(rendering::DrawingType::VOLUMES_FACES);
 	}
 
-	//void set_light_dir(const MESH& m, const Eigen::Vector3f& LD)
+	// void set_light_dir(const MESH& m, const Eigen::Vector3f& LD)
 	//{
 	//	parameters_[current_view][&m].light_dir = LD;
 	//	view_parameters_[current_view].data_.light_dir = LD;
@@ -523,18 +518,15 @@ public:
 	{
 		if (on_off)
 		{
-			//view->camera().set_type(Camera::Type::ORTHOGRAPHIC);
+			// view->camera().set_type(Camera::Type::ORTHOGRAPHIC);
 			view_parameters_[view].sha_data_->start(16384);
 		}
 		else
 		{
-			//view->camera().set_type(Camera::Type::PERSPECTIVE);
+			// view->camera().set_type(Camera::Type::PERSPECTIVE);
 			view_parameters_[view].sha_data_->stop();
 		}
-			
 	}
-
-	
 
 protected:
 	void update_volume_scalar_min_max_values(Parameters& p)
@@ -584,8 +576,6 @@ protected:
 		mesh_provider_->foreach_mesh([this](MESH& m, const std::string&) { init_mesh(&m); });
 		connections_.push_back(boost::synapse::connect<typename MeshProvider<MESH>::mesh_added>(
 			mesh_provider_, this, &VolumeRender<MESH>::init_mesh));
-
-
 	}
 
 	void draw(View* view) override
@@ -594,25 +584,23 @@ protected:
 		if (vp.use_shadows_)
 		{
 			const Camera& cam = app_.current_view()->camera();
-						
-			float64 sd = 2.0 * cam.scene_radius(); 
-			float64 sr = cam.scene_radius();// *0.9 ?;//			rendering::GLVec3d light_position = cam.pivot_point() + sd * vp.norm_light_dir_;
 
-			auto orthographic = [&]() {
-				float64 hw = 1.0 / sr;
-				rendering::GLMat4d m;
-				m << hw, 0, 0, 0, 0, hw, 0, 0, 0, 0, -hw, -sd*hw, 0, 0, 0, 1;
-				return m;
-			};
+			float64 sd = 2.0 * cam.scene_radius();
+			float64 sr = cam.scene_radius(); // *0.9 ?;//			rendering::GLVec3d light_position =
+											 // cam.pivot_point() + sd * vp.norm_light_dir_;
 
-			rendering::GLMat4d light_projection_matrix = orthographic();
-			//rendering::GLMat4d light_projection_matrix = Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr);
+			// auto orthographic = [&]() {
+			//	float64 hw = 1.0 / sr;
+			//	rendering::GLMat4d m;
+			//	m << hw, 0, 0, 0, 0, hw, 0, 0, 0, 0, -hw, -sd*hw, 0, 0, 0, 1;
+			//	return m;
+			//};
 
 			// warning dir & up mus be normalized
 			auto look_dir = [](const rendering::GLVec3d& eye, const rendering::GLVec3d& dir,
 							   const rendering::GLVec3d& up) {
 				rendering::GLVec3d zAxis = -dir; //.normalized();
-				//rendering::GLVec3d xAxis = up.normalized().cross(zAxis).normalized();
+				// rendering::GLVec3d xAxis = up.normalized().cross(zAxis).normalized();
 				rendering::GLVec3d xAxis = up.cross(zAxis).normalized();
 				rendering::GLVec3d yAxis = zAxis.cross(xAxis); //.normalized();
 
@@ -627,8 +615,53 @@ protected:
 				return trf;
 			};
 
-			rendering::GLMat4d light_view_matrix =
-				look_dir(cam.pivot_point() + 2.0* sr * vp.norm_light_dir_, - vp.norm_light_dir_, rendering::GLVec3d(0, 0, 1));
+			rendering::GLMat4d light_view_matrix = look_dir(cam.pivot_point() + 2.0 * sr * vp.norm_light_dir_,
+															-vp.norm_light_dir_, rendering::GLVec3d(0, 0, 1));
+
+			rendering::GLMat4d inv_pv = (cam.projection_matrix_d() * cam.modelview_matrix_d()).inverse();
+
+			std::vector<rendering::GLVec3d> corners;
+			corners.reserve(8);
+			for (int x = -1; x <= 1; x += 2)
+				for (int y = -1; y <= 1; y += 2)
+					for (int z = -1; z <= 1; z += 2)
+					{
+						rendering::GLVec4d p = inv_pv * rendering::GLVec4d(x, y, z, 1.0f);
+						p /= p.w();
+						corners.push_back((light_view_matrix * p).block<3, 1>(0, 0));
+					}
+			rendering::GLVec3d minP{std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
+									std::numeric_limits<double>::max()};
+			rendering::GLVec3d maxP{std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest(),
+									std::numeric_limits<double>::lowest()};
+
+			for (const auto& v : corners)
+			{
+				for (uint32 i = 0; i < 3; ++i)
+				{
+					minP[i] = std::min(minP[i], v[i]);
+					maxP[i] = std::max(maxP[i], v[i]);
+				}
+			}
+
+			std::cout << minP.transpose() << "  /  " << maxP.transpose() << std::endl;
+
+			// rendering::GLMat4d light_projection_matrix = orthographic();
+			// rendering::GLMat4d light_projection_matrix = Camera::orthographic(-sr, sr, -sr, sr, sd - sr, sd + sr);
+			rendering::GLMat4d light_projection_matrix =
+				Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], minP[2], maxP[2] );
+
+			 std::cout << "Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr)" << std::endl;
+			 std::cout << Camera::orthographic(-sr, sr, -sr, sr, sd - sr, sd + sr) << std::endl;
+			 std::cout << "Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], minP[2], maxP[2] )" << std::endl;
+			 std::cout << Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], minP[2], maxP[2]) << std::endl;
+			 std::cout << "------------------------------" << std::endl;
+
+			//std::cout << "orthographic()" << std::endl;
+			//std::cout << orthographic() << std::endl;
+			//std::cout << "Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr)" << std::endl;
+			//std::cout << Camera::orthographic(-sr, sr, -sr, sr, sd - sr, sd + sr) << std::endl;
+
 			
 			vp.sha_data_->fbo_shadows_->bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
