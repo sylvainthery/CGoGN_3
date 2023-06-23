@@ -71,10 +71,10 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 
 	const char* fragment_shader_source = R"(
 		#version 330
-		////out vec3 frago;
+		//out vec3 frago;
 		void main()
 		{
-			//frago =vec3(gl_FragCoord.z);
+			//frago =vec3(abs(gl_FragCoord.z));
 		}
 	)";
 
@@ -173,7 +173,7 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 
 		float compute_shadow(float dnl)
 		{
-			float bias_shd = 0.001+0.001*tan(acos(dnl));
+			float bias_shd = 0.00001+0.00001*tan(acos(dnl));
 			
 			float shcz = ShCoord.z/ShCoord.w+bias_shd;
 			return dnl*texture(TUshadow, vec3(ShCoord.xy/ShCoord.w,shcz));
@@ -185,7 +185,7 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 			vec3 L = normalize(light_dir);
 			float dnl = max(0.0, dot(N, L));
 			float lambert = 0.1*max(0.0,N.z) + 0.8 * compute_shadow(dnl);
-			frag_out = vec4(lambert * color.rgb, color.a);
+			frag_out = vec4(lambert * color.rgb, color.a);//*0.000001+vec4(ShCoord.wyz/ShCoord.w,1.0);
 		}
 	)";
 

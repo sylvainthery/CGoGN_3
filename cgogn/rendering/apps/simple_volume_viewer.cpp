@@ -67,14 +67,14 @@ int main(int argc, char** argv)
 
 	cgogn::ui::MeshProvider<Mesh> mp(app);
 	cgogn::ui::VolumeRender<Mesh> vr(app);
-	cgogn::ui::TopoRender<Mesh> tpr(app);
+	//cgogn::ui::TopoRender<Mesh> tpr(app);
 
 	app.init_modules();
 
 	cgogn::ui::View* v1 = app.current_view();
 	v1->link_module(&mp);
 	v1->link_module(&vr);
-	v1->link_module(&tpr);
+	//v1->link_module(&tpr);
 
 	Mesh* m = mp.load_volume_from_file(filename);
 	if (!m)

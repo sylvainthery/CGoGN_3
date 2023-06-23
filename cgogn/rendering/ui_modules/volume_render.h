@@ -130,8 +130,6 @@ class VolumeRender : public ViewModule
 				Eigen::Translation3f(Eigen::Vector3f(0, 0, -4)) * Eigen::Scaling(2000.0f);
 			param_plane_->transfo_ = trf.matrix();
 			param_plane_->scale_xy_ = 1000.0f;
-
-			// sha_data_->start(2048);
 		}
 	};
 
@@ -518,12 +516,10 @@ public:
 	{
 		if (on_off)
 		{
-			// view->camera().set_type(Camera::Type::ORTHOGRAPHIC);
-			view_parameters_[view].sha_data_->start(16384);
+			view_parameters_[view].sha_data_->start(4096);
 		}
 		else
 		{
-			// view->camera().set_type(Camera::Type::PERSPECTIVE);
 			view_parameters_[view].sha_data_->stop();
 		}
 	}
@@ -576,6 +572,8 @@ protected:
 		mesh_provider_->foreach_mesh([this](MESH& m, const std::string&) { init_mesh(&m); });
 		connections_.push_back(boost::synapse::connect<typename MeshProvider<MESH>::mesh_added>(
 			mesh_provider_, this, &VolumeRender<MESH>::init_mesh));
+
+		start_timer= std::chrono::high_resolution_clock::now();
 	}
 
 	void draw(View* view) override
@@ -583,18 +581,23 @@ protected:
 		ViewParameters& vp = view_parameters_[app_.current_view()];
 		if (vp.use_shadows_)
 		{
+//			app_.current_view()->request_update();
+			double angle = App::frame_time_ * 0.2;
+			vp.norm_light_dir_ = rendering::GLVec3d{30.0 * std::cos(angle), 30.0 * std::sin(angle), 60.0}
+					.normalized();
 			const Camera& cam = app_.current_view()->camera();
 
-			float64 sd = 2.0 * cam.scene_radius();
+			
 			float64 sr = cam.scene_radius(); // *0.9 ?;//			rendering::GLVec3d light_position =
 											 // cam.pivot_point() + sd * vp.norm_light_dir_;
+			float64 sd = 2.0 * sr;
 
-			// auto orthographic = [&]() {
-			//	float64 hw = 1.0 / sr;
-			//	rendering::GLMat4d m;
-			//	m << hw, 0, 0, 0, 0, hw, 0, 0, 0, 0, -hw, -sd*hw, 0, 0, 0, 1;
-			//	return m;
-			//};
+			 auto orthographic = [&]() {
+				float64 hw = 1.0 / sr;
+				rendering::GLMat4d m;
+				m << hw, 0, 0, 0, 0, hw, 0, 0, 0, 0, -hw, sd*hw, 0, 0, 0, 1;
+				return m;
+			};
 
 			// warning dir & up mus be normalized
 			auto look_dir = [](const rendering::GLVec3d& eye, const rendering::GLVec3d& dir,
@@ -615,25 +618,25 @@ protected:
 				return trf;
 			};
 
-			rendering::GLMat4d light_view_matrix = look_dir(cam.pivot_point() + 2.0 * sr * vp.norm_light_dir_,
+			rendering::GLMat4d light_view_matrix = look_dir(cam.pivot_point() + sd * vp.norm_light_dir_,
 															-vp.norm_light_dir_, rendering::GLVec3d(0, 0, 1));
 
 			rendering::GLMat4d inv_pv = (cam.projection_matrix_d() * cam.modelview_matrix_d()).inverse();
 
 			std::vector<rendering::GLVec3d> corners;
 			corners.reserve(8);
-			for (int x = -1; x <= 1; x += 2)
+				
+			for ( int z = -1; z <= 1; z += 2)
 				for (int y = -1; y <= 1; y += 2)
-					for (int z = -1; z <= 1; z += 2)
+					for (int x = -1; x <= 1; x += 2)
 					{
 						rendering::GLVec4d p = inv_pv * rendering::GLVec4d(x, y, z, 1.0f);
 						p /= p.w();
 						corners.push_back((light_view_matrix * p).block<3, 1>(0, 0));
 					}
-			rendering::GLVec3d minP{std::numeric_limits<double>::max(), std::numeric_limits<double>::max(),
-									std::numeric_limits<double>::max()};
-			rendering::GLVec3d maxP{std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest(),
-									std::numeric_limits<double>::lowest()};
+			rendering::GLVec3d minP = corners.back();
+			rendering::GLVec3d maxP = corners.back();
+			corners.pop_back();
 
 			for (const auto& v : corners)
 			{
@@ -644,31 +647,41 @@ protected:
 				}
 			}
 
-			std::cout << minP.transpose() << "  /  " << maxP.transpose() << std::endl;
+			//std::cout << minP.transpose() << "  /  " << maxP.transpose() << std::endl;
 
-			// rendering::GLMat4d light_projection_matrix = orthographic();
-			// rendering::GLMat4d light_projection_matrix = Camera::orthographic(-sr, sr, -sr, sr, sd - sr, sd + sr);
-			rendering::GLMat4d light_projection_matrix =
-				Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], minP[2], maxP[2] );
+			 //rendering::GLMat4d light_projection_matrix = orthographic();
+			 //rendering::GLMat4d light_projection_matrix = Camera::orthographic(-sr, sr, -sr, sr, (sd - sr), (sd + sr));
+			 
+			 rendering::GLMat4d light_projection_matrix = Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], (sd - sr), (sd + sr));
+	/*		std::cout << "(sd - sr) " << (sd - sr) << std::endl;
+			 std::cout << "(sd + sr) " << (sd + sr) << std::endl;
+			std::cout << "-minP[2] " << -minP[2] << std::endl;
+			 std::cout << "-maxP[2]  " << -maxP[2] << std::endl;*/
+			//rendering::GLMat4d light_projection_matrix = Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], -maxP[2], -minP[2] );
 
-			 std::cout << "Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr)" << std::endl;
+/*			 std::cout << "Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr)" << std::endl;
 			 std::cout << Camera::orthographic(-sr, sr, -sr, sr, sd - sr, sd + sr) << std::endl;
-			 std::cout << "Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], minP[2], maxP[2] )" << std::endl;
-			 std::cout << Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], minP[2], maxP[2]) << std::endl;
+			 std::cout << "light_projection_matrix " << std::endl;
+			 std::cout << light_projection_matrix << std::endl;
 			 std::cout << "------------------------------" << std::endl;
 
-			//std::cout << "orthographic()" << std::endl;
+	*/		//std::cout << "orthographic()" << std::endl;
 			//std::cout << orthographic() << std::endl;
 			//std::cout << "Camera::orthographic(-sr, sr, -sr, sr, -sd + sr, -sd - sr)" << std::endl;
 			//std::cout << Camera::orthographic(-sr, sr, -sr, sr, sd - sr, sd + sr) << std::endl;
 
+
+			 //std::cout << "light_projection_matrix " << std::endl;
+			 //std::cout << light_projection_matrix << std::endl;
 			
 			vp.sha_data_->fbo_shadows_->bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
+
+			//	std::cout << "update topo 3D in "<< elapsed_seconds.count() << std::endl;
+
 
 			double wh = cam.scene_radius();	
 
@@ -710,9 +723,10 @@ protected:
 				}
 			}
 			vp.sha_data_->fbo_shadows_->release();
-
+			
 			glDisable(GL_CULL_FACE);
-		// IF  USEPLANE ...
+
+// IF  USEPLANE ...
 			glDisable(GL_DEPTH_TEST);
 			vp.param_plane_->draw(view->projection_matrix(), view->modelview_matrix());
 			glEnable(GL_DEPTH_TEST);
@@ -1095,10 +1109,16 @@ protected:
 			if (need_update)
 				for (View* v : linked_views_)
 					v->request_update();
+
+			ViewParameters& vp = view_parameters_[selected_view_];
+			if (vp.use_shadows_)
+				selected_view_->request_update();
+
 		}
 	}
 
 private:
+	std::chrono::high_resolution_clock::time_point start_timer;
 	float poff1 = -1.0;
 	float poff2 = -1.0;
 	View* selected_view_;
