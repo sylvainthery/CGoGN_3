@@ -61,13 +61,13 @@ struct ShadowData
 	GLVec3d light_position_;
 	GLVec3d light_dir_;
 	std::shared_ptr<FBO> fbo_shadows_;
-	bool use_shadows_;
+	int32 use_shadows_;
 
-	inline ShadowData() : fbo_shadows_(nullptr), use_shadows_(false)
+	inline ShadowData() : fbo_shadows_(nullptr), use_shadows_(0)
 	{
 	}
 
-	inline void start(uint32 sz_tex)
+	inline void start()
 	{
 		fbo_shadows_ =
 			std::make_shared<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{}, true, nullptr);
@@ -76,6 +76,7 @@ struct ShadowData
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		fbo_shadows_->getDepthTexture()->release();
+		int32 sz_tex = std::pow(2,use_shadows_);
 		fbo_shadows_->resize(sz_tex,sz_tex); 
 	}
 

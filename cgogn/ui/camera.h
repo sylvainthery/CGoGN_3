@@ -81,7 +81,7 @@ public:
 	}
 
 
-	static rendering::GLMat4d Camera::orthographic(double l, double r, double b, double t, double zfar, double znear);
+	static rendering::GLMat4d orthographic(double l, double r, double b, double t, double znear,double zfar);
 
 	inline float64 width() const
 	{

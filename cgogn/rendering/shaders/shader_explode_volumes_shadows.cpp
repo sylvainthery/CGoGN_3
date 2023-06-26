@@ -185,7 +185,8 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 			vec3 L = normalize(light_dir);
 			float dnl = max(0.0, dot(N, L));
 			float lambert = 0.1*max(0.0,N.z) + 0.8 * compute_shadow(dnl);
-			frag_out = vec4(lambert * color.rgb, color.a);//*0.000001+vec4(ShCoord.wyz/ShCoord.w,1.0);
+			float k = gl_FragCoord.z;//*0.5+0.5;
+			frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(mix(vec3(1,0,0),vec3(0,1,0),k),1.0);
 		}
 	)";
 
