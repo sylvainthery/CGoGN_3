@@ -171,8 +171,8 @@ void GLViewer::mouse_wheel_event(float64, float64 dy)
 		else
 		{
 			float64 zcam = 1.0 / std::tan(camera_.field_of_view() / 2.0);
-			float64 a = camera_.scene_radius() - camera_.frame_.translation().z() / zcam / camera_.scene_radius();
-			camera_.frame_.translation().z() -= inputs_->wheel_sensitivity_ * dy * std::max(0.1, a);
+			float64 a = camera_.scene_radius() - camera_.frame_.translation().z() / zcam / camera_.scene_radius() * 0.2;
+			camera_.frame_.translation().z() -= inputs_->wheel_sensitivity_ * dy * std::max(0.01, a);
 			camera_.update_matrices();
 		}
 		need_redraw_ = true;

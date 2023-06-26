@@ -90,7 +90,6 @@ class VolumeRender : public ViewModule
 	struct ViewParameters
 	{
 		std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_FS_;
-
 		std::shared_ptr<rendering::ShadowData> sha_data_;
 		rendering::GLVec3d norm_light_dir_;
 		// Camera light_cam_;
@@ -516,7 +515,7 @@ public:
 	{
 		if (on_off)
 		{
-			view_parameters_[view].sha_data_->start(4096);
+			view_parameters_[view].sha_data_->start(2048);
 		}
 		else
 		{
@@ -590,6 +589,22 @@ protected:
 			
 			float64 sr = cam.scene_radius(); // *0.9 ?;//			rendering::GLVec3d light_position =
 											 // cam.pivot_point() + sd * vp.norm_light_dir_;
+
+			rendering::GLVec3d Qa = rendering::GLVec3d(-sr, 0, 0) + cam.pivot_point();
+			rendering::GLVec4d Pa = cam.modelview_matrix_d() * rendering::GLVec4d(Qa.x(), Qa.y(), Qa.z(), 1);
+			rendering::GLVec4d PPa = (cam.projection_matrix_d() * Pa).transpose();
+			PPa /= PPa.w();
+			std::cout << std::fixed << std::setprecision(2);
+			std::cout << "PPa " << Qa.transpose() << " =>> " << Pa.transpose() << " =>> " << PPa.transpose()
+					  << std::endl;
+
+			rendering::GLVec3d Qb = rendering::GLVec3d(sr, 0, 0) + cam.pivot_point();
+			rendering::GLVec4d Pb = cam.modelview_matrix_d() * rendering::GLVec4d(Qb.x(),Qb.y(),Qb.z(),1);
+			rendering::GLVec4d PPb = (cam.projection_matrix_d() * Pb).transpose();
+			PPb /= PPb.w();
+			std::cout << "PPb " << Qb.transpose() << " =>> " << Pb.transpose() << " =>> " << PPb.transpose()
+					  << std::endl;
+
 			float64 sd = 2.0 * sr;
 
 			 auto orthographic = [&]() {
@@ -623,36 +638,75 @@ protected:
 
 			rendering::GLMat4d inv_pv = (cam.projection_matrix_d() * cam.modelview_matrix_d()).inverse();
 
-			std::vector<rendering::GLVec3d> corners;
-			corners.reserve(8);
-				
-			for ( int z = -1; z <= 1; z += 2)
+			std::vector<rendering::GLVec2d> corners;
+			corners.reserve(12);
+			std::vector<double> vz{1.0, 0.875, 1.0 };
+			for ( double z :vz)
 				for (int y = -1; y <= 1; y += 2)
 					for (int x = -1; x <= 1; x += 2)
 					{
 						rendering::GLVec4d p = inv_pv * rendering::GLVec4d(x, y, z, 1.0f);
 						p /= p.w();
-						corners.push_back((light_view_matrix * p).block<3, 1>(0, 0));
+						corners.push_back((light_view_matrix * p).block<2, 1>(0, 0));
 					}
-			rendering::GLVec3d minP = corners.back();
-			rendering::GLVec3d maxP = corners.back();
-			corners.pop_back();
-
-			for (const auto& v : corners)
+			rendering::GLVec2d minP = corners[0];
+			rendering::GLVec2d maxP = corners[0];
+			for (int i=0;i<8;++i)
 			{
-				for (uint32 i = 0; i < 3; ++i)
+				const auto& v = corners[i];
+				for (uint32 i = 0; i < 2; ++i)
 				{
 					minP[i] = std::min(minP[i], v[i]);
 					maxP[i] = std::max(maxP[i], v[i]);
 				}
 			}
 
+			rendering::GLMat4d light_projection_matrix1 =
+				Camera::orthographic(std::max(minP[0], -sr), std::min(maxP[0], sr), std::max(minP[1], -sr),
+									 std::min(maxP[1], sr), sd - sr, sd + sr);
+
+			minP = corners[4];
+			maxP = corners[4];
+			for (int i = 4; i < 12; ++i)
+			{
+				const auto& v = corners[i];
+				for (uint32 i = 0; i < 2; ++i)
+				{
+					minP[i] = std::min(minP[i], v[i]);
+					maxP[i] = std::max(maxP[i], v[i]);
+				}
+			}
+
+			rendering::GLMat4d light_projection_matrix2 =
+				Camera::orthographic(std::max(minP[0], -sr), std::min(maxP[0], sr), std::max(minP[1], -sr),
+									 std::min(maxP[1], sr), sd - sr, sd + sr);
+
 			//std::cout << minP.transpose() << "  /  " << maxP.transpose() << std::endl;
+			//std::cout <<-sr << " / "<<  sr << "   Z " <<(sd - sr)<< " / "<< (sd + sr)<< std::endl;		
+			//std::cout << "  ******************  " << std::endl;
 
 			 //rendering::GLMat4d light_projection_matrix = orthographic();
 			 //rendering::GLMat4d light_projection_matrix = Camera::orthographic(-sr, sr, -sr, sr, (sd - sr), (sd + sr));
 			 
-			 rendering::GLMat4d light_projection_matrix = Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], (sd - sr), (sd + sr));
+//			 rendering::GLMat4d light_projection_matrix = Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], (sd - sr), (sd + sr));
+			//double x0 = -sr / 2;//std::max(minP[0], -sr);
+			//double x1 = sr / 2; //std::min(maxP[0], sr);
+			//double y0 = -sr / 2; // std::max(minP[1], -sr);
+			//double y1 = sr / 2;	 // std::min(maxP[1], sr);
+			//double z0 = sd - sr;
+			//double z1 = sd + sr;
+			//double x0 = std::max(minP[0], -sr);
+			//double x1 = std::min(maxP[0], sr);
+			//double y0 = std::max(minP[1], -sr);
+			//double y1 = std::min(maxP[1], sr);
+			//double z0 = sd - sr;
+			//double z1 = sd + sr;
+
+			//rendering::GLMat4d light_projection_matrix =
+			//	Camera::orthographic(x0, x1, y0, y1, z0, z1);
+
+			//rendering::GLMat4d light_projection_matrix =
+			//	Camera::orthographic(minP[0], maxP[0], minP[1], maxP[1], (sd - sr), (sd + sr));
 	/*		std::cout << "(sd - sr) " << (sd - sr) << std::endl;
 			 std::cout << "(sd + sr) " << (sd + sr) << std::endl;
 			std::cout << "-minP[2] " << -minP[2] << std::endl;
@@ -673,57 +727,57 @@ protected:
 
 			 //std::cout << "light_projection_matrix " << std::endl;
 			 //std::cout << light_projection_matrix << std::endl;
-			
-			vp.sha_data_->fbo_shadows_->bind();
+
+			rendering::GLMat4d biasmat;
+			biasmat << 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0;
+			rendering::GLVec3d ldv =
+				Eigen::Affine3d(view->modelview_matrix_d()).linear().inverse().transpose().matrix() *
+				vp.norm_light_dir_;
+			vp.sha_data_->light_dir_ = ldv;
+
+
+			vp.sha_data_->fbo_shadows1_->bind();
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
-
-			//	std::cout << "update topo 3D in "<< elapsed_seconds.count() << std::endl;
-
-
-			double wh = cam.scene_radius();	
-
-			rendering::GLMat4d biasmat;
-			biasmat << 0.5 , 0.0 , 0.0 , 0.5 ,
-				0.0 , 0.5 , 0.0 , 0.5 ,
-				0.0 , 0.0 , 0.5 , 0.5 ,
-				0.0 , 0.0 , 0.0 , 1.0;
-
-			vp.sha_data_->shadow_matrix_ =
-				biasmat * light_projection_matrix * light_view_matrix;
-
-			//rendering::GLVec3d light_position_render = cam.pivot_point() + 4.0 * sd * vp.norm_light_dir_;
-			//
-			//rendering::GLVec3d lpv = (view->modelview_matrix_d(). *
-			//						  rendering::GLVec4d(light_position_render[0], light_position_render[1], light_position_render[2], 1.0))
-			//							 .block<3, 1>(0, 0);
-
-			rendering::GLVec3d ldv = Eigen::Affine3d(view->modelview_matrix_d()).linear().inverse().transpose().matrix() *
-						  vp.norm_light_dir_;
-			vp.sha_data_->light_dir_ = ldv;
-				
+			vp.sha_data_->shadow_matrix1_ =	biasmat * light_projection_matrix1 * light_view_matrix;
 
 			for (auto& [m, p] : parameters_[view])
 			{
 				if (p.render_volumes_)
 				{
 					p.data_.light_dir_ = ldv.cast<float>();
-//					glPolygonOffset(0.0f, 0.0f);
-					//glEnable(GL_POLYGON_OFFSET_FILL);
-					//glPolygonOffset(poff1, poff2);
-					//std::cout << "glPolygonOffset" << poff1 << " , " << poff2 << std::endl;
-
-
-					p.param_volume_generate_shadows_->bind(light_projection_matrix.cast<float>(),
+					p.param_volume_generate_shadows_->bind(light_projection_matrix1.cast<float>(),
 														   light_view_matrix.cast<float>());
 					mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
 					p.param_volume_generate_shadows_->release();
 				}
 			}
-			vp.sha_data_->fbo_shadows_->release();
-			
+			vp.sha_data_->fbo_shadows1_->release();
+
+
+			vp.sha_data_->fbo_shadows2_->bind();
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
+			vp.sha_data_->shadow_matrix2_ = biasmat * light_projection_matrix2 * light_view_matrix;
+
+			for (auto& [m, p] : parameters_[view])
+			{
+				if (p.render_volumes_)
+				{
+					p.data_.light_dir_ = ldv.cast<float>();
+
+					p.param_volume_generate_shadows_->bind(light_projection_matrix2.cast<float>(),
+														   light_view_matrix.cast<float>());
+					mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+					p.param_volume_generate_shadows_->release();
+				}
+			}
+			vp.sha_data_->fbo_shadows2_->release();
+
 			glDisable(GL_CULL_FACE);
 
 // IF  USEPLANE ...
@@ -860,6 +914,23 @@ protected:
 					p.manipulating_frame_ = true;
 			}
 		}
+		if (key_code == GLFW_KEY_Q)
+		{
+			float64 f = selected_view_->camera().field_of_view();
+			selected_view_->camera().set_field_of_view(f + 0.02);
+			selected_view_->request_update();
+			std::cout << "Fd"
+					  << selected_view_->camera().scene_radius() / std::tan(selected_view_->camera().field_of_view()) << std::endl;
+		}
+		if (key_code == GLFW_KEY_W)
+		{
+			float64 f = selected_view_->camera().field_of_view();
+			selected_view_->camera().set_field_of_view(f - 0.02);
+			selected_view_->request_update();
+			std::cout << "Fd"
+					  << selected_view_->camera().scene_radius() / std::tan(selected_view_->camera().field_of_view())<< std::endl;
+		}
+
 	}
 
 	void key_release_event(View* view, int32 key_code) override
@@ -1110,9 +1181,9 @@ protected:
 				for (View* v : linked_views_)
 					v->request_update();
 
-			ViewParameters& vp = view_parameters_[selected_view_];
-			if (vp.use_shadows_)
-				selected_view_->request_update();
+			//ViewParameters& vp = view_parameters_[selected_view_];
+			//if (vp.use_shadows_)
+			//	selected_view_->request_update();
 
 		}
 	}

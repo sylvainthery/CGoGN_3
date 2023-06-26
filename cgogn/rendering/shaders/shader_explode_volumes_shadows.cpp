@@ -118,7 +118,8 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		#version 330
 		uniform mat4 projection_matrix;
 		uniform mat4 model_view_matrix;
-		uniform mat4 shadow_matrix;
+		uniform mat4 shadow_matrix1;
+		uniform mat4 shadow_matrix2;
 
 
 		uniform usamplerBuffer vertex_ind;
@@ -131,7 +132,8 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		uniform vec4 plane_clip2;
 
 		out vec3 position;
-		out vec4 ShCoord;
+		out vec4 ShCoord1;
+		out vec4 ShCoord2;
 
 		void main()
 		{
@@ -150,7 +152,8 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				position = position4.xyz;
 				gl_Position = projection_matrix * position4;
-				ShCoord = shadow_matrix * vec4(explode_position, 1.0);
+				ShCoord1 = shadow_matrix1 * vec4(explode_position, 1.0);
+				ShCoord2 = shadow_matrix2 * vec4(explode_position, 1.0);
 			}
 			else
 			{
@@ -163,10 +166,12 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		#version 330
 		uniform vec4 color;
 		uniform vec3 light_dir;
-		uniform sampler2DShadow TUshadow;
+		uniform sampler2DShadow TUshadow1;
+		uniform sampler2DShadow TUshadow2;
 		
 		in vec3 position;
-		in vec4 ShCoord;
+		in vec4 ShCoord1;
+		in vec4 ShCoord2;
 
 		out vec4 frag_out;
 
@@ -174,9 +179,10 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		float compute_shadow(float dnl)
 		{
 			float bias_shd = 0.00001+0.00001*tan(acos(dnl));
-			
-			float shcz = ShCoord.z/ShCoord.w+bias_shd;
-			return dnl*texture(TUshadow, vec3(ShCoord.xy/ShCoord.w,shcz));
+			if (gl_FragCoord.z > 0.875) 
+				return texture(TUshadow1, vec3(ShCoord1.xy/ShCoord1.w, ShCoord1.z/ShCoord1.w+bias_shd));
+			else
+				return texture(TUshadow2, vec3(ShCoord2.xy/ShCoord2.w, ShCoord2.z/ShCoord2.w+bias_shd));			
 		}
 		
 		void main()
@@ -184,14 +190,17 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_dir);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.1*max(0.0,N.z) + 0.8 * compute_shadow(dnl);
-			frag_out = vec4(lambert * color.rgb, color.a);//*0.000001+vec4(ShCoord.wyz/ShCoord.w,1.0);
+			float lambert = 0.1*max(0.0,N.z) + 0.8 * dnl * compute_shadow(dnl);
+
+			//frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(mix(vec3(1,0,0),vec3(0,1,0),gl_FragCoord.z),1.0);
+			frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(vec3(abs(gl_FragCoord.z)),1.0);
+
 		}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_dir",
-				 "explode", "plane_clip", "plane_clip2", "shadow_matrix", "TUshadow");
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_dir", "explode",
+				 "plane_clip", "plane_clip2", "shadow_matrix1", "TUshadow1", "shadow_matrix2", "TUshadow2");
 
 	nb_attributes_ = 2;
 }
@@ -200,7 +209,8 @@ void ShaderParamExplodeVolumesShadows::set_uniforms()
 {
 	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, sha_data_->light_dir_,
 								 data_->explode_, data_->plane_clip_, data_->plane_clip2_,
-								 sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0));
+								 sha_data_->shadow_matrix1_, sha_data_->fbo_shadows1_->getDepthTexture()->bind(0),
+								sha_data_->shadow_matrix2_, sha_data_->fbo_shadows2_->getDepthTexture()->bind(1));
 }
 
 void ShaderParamExplodeVolumesShadows::bind_texture_buffers()

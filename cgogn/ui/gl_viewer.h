@@ -58,6 +58,12 @@ public:
 	{
 		return camera_;
 	}
+
+
+	inline Camera& camera() 
+	{
+		return camera_;
+	}
 	inline void save_camera()
 	{
 		std::ofstream out_file;

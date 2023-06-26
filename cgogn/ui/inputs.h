@@ -36,7 +36,7 @@ namespace ui
 struct CGOGN_UI_EXPORT Inputs
 {
 	Inputs()
-		: wheel_sensitivity_(0.0025), mouse_sensitivity_(0.005), spin_sensitivity_(0.025), double_click_timeout_(0.3),
+		: wheel_sensitivity_(0.00025), mouse_sensitivity_(0.005), spin_sensitivity_(0.025), double_click_timeout_(0.3),
 		  mouse_buttons_(0), shift_pressed_(false), control_pressed_(false), alt_pressed_(false), meta_pressed_(false)
 	{
 	}

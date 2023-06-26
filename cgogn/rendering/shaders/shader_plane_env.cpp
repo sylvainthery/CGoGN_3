@@ -37,11 +37,13 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 		#version 330
 		uniform mat4 projection_matrix;
 		uniform mat4 model_view_matrix;
-		uniform mat4 shadow_matrix;
+		uniform mat4 shadow_matrix1;
+		uniform mat4 shadow_matrix2;
 		uniform mat4 transfo;
 		uniform float scale_xy;
 
-		out vec4 ShCoord;
+		out vec4 ShCoord1;
+		out vec4 ShCoord2;
 		out vec3 position;
 		out vec2 tc;
 
@@ -50,7 +52,8 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 			vec2 p = vec2(gl_VertexID % 2, gl_VertexID / 2);
 			vec4 pt = transfo*vec4((2.0 * p - 1.0),0.0,1.0);
 			tc = p*scale_xy;
-			ShCoord = shadow_matrix * pt;
+			ShCoord1 = shadow_matrix1 * pt;
+			ShCoord2 = shadow_matrix2 * pt;
 			pt =  model_view_matrix*pt;
 			position = pt.xyz;
 			gl_Position = projection_matrix * pt; 
@@ -62,12 +65,14 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 	const char* fragment_shader_source = R"(
 		#version 330
 		uniform vec4 color;
-		uniform sampler2DShadow TUshadow;
+		uniform sampler2DShadow TUshadow1;
+		uniform sampler2DShadow TUshadow2;
 		uniform vec3 light_dir;
 		uniform sampler2D TUcolor;
 		
 		in vec3 position;
-		in vec4 ShCoord;
+		in vec4 ShCoord1;
+		in vec4 ShCoord2;
 		in vec2 tc;
 
 		out vec4 frag_out;
@@ -77,10 +82,13 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_dir);
 			float dnl = max(0.0, dot(N, L));
-			vec3 shc = vec3(ShCoord.xy/ShCoord.w, clamp(ShCoord.z/ShCoord.w,0.0,1.0)); 
-			shc.z = clamp(shc.z,0.0,1.0);
+			vec3 shc1 = vec3(ShCoord1.xy/ShCoord1.w, clamp(ShCoord1.z/ShCoord1.w,0.0,1.0)); 
+			shc1.z = clamp(shc1.z,0.0,1.0);
+			vec3 shc2 = vec3(ShCoord2.xy/ShCoord2.w, clamp(ShCoord2.z/ShCoord2.w,0.0,1.0)); 
+			shc2.z = clamp(shc2.z,0.0,1.0);
 
-			float shadow = dnl*texture(TUshadow, shc);
+			float shadow =	(gl_FragCoord.z > 0.125) ? texture(TUshadow1, shc1) : texture(TUshadow2, shc2) * dnl;
+			
 			float lambert = 0.1 + 0.2*max(0.0,N.z) + 0.6 * shadow;
 			frag_out = vec4(vec3(lambert * texture(TUcolor,tc).r), 1.0);
 		}
@@ -88,14 +96,17 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("transfo", "scale_xy", "shadow_matrix", "TUcolor", "TUshadow", "light_dir");
+	get_uniforms("transfo", "scale_xy", "shadow_matrix1", "shadow_matrix2", "TUcolor", "TUshadow1", "TUshadow2",
+				 "light_dir");
 	nb_attributes_ = 0;
 }
 
 void ShaderParamPlaneShadow::set_uniforms()
 {
-	shader_->set_uniforms_values(transfo_, scale_xy_, sha_data_->shadow_matrix_, tex_col_->bind(0),
-										   sha_data_->fbo_shadows_->getDepthTexture()->bind(1),
+	shader_->set_uniforms_values(transfo_, scale_xy_, sha_data_->shadow_matrix1_,
+								 sha_data_->shadow_matrix2_, tex_col_->bind(0),
+										   sha_data_->fbo_shadows1_->getDepthTexture()->bind(1),
+											sha_data_->fbo_shadows2_->getDepthTexture()->bind(2),
 								 sha_data_->light_dir_);
 }
 

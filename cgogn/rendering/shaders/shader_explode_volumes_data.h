@@ -43,45 +43,61 @@ struct ExplodeVolumeData
 	GLColor color_;
 	GLColor color_line_;
 	shader_function::ColorMap::Uniforms color_map_;
-	GLMat4 shadow_matrix_;
+	//GLMat4 shadow_matrix1_;
+	//GLMat4 shadow_matrix2_;
 	GLVec3 light_dir_;
-	std::shared_ptr<FBO> fbo_shadows_;
+	std::shared_ptr<FBO> fbo_shadows1_;
+	std::shared_ptr<FBO> fbo_shadows2_;
 	GLVec3 light_position_;
 	float32 explode_;
 
 	inline ExplodeVolumeData()
-		: plane_clip_(0, 0, 0, 0), plane_clip2_(0, 0, 0, 0), color_(0.9f, 0, 0, 1),
-		  light_dir_(0,0,0), fbo_shadows_(nullptr), explode_(0.9f)
+		: plane_clip_(0, 0, 0, 0), plane_clip2_(0, 0, 0, 0), color_(0.9f, 0, 0, 1), light_dir_(0, 0, 0),
+		  fbo_shadows1_(nullptr), fbo_shadows2_(nullptr), explode_(0.9f)
 	{}
 };
 
 struct ShadowData
 {
-	GLMat4d shadow_matrix_;
+	GLMat4d shadow_matrix1_;
+	GLMat4d shadow_matrix2_;
 	GLVec3d light_position_;
 	GLVec3d light_dir_;
-	std::shared_ptr<FBO> fbo_shadows_;
+	std::shared_ptr<FBO> fbo_shadows1_;
+	std::shared_ptr<FBO> fbo_shadows2_;
 	bool use_shadows_;
 
-	inline ShadowData() : fbo_shadows_(nullptr), use_shadows_(false)
+	inline ShadowData() : fbo_shadows1_(nullptr), fbo_shadows2_(nullptr), use_shadows_(false)
 	{
 	}
 
 	inline void start(uint32 sz_tex)
 	{
-		fbo_shadows_ =
+		fbo_shadows1_ =
 			std::make_shared<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{}, true, nullptr);
-		fbo_shadows_->getDepthTexture()->bind();
+		fbo_shadows1_->getDepthTexture()->bind();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		fbo_shadows_->getDepthTexture()->release();
-		fbo_shadows_->resize(sz_tex,sz_tex); 
+		fbo_shadows1_->getDepthTexture()->release();
+		fbo_shadows1_->resize(sz_tex,sz_tex); 
+
+		fbo_shadows2_ =
+			std::make_shared<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{}, true, nullptr);
+		fbo_shadows2_->getDepthTexture()->bind();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		fbo_shadows2_->getDepthTexture()->release();
+		fbo_shadows2_->resize(sz_tex, sz_tex); 
+
 	}
+
 
 	inline void stop()
 	{
-		fbo_shadows_ = nullptr;
+		fbo_shadows1_ = nullptr;
+		fbo_shadows2_ = nullptr;
 	}
 };
 

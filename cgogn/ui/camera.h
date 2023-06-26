@@ -94,18 +94,25 @@ public:
 
 	inline void update_matrices()
 	{
-		float64 d = focal_distance_ - frame_.translation().z();
-		//float64 znear = std::max(0.05, d - scene_radius_);
-		float64 znear = std::max(scene_radius_ / 16.0, d - scene_radius_);
-		float64 zfar = d + scene_radius_;
-		proj_d_ = ((type_ == PERSPECTIVE) ? perspective(znear, zfar) : orthographic(znear, zfar));
-		proj_ = proj_d_.cast<float32>();	
-
-		rendering::Transfo3d m = (type_ == PERSPECTIVE) ? 
-			Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) * frame_ * Eigen::Translation3d(-pivot_point_) 
-						: frame_;
+		rendering::Transfo3d m = (type_ == PERSPECTIVE)
+									 ? Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) * frame_ *
+										   Eigen::Translation3d(-pivot_point_)
+									 : frame_;
 		mv_d_ = m.matrix();
 		mv_ = mv_d_.cast<float32>();
+
+		rendering::GLVec4d P = (mv_d_ * rendering::GLVec4d(pivot_point_.x(), pivot_point_.y(), pivot_point_.z(), 1));
+		float64 d = -P.z();
+		//		float64 d = -mv_d_.block<3, 1>(0, 3).z();
+		float64 znear = std::max(0.1, d - scene_radius_);
+//		float64 znear =  d - scene_radius_;
+		float64 zfar = d + scene_radius_;
+		std::cout << d << " => "<< znear << " <=> " << zfar << std::endl;
+		proj_d_ = ((type_ == PERSPECTIVE) ? perspective(znear, zfar) : orthographic(znear, zfar));
+		proj_ = proj_d_.cast<float32>();	
+//		std::cout << " PROJ " <<  proj_d_ << std::endl;
+
+
 	}
 
 	inline void set_type(Type type)
@@ -116,11 +123,13 @@ public:
 	inline void set_field_of_view(float64 fov)
 	{
 		field_of_view_ = fov;
-		focal_distance_ = scene_radius_ / std::tan(field_of_view_ / 2.0);
+		//focal_distance_ = scene_radius_ / std::tan(field_of_view_ / 2.0);
+		focal_distance_ = scene_radius_ / std::tan(field_of_view_ );
+
 		update_matrices();
 	}
 
-	inline float64 field_of_view()
+	inline float64 field_of_view() const
 	{
 		return field_of_view_;
 	}
@@ -136,7 +145,9 @@ public:
 		scene_radius_ = radius;
 		if (!scene_radius_initialized_)
 		{
-			focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ / std::tan(field_of_view_ / 2.0) : 0.0;
+			//focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ / std::tan(field_of_view_ / 2.0) : 0.0;
+			focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ / std::tan(field_of_view_) : 0.0;
+
 			frame_.translation().z() -= focal_distance_;
 			scene_radius_initialized_ = true;
 		}
@@ -161,7 +172,12 @@ public:
 	}
 
 
-	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="eye"></param>
+	/// <param name="dir"></param>
+	/// <param name="up"></param>
 
 	inline void look_dir(const rendering::GLVec3d& eye, const rendering::GLVec3d& dir, const rendering::GLVec3d& up)  
 	{
