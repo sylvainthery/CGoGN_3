@@ -93,10 +93,10 @@ class VolumeRender : public ViewModule
 		std::shared_ptr<rendering::ShadowData> sha_data_;
 		rendering::GLVec3d norm_light_dir_;
 		// Camera light_cam_;
-		bool use_shadows_;
+		int32 use_shadows_;
 		std::unique_ptr<rendering::ShaderPlaneShadow::Param> param_plane_;
 
-		ViewParameters() : use_shadows_(false)
+		ViewParameters() : use_shadows_(0)
 		{
 			norm_light_dir_ = rendering::GLVec3d{400.0, 400.0, 1500.0}.normalized();
 			sha_data_ = std::make_shared<rendering::ShadowData>();
@@ -511,11 +511,11 @@ public:
 	//	view_parameters_[current_view].data_.light_dir = LD;
 	//}
 
-	void set_shadows(View* view, bool on_off)
+	void set_shadows(View* view, uint32 sz)
 	{
-		if (on_off)
+		if (sz >0)
 		{
-			view_parameters_[view].sha_data_->start(2048);
+			view_parameters_[view].sha_data_->start();
 		}
 		else
 		{
@@ -737,8 +737,12 @@ protected:
 
 
 			vp.sha_data_->fbo_shadows1_->bind();
+
 			glClear(GL_DEPTH_BUFFER_BIT);
 			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_ALWAYS);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
 			vp.sha_data_->shadow_matrix1_ =	biasmat * light_projection_matrix1 * light_view_matrix;
@@ -777,7 +781,8 @@ protected:
 				}
 			}
 			vp.sha_data_->fbo_shadows2_->release();
-
+		
+			glDepthFunc(GL_LESS);
 			glDisable(GL_CULL_FACE);
 
 // IF  USEPLANE ...
@@ -1051,7 +1056,7 @@ protected:
 
 				View* view = app_.current_view();
 				ViewParameters& vp = view_parameters_[view];
-				if (ImGui::Checkbox("Shadows", &vp.use_shadows_))
+				if (ImGui::SliderInt("Shadows", &vp.use_shadows_,0,15))
 				{
 					set_shadows(view, vp.use_shadows_);
 					need_update = true;

@@ -43,8 +43,6 @@ struct ExplodeVolumeData
 	GLColor color_;
 	GLColor color_line_;
 	shader_function::ColorMap::Uniforms color_map_;
-	//GLMat4 shadow_matrix1_;
-	//GLMat4 shadow_matrix2_;
 	GLVec3 light_dir_;
 	std::shared_ptr<FBO> fbo_shadows1_;
 	std::shared_ptr<FBO> fbo_shadows2_;
@@ -65,13 +63,13 @@ struct ShadowData
 	GLVec3d light_dir_;
 	std::shared_ptr<FBO> fbo_shadows1_;
 	std::shared_ptr<FBO> fbo_shadows2_;
-	bool use_shadows_;
-
+	int use_shadows_;
 	inline ShadowData() : fbo_shadows1_(nullptr), fbo_shadows2_(nullptr), use_shadows_(false)
+
 	{
 	}
 
-	inline void start(uint32 sz_tex)
+	inline void start()
 	{
 		fbo_shadows1_ =
 			std::make_shared<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{}, true, nullptr);
@@ -80,7 +78,7 @@ struct ShadowData
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		fbo_shadows1_->getDepthTexture()->release();
-		fbo_shadows1_->resize(sz_tex,sz_tex); 
+		fbo_shadows1_->resize(1024,1024); 
 
 		fbo_shadows2_ =
 			std::make_shared<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{}, true, nullptr);
@@ -89,7 +87,7 @@ struct ShadowData
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		fbo_shadows2_->getDepthTexture()->release();
-		fbo_shadows2_->resize(sz_tex, sz_tex); 
+		fbo_shadows2_->resize(1024, 1024); 
 
 	}
 
