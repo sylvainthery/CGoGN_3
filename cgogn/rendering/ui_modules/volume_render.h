@@ -513,7 +513,7 @@ public:
 
 	void set_shadows(View* view, uint32 sz)
 	{
-		if (sz >0)
+		if (sz > 0)
 		{
 			view_parameters_[view].sha_data_->start();
 		}
@@ -921,21 +921,35 @@ protected:
 		}
 		if (key_code == GLFW_KEY_Q)
 		{
-			float64 f = selected_view_->camera().field_of_view();
-			selected_view_->camera().set_field_of_view(f + 0.02);
-			selected_view_->request_update();
+			float64 f = view->camera().field_of_view();
+			view->camera().set_field_of_view(f + 0.02);
+			view->request_update();
 			std::cout << "Fd"
-					  << selected_view_->camera().scene_radius() / std::tan(selected_view_->camera().field_of_view()) << std::endl;
+					  << view->camera().scene_radius() / std::tan(view->camera().field_of_view()) << std::endl;
 		}
 		if (key_code == GLFW_KEY_W)
 		{
-			float64 f = selected_view_->camera().field_of_view();
-			selected_view_->camera().set_field_of_view(f - 0.02);
-			selected_view_->request_update();
+			float64 f = view->camera().field_of_view();
+			view->camera().set_field_of_view(f - 0.02);
+			view->request_update();
 			std::cout << "Fd"
-					  << selected_view_->camera().scene_radius() / std::tan(selected_view_->camera().field_of_view())<< std::endl;
+					  << view->camera().scene_radius() / std::tan(view->camera().field_of_view())<< std::endl;
 		}
 
+		if (key_code == GLFW_KEY_E)
+		{
+			float64 d = view->camera().scene_radius();
+			std::cout << "D = " << d << std::endl;
+			view->camera().look_dir(view->camera().pivot_point() + rendering::GLVec3d(+d, 0, 0),
+									rendering::GLVec3d(-d, 0, 0),
+									rendering::GLVec3d(0, 0, 1));
+			view->request_update();
+		}
+		if (key_code == GLFW_KEY_R)
+		{
+			view->camera().reset();
+			view->request_update();
+		}
 	}
 
 	void key_release_event(View* view, int32 key_code) override

@@ -134,6 +134,11 @@ public:
 		return field_of_view_;
 	}
 
+	inline float64 focal_distance() const
+	{
+		return focal_distance_;
+	}
+
 	inline void set_aspect_ratio(float64 aspect)
 	{
 		aspect_ratio_ = aspect;
@@ -192,10 +197,24 @@ public:
 
 		trf.block<3, 1>(0, 3) = rendering::GLVec3d(-xAxis.dot(eye), -yAxis.dot(eye), -zAxis.dot(eye));
 		trf.block<1, 4>(3, 0) = rendering::GLVec4d(0, 0, 0, 1).transpose();
+		std::cout << "TRANSFO" << std::endl << trf << std::endl;
+
 		if (type_ == PERSPECTIVE)
-			this->frame_ = Eigen::Translation3d(0.0, 0.0, focal_distance_) * Eigen::Affine3d(trf);
+			this->frame_ = Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, focal_distance_)) *
+						   rendering::Transfo3d(trf) * Eigen::Translation3d(pivot_point_);
+		// this->frame_ =  * Eigen::Translation3d(pivot_point_);
+			//this->frame_ = rendering::Transfo3d(trf);
+				//Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, focal_distance_)) * rendering::Transfo3d(trf);
+
 		else
 			this->frame_ = Eigen::Affine3d(trf);
+		update_matrices();
+	}
+
+	inline void reset(const rendering::GLVec3d& eye, const rendering::GLVec3d& dir, const rendering::GLVec3d& up)
+	{
+		this->frame_ = Eigen::Translation3d(0, 0, 0);
+		update_matrices();
 	}
 
 
