@@ -62,9 +62,21 @@ inline GLVec4 construct_GLVec4(T1 x, T2 y, T3 z, T4 w)
 	return GLVec4(float32(x), float32(y), float32(z), float32(w));
 }
 
+inline GLVec4 homogenous(const GLVec3& v)
+{
+	return GLVec4{v.x(), v.y(), v.z(), 1.0f};
+}
+
+
 using GLVec2d = Eigen::Vector2d;
 using GLVec3d = Eigen::Vector3d;
 using GLVec4d = Eigen::Vector4d;
+
+inline GLVec4d homogenous(const GLVec3d& v)
+{
+	return GLVec4d{v.x(), v.y(), v.z(), 1.0};
+}
+
 
 using GLMat3 = Eigen::Matrix3f;
 using GLMat4 = Eigen::Matrix4f;

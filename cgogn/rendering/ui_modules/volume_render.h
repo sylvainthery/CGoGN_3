@@ -590,20 +590,29 @@ protected:
 			float64 sr = cam.scene_radius(); // *0.9 ?;//			rendering::GLVec3d light_position =
 											 // cam.pivot_point() + sd * vp.norm_light_dir_;
 
-			rendering::GLVec3d Qa = rendering::GLVec3d(-sr, 0, 0) + cam.pivot_point();
-			rendering::GLVec4d Pa = cam.modelview_matrix_d() * rendering::GLVec4d(Qa.x(), Qa.y(), Qa.z(), 1);
-			rendering::GLVec4d PPa = (cam.projection_matrix_d() * Pa).transpose();
-			PPa /= PPa.w();
-			std::cout << std::fixed << std::setprecision(2);
-			std::cout << "PPa " << Qa.transpose() << " =>> " << Pa.transpose() << " =>> " << PPa.transpose()
-					  << std::endl;
+			//rendering::GLVec3d Qa = rendering::GLVec3d(0, 0, -0.95 * sr) + cam.pivot_point();
+			//rendering::GLVec4d Pa = cam.modelview_matrix_d() * rendering::GLVec4d(Qa.x(), Qa.y(), Qa.z(), 1);
+			//rendering::GLVec4d PPa = (cam.projection_matrix_d() * Pa).transpose();
+			//PPa /= PPa.w();
+			//std::cout << "Pivot " << cam.pivot_point().transpose() << std::endl;
+			//std::cout << "Scene Radius " << cam.scene_radius() << std::endl;
 
-			rendering::GLVec3d Qb = rendering::GLVec3d(sr, 0, 0) + cam.pivot_point();
-			rendering::GLVec4d Pb = cam.modelview_matrix_d() * rendering::GLVec4d(Qb.x(),Qb.y(),Qb.z(),1);
-			rendering::GLVec4d PPb = (cam.projection_matrix_d() * Pb).transpose();
-			PPb /= PPb.w();
-			std::cout << "PPb " << Qb.transpose() << " =>> " << Pb.transpose() << " =>> " << PPb.transpose()
-					  << std::endl;
+			//std::cout << std::fixed << std::setprecision(2);
+			//std::cout << "PPa " << Qa.transpose() << " =>> " << Pa.transpose() << " =>> " << PPa.transpose()
+			//		  << std::endl;
+			std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl<<std::fixed << std::setprecision(2);
+			std::cout << "Pivot " << cam.pivot_point().transpose() << std::endl;
+			std::cout << "Scene Radius " << cam.scene_radius() << std::endl;
+			for (double d = 1.0; d>-1.045; d-= 0.1)
+			{
+				rendering::GLVec3d Qb = rendering::GLVec3d(0, 0, d * sr) + cam.pivot_point();
+				rendering::GLVec4d Pb = cam.modelview_matrix_d() * rendering::GLVec4d(Qb.x(),Qb.y(),Qb.z(),1);
+				rendering::GLVec4d PPb = (cam.projection_matrix_d() * Pb).transpose();
+				PPb /= PPb.w();
+				
+				std::cout << "PP [ " << d << "] "<< Qb.transpose() << " =>> " << Pb.transpose() << " =>> " << PPb.transpose()
+						  << std::endl;
+			}
 
 			float64 sd = 2.0 * sr;
 
@@ -640,7 +649,7 @@ protected:
 
 			std::vector<rendering::GLVec2d> corners;
 			corners.reserve(12);
-			std::vector<double> vz{1.0, 0.875, 1.0 };
+			std::vector<double> vz{1.0, 0.75, -1.0 };
 			for ( double z :vz)
 				for (int y = -1; y <= 1; y += 2)
 					for (int x = -1; x <= 1; x += 2)
@@ -813,6 +822,12 @@ protected:
 					{
 						if (p.param_volume_shadows_->attributes_initialized())
 						{
+							const Camera& cam = app_.current_view()->camera();
+							float Pz = -(cam.modelview_matrix_d() * rendering::GLVec4d(cam.pivot_point().x(),
+																					  cam.pivot_point().y(),
+																					  cam.pivot_point().z(), 1)).z();
+							vp.sha_data_->znear = std::max(0.1, Pz - cam.scene_radius());
+							vp.sha_data_->zfar = Pz + cam.scene_radius();
 							//std::cout << "======= BIAS MAT ======" << std::endl;
 							//std::cout << vp.sha_data_->shadow_matrix_ << std::endl;
 

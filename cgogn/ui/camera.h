@@ -51,7 +51,9 @@ public:
 
 private:
 	Type type_;
-	float64 field_of_view_;
+	float64 inv_tg_half_field_of_view_;
+	//float64 znear;
+	//float64 zfar;
 	float64 aspect_ratio_; // width/height
 	rendering::GLVec3d pivot_point_;
 	bool pivot_point_initialized_;
@@ -67,19 +69,21 @@ private:
 	rendering::GLMat4d perspective(float64 znear, float64 zfar) const;
 	rendering::GLMat4d orthographic(float64 znear, float64 zfar) const;
 
-public:
+public:	
 	inline Camera()
-		: type_(PERSPECTIVE), field_of_view_(0.65), aspect_ratio_(1.0), pivot_point_initialized_(false),
+		: type_(PERSPECTIVE), inv_tg_half_field_of_view_(1.0 / std::tan(1.3/2.0)), aspect_ratio_(1.0),
+		  pivot_point_initialized_(false),
 		  scene_radius_initialized_(false)
 	{
 	}
 
 	inline Camera(Type tp)
-		: type_(tp), field_of_view_(0.65), aspect_ratio_(1.0), pivot_point_initialized_(false),
+		: type_(tp), inv_tg_half_field_of_view_(1.0/ std::tan(1.3/2.0)), aspect_ratio_(1.0),
+		  pivot_point_initialized_(false),
 		  scene_radius_initialized_(false)
 	{
-	}
 
+	}
 
 	static rendering::GLMat4d orthographic(double l, double r, double b, double t, double znear,double zfar);
 
@@ -87,6 +91,7 @@ public:
 	{
 		return (aspect_ratio_ > 1.0) ? aspect_ratio_ : 1.0;
 	}
+
 	inline float64 height() const
 	{
 		return (aspect_ratio_ > 1.0) ? 1.0 : 1.0 / aspect_ratio_;
@@ -101,17 +106,13 @@ public:
 		mv_d_ = m.matrix();
 		mv_ = mv_d_.cast<float32>();
 
-		rendering::GLVec4d P = (mv_d_ * rendering::GLVec4d(pivot_point_.x(), pivot_point_.y(), pivot_point_.z(), 1));
-		float64 d = -P.z();
-		//		float64 d = -mv_d_.block<3, 1>(0, 3).z();
-		float64 znear = std::max(0.1, d - scene_radius_);
-//		float64 znear =  d - scene_radius_;
+		float64 d = -(mv_d_ * rendering::homogenous(pivot_point_)).z();
+
+		float64 znear = std::max(scene_radius_/32.0, d - scene_radius_);
 		float64 zfar = d + scene_radius_;
-		std::cout << d << " => "<< znear << " <=> " << zfar << std::endl;
+
 		proj_d_ = ((type_ == PERSPECTIVE) ? perspective(znear, zfar) : orthographic(znear, zfar));
 		proj_ = proj_d_.cast<float32>();	
-//		std::cout << " PROJ " <<  proj_d_ << std::endl;
-
 
 	}
 
@@ -122,16 +123,15 @@ public:
 
 	inline void set_field_of_view(float64 fov)
 	{
-		field_of_view_ = fov;
-		//focal_distance_ = scene_radius_ / std::tan(field_of_view_ / 2.0);
-		focal_distance_ = scene_radius_ / std::tan(field_of_view_ );
+		inv_tg_half_field_of_view_ = (1.0 / std::tan(fov));
+		focal_distance_ = scene_radius_ * inv_tg_half_field_of_view_;
 
 		update_matrices();
 	}
 
 	inline float64 field_of_view() const
 	{
-		return field_of_view_;
+		return std::atan(1.0 / inv_tg_half_field_of_view_);
 	}
 
 	inline float64 focal_distance() const
@@ -150,9 +150,7 @@ public:
 		scene_radius_ = radius;
 		if (!scene_radius_initialized_)
 		{
-			//focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ / std::tan(field_of_view_ / 2.0) : 0.0;
-			focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ / std::tan(field_of_view_) : 0.0;
-
+			focal_distance_ = (type_ == PERSPECTIVE) ? scene_radius_ * inv_tg_half_field_of_view_ : 0.0;
 			frame_.translation().z() -= focal_distance_;
 			scene_radius_initialized_ = true;
 		}
@@ -197,7 +195,7 @@ public:
 
 		trf.block<3, 1>(0, 3) = rendering::GLVec3d(-xAxis.dot(eye), -yAxis.dot(eye), -zAxis.dot(eye));
 		trf.block<1, 4>(3, 0) = rendering::GLVec4d(0, 0, 0, 1).transpose();
-		std::cout << "TRANSFO" << std::endl << trf << std::endl;
+		//std::cout << "TRANSFO" << std::endl << trf << std::endl;
 
 		if (type_ == PERSPECTIVE)
 			this->frame_ = Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, focal_distance_)) *
@@ -266,9 +264,9 @@ public:
 	{
 		os << c.type_ << "\n";
 		os << c.aspect_ratio_ << "\n";
-		os << c.scene_radius_ << "\n";
-		os << c.field_of_view_ << "\n";
-		os << c.pivot_point_[0] << " " << c.pivot_point_[1] << " " << c.pivot_point_[2] << "\n";
+		os << c.scene_radius() << "\n";
+		os << c.field_of_view() << "\n";
+		os << c.pivot_point_.transpose() << "\n";
 		os << c.frame_.matrix();
 
 		return os;

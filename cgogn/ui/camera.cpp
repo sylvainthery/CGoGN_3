@@ -32,13 +32,15 @@ namespace ui
 rendering::GLMat4d Camera::perspective(float64 znear, float64 zfar) const
 {
 	float64 range_inv = 1.0 / (znear - zfar);
-	float64 f = 1.0 / std::tan(field_of_view_);
+	float64 f = inv_tg_half_field_of_view_;
+
 	auto m05 = (aspect_ratio_ > 1) ? std::make_pair(f / aspect_ratio_, f) : std::make_pair(f, f * aspect_ratio_);
+
 	rendering::GLMat4d m;
 	m << m05.first, 0, 0, 0,
-		0, m05.second, 0, 0,
-		0, 0, (znear + zfar) * range_inv, 2 * znear * zfar * range_inv, 
-		0, 0, -1, 0;
+		 0, m05.second, 0, 0,
+		 0, 0, (znear + zfar) * range_inv, 2 * znear * zfar * range_inv, 
+		 0, 0, -1, 0;
 	return m;
 }
 

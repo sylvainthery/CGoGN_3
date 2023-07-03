@@ -63,6 +63,8 @@ struct ShadowData
 	GLVec3d light_dir_;
 	std::shared_ptr<FBO> fbo_shadows1_;
 	std::shared_ptr<FBO> fbo_shadows2_;
+	float znear;
+	float zfar;
 	int use_shadows_;
 	inline ShadowData() : fbo_shadows1_(nullptr), fbo_shadows2_(nullptr), use_shadows_(false)
 
