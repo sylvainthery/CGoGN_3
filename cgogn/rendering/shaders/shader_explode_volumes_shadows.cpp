@@ -195,14 +195,12 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		
 		float computeZlinear01()
 		{
-			//float n2 = 2.0*znear;
-			//float fpn = zfar+znear;
-			//float fmn = zfar-znear;
-			//float  z = n2/(fpn-gl_FragCoord.z*fmn);
-			//return (z-znear)/fmn;
+			float z_n = 2.0 * gl_FragCoord.z - 1.0;
+			float z_e = 2.0 * znear * zfar / (zfar + znear - z_n * (zfar - znear));
 
-			/*return 2.0/(3.0-gl_FragCoord.z)+0.000000001*(znear/zfar) -1.0;*/
-			return gl_FragCoord.z;
+			float z_eee = 4 / (3 - z_n) - 1.0;
+
+			return (z_e-znear)/(zfar-znear)*0.000001+ z_eee;
 		}
 
 		void main()
@@ -214,7 +212,7 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 			float lambert = 0.1*max(0.0,N.z) + 0.8 * dnl * compute_shadow(dnl,zlin);
 			//frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(mix(vec3(1,0,0),vec3(0,1,0),gl_FragCoord.z),1.0);
 	
-			frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(vec3(100.0*zlin),1.0);
+			frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(vec3(zlin),1.0);
 
 		}
 	)";

@@ -108,7 +108,7 @@ public:
 
 		float64 d = -(mv_d_ * rendering::homogenous(pivot_point_)).z();
 
-		float64 znear = std::max(scene_radius_/32.0, d - scene_radius_);
+		float64 znear = std::max(scene_radius_/128.0, d - scene_radius_);
 		float64 zfar = d + scene_radius_;
 
 		proj_d_ = ((type_ == PERSPECTIVE) ? perspective(znear, zfar) : orthographic(znear, zfar));
