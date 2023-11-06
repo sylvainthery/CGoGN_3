@@ -43,6 +43,44 @@ namespace ui
 
 class App;
 
+class CGOGN_UI_EXPORT HBAO
+{
+public:
+	HBAO();
+	void init();
+	void compute(const rendering::Texture2D* depth_tex, float rad, int steps, int rots, int subs, int blurs);
+
+protected:
+	std::unique_ptr<rendering::FBO> fbo_ao_;
+	std::unique_ptr<rendering::FBO> fbo_blur_;
+};
+
+
+HBAO::HBAO()
+{
+}
+
+void HBAO::init()
+{
+	auto tex_ao = std::make_shared<rendering::Texture2D>();
+	tex_ao->allocate(1, 1, GL_R32F, GL_RED);
+	fbo_ao_ = std::make_unique<rendering::FBO>({tex_ao.get()});
+
+	auto tex_blur = std::make_shared<rendering::Texture2D>();
+	tex_blur->allocate(1, 1, GL_R32F, GL_RED);
+	fbo_blur_ = std::make_unique<rendering::FBO>({tex_blur.get()});
+
+	prg_ssao,prg_blur_ao,
+
+}
+
+void HBAO::compute(const rendering::Texture2D* depth_tex, float rad, int steps, int rots, int subs, int blurs)
+{
+
+
+}
+
+
 class CGOGN_UI_EXPORT View : public GLViewer
 {
 	friend class App;
@@ -91,6 +129,8 @@ public:
 	{
 		event_stopped_ = true;
 	}
+
+	void compute_hbao();
 
 	void save_screenshot();
 
