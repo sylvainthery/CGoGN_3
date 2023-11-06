@@ -34,6 +34,8 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/fbo.h"
 		"${CMAKE_CURRENT_LIST_DIR}/fbo.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/vbo_update.h"
+		"${CMAKE_CURRENT_LIST_DIR}/hbao.h"
+		"${CMAKE_CURRENT_LIST_DIR}/hbao.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp"
 
@@ -44,6 +46,8 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/topo_render.h"
 
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_no_illum.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_no_illum.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_no_illum_scalar_per_vertex.h"

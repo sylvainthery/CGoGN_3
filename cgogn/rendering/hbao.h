@@ -1,3 +1,4 @@
+﻿
 /*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
@@ -21,17 +22,18 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_FBO_H_
-#define CGOGN_RENDERING_FBO_H_
+#ifndef CGOGN_RENDERING_HBAO_H_
+#define CGOGN_RENDERING_HBAO_H_
 
 #include <GL/gl3w.h>
-#include <cgogn/core/utils/numerics.h>
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
-#include <cgogn/rendering/texture.h>
-#include <memory>
+#include <cgogn/rendering/types.h>
 
-#include <vector>
+#include <cgogn/core/utils/numerics.h>
+
+#include <iostream>
+#include <string>
 
 namespace cgogn
 {
@@ -39,81 +41,48 @@ namespace cgogn
 namespace rendering
 {
 
-class CGOGN_RENDERING_EXPORT FBO
+
+class CGOGN_RENDERING_EXPORT HBAO
 {
-	GLint prev_id_;
-	GLint prev_viewport[4];
-
 public:
-	FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from);
-
-	inline void bind()
-	{
-		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prev_id_);
-		glGetIntegerv(GL_VIEWPORT, prev_viewport);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id_);
-		glViewport(0, 0, tex_[0]->width(), tex_[0]->height());
-	}
-
-	/**
-	 * do no save prceeding fbo & viewport
-	 */
-	inline void bind_no_release()
-	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id_);
-	}
-
-	inline void release()
-	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, prev_id_);
-		glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]);
-	}
-
-	inline void bind_read()
-	{
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, id_);
-	}
-
-	inline void release_read()
-	{
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	}
-
-	void resize(int w, int h);
-
-	inline std::shared_ptr<Texture2D> texture(std::size_t i)
-	{
-		return tex_[i];
-	}
-
-	inline int32 nb_textures()
-	{
-		return uint32(tex_.size());
-	}
-
-	inline GLint width() const
-	{
-		return tex_.front()->width();
-	}
-	inline GLint height() const
-	{
-		return tex_.front()->height();
-	}
-
-	inline std::shared_ptr<Texture2D> depth_texture() const
-	{
-		return depth_tex_;
-	}
+	HBAO();
+	void init();
+	void compute(const rendering::Texture2D* depth_tex, float rad, int steps, int rots, int subs, int blurs);
 
 protected:
-	GLuint id_;
-	GLuint depth_render_buffer_;
-	std::shared_ptr<Texture2D> depth_tex_;
-	std::vector<std::shared_ptr<rendering::Texture2D>> tex_;
+	std::unique_ptr<rendering::FBO> fbo_ao_;
+	std::unique_ptr<rendering::FBO> fbo_blur_;
 };
+
+
+HBAO::HBAO()
+{
+}
+
+void HBAO::init()
+{
+	auto tex_ao = std::make_shared<rendering::Texture2D>();
+	tex_ao->allocate(1, 1, GL_R32F, GL_RED);
+	fbo_ao_ = std::make_unique<rendering::FBO>({tex_ao.get()});
+
+	auto tex_blur = std::make_shared<rendering::Texture2D>();
+	tex_blur->allocate(1, 1, GL_R32F, GL_RED);
+	fbo_blur_ = std::make_unique<rendering::FBO>({tex_blur.get()});
+
+		prg_ssao,prg_blur_ao,
+
+		}
+
+void HBAO::compute(const rendering::Texture2D* depth_tex, float rad, int steps, int rots, int subs, int blurs)
+{
+
+
+}
+
+
 
 } // namespace rendering
 
 } // namespace cgogn
 
-#endif // CGOGN_RENDERING_FBO_H_
+#endif // CGOGN_RENDERING_HBA`O_H_

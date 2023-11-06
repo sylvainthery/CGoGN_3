@@ -21,17 +21,12 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_FBO_H_
-#define CGOGN_RENDERING_FBO_H_
-
-#include <GL/gl3w.h>
-#include <cgogn/core/utils/numerics.h>
+#ifndef CGOGN_RENDERING_SHADERS_HBAO_H_
+#define CGOGN_RENDERING_SHADERS_HBAO_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
+#include <cgogn/rendering/shader_program.h>
 #include <cgogn/rendering/texture.h>
-#include <memory>
-
-#include <vector>
 
 namespace cgogn
 {
@@ -39,81 +34,45 @@ namespace cgogn
 namespace rendering
 {
 
-class CGOGN_RENDERING_EXPORT FBO
+DECLARE_SHADER_CLASS(HBAO, false, CGOGN_STR(HBAO))
+
+class CGOGN_RENDERING_EXPORT ShaderParamHBAO : public ShaderParam
 {
-	GLint prev_id_;
-	GLint prev_viewport[4];
+	void set_uniforms() override;
 
 public:
-	FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from);
+	GLMat4d projection_matrix_;
+	std::shared_ptr<Texture2D> depth_texture_;
+	GLint unit_;
+	float width_;
+	float height_;
+	float radius_;
+	float subs_;
+	int nb_dirs_;
+	int nb_steps_;
+	GLVec3 far_near_precomp_values_;
+	GLVec2 proj_values_;
 
-	inline void bind()
+	using ShaderType = ShaderHBAO;
+
+	ShaderParamHBAO(ShaderType* sh) : ShaderParam(sh), unit_(0), alpha_(1.0f)
 	{
-		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prev_id_);
-		glGetIntegerv(GL_VIEWPORT, prev_viewport);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id_);
-		glViewport(0, 0, tex_[0]->width(), tex_[0]->height());
 	}
 
-	/**
-	 * do no save prceeding fbo & viewport
-	 */
-	inline void bind_no_release()
+	inline ~ShaderParamHNBAO() override
 	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id_);
 	}
 
-	inline void release()
+	inline void draw()
 	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, prev_id_);
-		glViewport(prev_viewport[0], prev_viewport[1], prev_viewport[2], prev_viewport[3]);
+		bind();
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		release();
 	}
-
-	inline void bind_read()
-	{
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, id_);
-	}
-
-	inline void release_read()
-	{
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	}
-
-	void resize(int w, int h);
-
-	inline std::shared_ptr<Texture2D> texture(std::size_t i)
-	{
-		return tex_[i];
-	}
-
-	inline int32 nb_textures()
-	{
-		return uint32(tex_.size());
-	}
-
-	inline GLint width() const
-	{
-		return tex_.front()->width();
-	}
-	inline GLint height() const
-	{
-		return tex_.front()->height();
-	}
-
-	inline std::shared_ptr<Texture2D> depth_texture() const
-	{
-		return depth_tex_;
-	}
-
-protected:
-	GLuint id_;
-	GLuint depth_render_buffer_;
-	std::shared_ptr<Texture2D> depth_tex_;
-	std::vector<std::shared_ptr<rendering::Texture2D>> tex_;
 };
 
 } // namespace rendering
 
 } // namespace cgogn
 
-#endif // CGOGN_RENDERING_FBO_H_
+#endif // CGOGN_RENDERING_SHADERS_FULL_SCREEN_TEXTURE_H_
