@@ -34,8 +34,8 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/fbo.h"
 		"${CMAKE_CURRENT_LIST_DIR}/fbo.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/vbo_update.h"
-		"${CMAKE_CURRENT_LIST_DIR}/hbao.h"
-		"${CMAKE_CURRENT_LIST_DIR}/hbao.cpp"
+#		"${CMAKE_CURRENT_LIST_DIR}/hbao.h"
+#		"${CMAKE_CURRENT_LIST_DIR}/hbao.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp"
 
@@ -46,8 +46,8 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/topo_render.h"
 
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.h"
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.cpp"
+#		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.h"
+#		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_no_illum.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_no_illum.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_no_illum_scalar_per_vertex.h"
@@ -90,8 +90,16 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_point_sprite.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_point_sprite.cpp"
 
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_data.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.cpp"
+
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_smooth.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_smooth.cpp"
+
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_shadows.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_shadows.cpp"
+
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_color.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_color.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_scalar.h"
@@ -102,13 +110,16 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_fullscreen_texture.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_fullscreen_texture.cpp"
 
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.cpp"
+
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_frame2d.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_frame2d.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/transform_feedback.h"
 
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.h"
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.cpp"
+#		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.h"
+#		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_volume_centers.cpp"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_normals.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/compute_normals.cpp"
 

@@ -62,9 +62,21 @@ inline GLVec4 construct_GLVec4(T1 x, T2 y, T3 z, T4 w)
 	return GLVec4(float32(x), float32(y), float32(z), float32(w));
 }
 
+inline GLVec4 homogenous(const GLVec3& v)
+{
+	return GLVec4{v.x(), v.y(), v.z(), 1.0f};
+}
+
+
 using GLVec2d = Eigen::Vector2d;
 using GLVec3d = Eigen::Vector3d;
 using GLVec4d = Eigen::Vector4d;
+
+inline GLVec4d homogenous(const GLVec3d& v)
+{
+	return GLVec4d{v.x(), v.y(), v.z(), 1.0};
+}
+
 
 using GLMat3 = Eigen::Matrix3f;
 using GLMat4 = Eigen::Matrix4f;
@@ -78,20 +90,12 @@ using Transfo3d = Eigen::Affine3d;
 
 using Transfo3f = Eigen::Affine3f;
 
-// inline GLColor col4i(uint8 R, uint8 G, uint8 B, uint8 A)
-// {
-// 	return GLColor(R/255.0f, G/255.0f, B/255.0f, A/255.0f);
-// }
-
-// inline GLColor col3i(uint8 R, uint8 G, uint8 B)
-// {
-// 	return GLColor(R/255.0f, G/255.0f, B/255.0f, 1.0f);
-// }
-
-// inline GLColor col1i(uint8 R)
-// {
-// 	return GLColor(R/255.0f, R/255.0f, R/255.0f, 1.0f);
-// }
+inline GLVec3d homoTransform(const GLMat4d& m, const GLVec3d& p)
+{
+	GLVec4d p4(p.x(), p.y(), p.z(),1.0);
+	GLVec4d q = m * p4;
+	return GLVec3d{q[0], q[1], q[2]};
+}
 
 static std::map<GLenum, std::string> GL_ERRORS_NAMES = {
 	{GL_INVALID_ENUM, "GL_INVALID_ENUM"},

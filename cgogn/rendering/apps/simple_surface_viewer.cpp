@@ -98,6 +98,9 @@ int main(int argc, char** argv)
 
 		std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
 		std::shared_ptr<Attribute<Vec3>> vertex_normal = cgogn::add_attribute<Vec3, Vertex>(*m, "normal");
+		mp.set_mesh_bb_vertex_position(*m, vertex_position);
+		for (auto& P : *vertex_position)
+			P *= 100.0f;
 
 		std::shared_ptr<Attribute<Vec3>> face_color = cgogn::add_attribute<Vec3, Face>(*m, "color");
 		std::shared_ptr<Attribute<Scalar>> face_weight = cgogn::add_attribute<Scalar, Face>(*m, "weight");
@@ -109,8 +112,6 @@ int main(int argc, char** argv)
 			cgogn::value<Scalar>(*m, face_weight, f) = double(rand()) / RAND_MAX;
 			return true;
 		});
-
-		mp.set_mesh_bb_vertex_position(*m, vertex_position);
 
 		sdp.compute_normal(*m, vertex_position.get(), vertex_normal.get());
 

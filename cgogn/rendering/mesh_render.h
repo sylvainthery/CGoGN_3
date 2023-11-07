@@ -1,4 +1,4 @@
-/*******************************************************************************
+	/*******************************************************************************
  * CGoGN: Combinatorial and Geometric modeling with Generic N-dimensional Maps  *
  * Copyright (C), IGG Group, ICube, University of Strasbourg, France            *
  *                                                                              *
@@ -46,24 +46,22 @@ void MeshRender::init_points(const MESH& m, TablesIndices& table_indices)
 template <bool EMB, typename MESH>
 void MeshRender::init_lines(const MESH& m, TablesIndices& table_indices, TablesIndices& table_emb_edge)
 {
-	if constexpr (mesh_traits<MESH>::dimension > 0)
-	{
-		using Vertex = typename mesh_traits<MESH>::Vertex;
-		using Edge = typename mesh_traits<MESH>::Edge;
-		std::vector<uint32> i_e(thread_pool()->nb_workers(), 0);
-		parallel_foreach_cell(m, [&](Edge e) -> bool {
-			uint32 worker_index = current_worker_index();
-			foreach_incident_vertex(m, e, [&](Vertex v) -> bool {
-				table_indices[worker_index].push_back(index_of(m, v));
-				return true;
-			});
-			if (EMB)
-				table_emb_edge[worker_index].push_back(index_of(m, e));
-			else
-				table_emb_edge[worker_index].push_back(i_e[worker_index]++);
+
+	using Vertex = typename mesh_traits<MESH>::Vertex;
+	using Edge = typename mesh_traits<MESH>::Edge;
+	std::vector<uint32> i_e(thread_pool()->nb_workers(), 0);
+	parallel_foreach_cell(m, [&](Edge e) -> bool {
+		uint32 worker_index = current_worker_index();
+		foreach_incident_vertex(m, e, [&](Vertex v) -> bool {
+			table_indices[worker_index].push_back(index_of(m, v));
 			return true;
 		});
-	}
+		if (EMB)
+			table_emb_edge[worker_index].push_back(index_of(m, e));
+		else
+			table_emb_edge[worker_index].push_back(i_e[worker_index]++);
+		return true;
+	});
 }
 
 template <bool EMB, typename MESH>
@@ -190,22 +188,50 @@ void MeshRender::init_volumes(const MESH& m, TablesIndices& table_indices_f, Tab
 				ivol = index_of(m, vol);
 
 			auto& vertices = vvertices[worker_index];
+			if (smooth_volume_faces_)
+			{
+				foreach_incident_face(m, vol, [&](Face f) -> bool {
+					auto& tif = table_indices_f[worker_index];
+					if (codegree(m, f) == 3)
+					{
+						vertices.clear();
+						append_incident_vertices(m, f, vertices);
+						tif.push_back(index_of(m, vertices[0]));
+						tif.push_back(index_of(m, vertices[2]));
+						tif.push_back(index_of(m, vertices[1]));
 
-			foreach_incident_face(m, vol, [&](Face f) -> bool {
-				auto& tif = table_indices_f[worker_index];
-				if (codegree(m, f) == 3)
-				{
-					vertices.clear();
-					append_incident_vertices(m, f, vertices);
-					tif.push_back(index_of(m, vertices[0]));
-					tif.push_back(index_of(m, vertices[1]));
-					tif.push_back(index_of(m, vertices[2]));
-					tif.push_back(ivol);
-				}
-				else
-					geometry::append_ear_triangulation(m, f, position, tif, [&]() { tif.push_back(ivol); });
-				return true;
-			});
+						tif.push_back(index_of(m, vertices[1]));
+						tif.push_back(index_of(m, vertices[0]));
+						tif.push_back(index_of(m, vertices[2]));
+
+						tif.push_back(index_of(m, vertices[2]));
+						tif.push_back(index_of(m, vertices[1]));
+						tif.push_back(index_of(m, vertices[0]));
+						tif.push_back(ivol);
+					}
+					else
+						geometry::append_ear_triangulation3(m, f, position, tif, [&]() { tif.push_back(ivol); });
+					return true;
+				});
+			}
+			else
+			{
+				foreach_incident_face(m, vol, [&](Face f) -> bool {
+					auto& tif = table_indices_f[worker_index];
+					if (codegree(m, f) == 3)
+					{
+						vertices.clear();
+						append_incident_vertices(m, f, vertices);
+						tif.push_back(index_of(m, vertices[0]));
+						tif.push_back(index_of(m, vertices[1]));
+						tif.push_back(index_of(m, vertices[2]));
+						tif.push_back(ivol);
+					}
+					else
+						geometry::append_ear_triangulation(m, f, position, tif, [&]() { tif.push_back(ivol); });
+					return true;
+				});
+			}
 
 			foreach_incident_edge(m, vol, [&](Edge e) -> bool {
 				vertices.clear();

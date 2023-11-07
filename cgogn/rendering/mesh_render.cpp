@@ -30,7 +30,7 @@ namespace cgogn
 namespace rendering
 {
 
-MeshRender::MeshRender()
+MeshRender::MeshRender():smooth_volume_faces_(false)
 {
 	for (uint32 i = 0u; i < SIZE_BUFFER; ++i)
 	{
@@ -100,6 +100,7 @@ void MeshRender::draw(DrawingType prim)
 		break;
 	case VOLUMES_FACES:
 	case VOLUMES_FACES_TB:
+	case VOLUMES_SMOOTH_FACES:
 		indices_buffers_[prim]->bind_texture_buffer(10);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 3, nb_indices / 4);
 		indices_buffers_[prim]->release_texture_buffer(10);

@@ -29,14 +29,14 @@ namespace cgogn
 namespace rendering
 {
 
-FBO::FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from)
+void FBO::init(const std::vector<std::shared_ptr<Texture2D>>& textures, bool add_depth, FBO* from)
 {
 	glGenFramebuffers(1, &id_);
 	glBindFramebuffer(GL_FRAMEBUFFER, id_);
 	GLenum att = GL_COLOR_ATTACHMENT0;
-	for (auto* t : textures)
+	tex_.clear();
+	for (auto& t : textures)
 	{
-		tex_.clear();
 		tex_.push_back(t);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, att++, GL_TEXTURE_2D, t->id(), 0);
 	}
@@ -66,12 +66,11 @@ FBO::FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from)
 			depth_tex_ = from->depth_tex_;
 		else
 		{
-			depth_tex_ = new Texture2D({
+			depth_tex_ = std::make_shared<Texture2D>(std::vector<std::pair<GLenum, GLint>>{
 				{GL_TEXTURE_MIN_FILTER, GL_NEAREST},
 				{GL_TEXTURE_MAG_FILTER, GL_NEAREST},
 				{GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
-				{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE},
-			});
+				{GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}});
 			depth_tex_->allocate(0, 0, GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT);
 		}
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_tex_->id(), 0);
@@ -82,9 +81,20 @@ FBO::FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+FBO::FBO(const std::vector<std::shared_ptr<Texture2D>>& textures, bool add_depth, FBO* from)
+{
+	init(textures,add_depth,from);
+}
+
+FBO::FBO(const std::shared_ptr<Texture2D>& texture, bool add_depth, FBO* from)
+{
+	std::vector<std::shared_ptr<Texture2D>> vt = {texture};
+	init(vt,add_depth,from);
+}
+
 void FBO::resize(int w, int h)
 {
-	for (auto* t : tex_)
+	for (auto& t : tex_)
 		t->resize(w, h);
 
 	if (depth_tex_ != nullptr)

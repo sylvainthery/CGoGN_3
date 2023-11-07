@@ -43,6 +43,7 @@ namespace ui
 
 class App;
 
+/*
 class CGOGN_UI_EXPORT HBAO
 {
 public:
@@ -64,13 +65,13 @@ void HBAO::init()
 {
 	auto tex_ao = std::make_shared<rendering::Texture2D>();
 	tex_ao->allocate(1, 1, GL_R32F, GL_RED);
-	fbo_ao_ = std::make_unique<rendering::FBO>({tex_ao.get()});
+	fbo_ao_ = std::make_unique<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{tex_ao});
 
 	auto tex_blur = std::make_shared<rendering::Texture2D>();
 	tex_blur->allocate(1, 1, GL_R32F, GL_RED);
-	fbo_blur_ = std::make_unique<rendering::FBO>({tex_blur.get()});
+	fbo_blur_ = std::make_unique<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{tex_blur});
 
-	prg_ssao,prg_blur_ao,
+	//prg_ssao,prg_blur_ao,
 
 }
 
@@ -79,7 +80,7 @@ void HBAO::compute(const rendering::Texture2D* depth_tex, float rad, int steps, 
 
 
 }
-
+*/
 
 class CGOGN_UI_EXPORT View : public GLViewer
 {
@@ -130,7 +131,7 @@ public:
 		event_stopped_ = true;
 	}
 
-	void compute_hbao();
+	//void compute_hbao();
 
 	void save_screenshot();
 
@@ -153,7 +154,7 @@ protected:
 
 	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
 	std::unique_ptr<rendering::FBO> fbo_;
-	std::unique_ptr<rendering::Texture2D> tex_;
+	std::shared_ptr<rendering::Texture2D> tex_;
 
 	std::vector<ViewModule*> linked_view_modules_;
 	std::vector<ProviderModule*> linked_provider_modules_;

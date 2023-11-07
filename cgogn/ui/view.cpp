@@ -35,10 +35,10 @@ View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
 	  param_full_screen_texture_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false)
 {
-	tex_ = std::make_unique<rendering::Texture2D>();
+	tex_ = std::make_shared<rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
 
-	fbo_ = std::make_unique<rendering::FBO>(std::vector<rendering::Texture2D*>{tex_.get()}, true, nullptr);
+	fbo_ = std::make_unique<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{tex_}, true, nullptr);
 
 	param_full_screen_texture_ = rendering::ShaderFullScreenTexture::generate_param();
 	param_full_screen_texture_->unit_ = 0;

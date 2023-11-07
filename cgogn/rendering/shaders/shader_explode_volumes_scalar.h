@@ -27,6 +27,7 @@
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
 #include <cgogn/rendering/shaders/shader_function_color_maps.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
 
 namespace cgogn
 {
@@ -57,23 +58,61 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesScalar : public ShaderPara
 	};
 
 public:
-	GLVec3 light_position_;
-	float32 explode_;
-	GLVec4 plane_clip_;
-	GLVec4 plane_clip2_;
-	shader_function::ColorMap::Uniforms color_map_;
+	ExplodeVolumeData* data_;
+
+	ShadowData* sha_data_;
 
 	using ShaderType = ShaderExplodeVolumesScalar;
 
-	ShaderParamExplodeVolumesScalar(ShaderType* sh)
-		: ShaderParam(sh), light_position_(10, 100, 1000), explode_(0.9f), plane_clip_(0, 0, 0, 0),
-		  plane_clip2_(0, 0, 0, 0)
+	ShaderParamExplodeVolumesScalar(ShaderType* sh) : ShaderParam(sh), data_(nullptr), sha_data_(nullptr)
 	{
 		for (auto& v : vbos_)
 			v = nullptr;
 	}
 
 	inline ~ShaderParamExplodeVolumesScalar() override
+	{
+	}
+};
+	
+
+
+DECLARE_SHADER_CLASS(ExplodeVolumesScalarSmooth, true, CGOGN_STR(ExplodeVolumesScalarSmooth))
+
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesScalarSmooth : public ShaderParam
+{
+	void set_uniforms() override;
+
+	std::array<VBO*, 4> vbos_;
+	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
+	{
+		vbos_[i] = vbo;
+	}
+	void bind_texture_buffers() override;
+	void release_texture_buffers() override;
+
+	enum VBOName : uint32
+	{
+		VERTEX_POSITION = 0,
+		VOLUME_CENTER,
+		VOLUME_SCALAR,
+		VOLUME_CLIPPING
+	};
+
+public:
+	ExplodeVolumeData* data_;
+	ShadowData* sha_data_;
+
+	using ShaderType = ShaderExplodeVolumesScalarSmooth;
+
+	ShaderParamExplodeVolumesScalarSmooth(ShaderType* sh) : ShaderParam(sh), data_(nullptr), sha_data_(nullptr)
+	{
+		
+		for (auto& v : vbos_)
+			v = nullptr;
+	}
+
+	inline ~ShaderParamExplodeVolumesScalarSmooth() override
 	{
 	}
 };

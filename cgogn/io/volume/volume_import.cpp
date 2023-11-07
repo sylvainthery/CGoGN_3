@@ -51,16 +51,21 @@ auto import_volume_data_map_tmpl(MESH& m, VolumeImportData& volume_data)
 
 	using ParentMESH = typename MESH::Parent;
 
+
+	auto start_timer = std::chrono::high_resolution_clock::now();
+
 	auto position = get_or_add_attribute<geometry::Vec3, Vertex>(m, volume_data.vertex_position_attribute_name_);
+	auto darts_per_vertex = add_attribute<std::vector<Dart>, Vertex>(m, "__darts_per_vertex");
 
 	for (uint32 i = 0u; i < volume_data.nb_vertices_; ++i)
 	{
 		uint32 vertex_id = new_index<Vertex>(m);
 		(*position)[vertex_id] = volume_data.vertex_position_[i];
 		volume_data.vertex_id_after_import_.push_back(vertex_id);
+		(*darts_per_vertex)[vertex_id].reserve(256);
 	}
 
-	auto darts_per_vertex = add_attribute<std::vector<Dart>, Vertex>(m, "__darts_per_vertex");
+
 
 	uint32 index = 0u;
 	DartMarker dart_marker(m);
@@ -175,6 +180,12 @@ auto import_volume_data_map_tmpl(MESH& m, VolumeImportData& volume_data)
 			set_index(m, vol, vol_emb++);
 	}
 
+	auto end_timer = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end_timer - start_timer;
+	std::cout << "import part1 " << elapsed_seconds.count() << " seconds" << std::endl;
+//	for (const auto& vd : *darts_per_vertex)
+//		std::cout << vd.size() << "  capa (" << vd.capacity() << ")" << std::endl;
+
 	// reconstruct neighbourhood
 	uint32 nb_boundary_faces = 0u;
 	DartMarkerStore marker(m);
@@ -257,6 +268,10 @@ auto import_volume_data_map_tmpl(MESH& m, VolumeImportData& volume_data)
 				++nb_boundary_faces;
 		}
 	}
+	start_timer = end_timer;
+	end_timer = std::chrono::high_resolution_clock::now();
+	elapsed_seconds = end_timer - start_timer;
+	std::cout << "import part2 " << elapsed_seconds.count() << " seconds" << std::endl;
 
 	if (nb_boundary_faces > 0u)
 	{

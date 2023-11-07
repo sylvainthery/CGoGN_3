@@ -85,21 +85,23 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 		{
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_position - position);
-			float lambert = 0.2 + 0.8 * (max(0.0, dot(N, L)));
+			float dnl = max(0.0, dot(N, L));
+			float lambert = 0.1 + 0.1*max(0.0,N.z) + 0.8 * dnl;
 			frag_out = vec4(lambert * color.rgb, color.a);
 		}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping","color", "light_position", "explode", "plane_clip",
-				 "plane_clip2");
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_position",
+				 "explode", "plane_clip", "plane_clip2");
 
 	nb_attributes_ = 2;
 }
 
 void ShaderParamExplodeVolumes::set_uniforms()
 {
-	shader_->set_uniforms_values(10, 11, 12, 13, color_, light_position_, explode_, plane_clip_, plane_clip2_);
+	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+								 data_->plane_clip_, data_->plane_clip2_);
 }
 
 void ShaderParamExplodeVolumes::bind_texture_buffers()

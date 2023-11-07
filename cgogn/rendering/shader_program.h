@@ -140,6 +140,20 @@ protected:
 
 	std::vector<GLint> uniforms_;
 
+
+	template <typename T>
+	void set_uniforms_values_rec(int32 max_uniforms_size,T v)
+	{
+		set_uniform_value(max_uniforms_size - 1, v);
+	}
+
+	template <typename T, typename... Ts>
+	void set_uniforms_values_rec(int32 max_uniforms_size, T v, Ts... vs)
+	{
+		set_uniform_value(max_uniforms_size - 1 - uint32(sizeof...(Ts)), v);
+		set_uniforms_values_rec(max_uniforms_size, vs...);
+	}
+
 public:
 	ShaderProgram();
 	ShaderProgram(const ShaderProgram&) = delete;
@@ -225,17 +239,53 @@ public:
 		glUniform1i(uniforms_[i], int32(v));
 	}
 
-	template <typename T>
-	void set_uniforms_values(T v)
+	inline void set_uniform_value(std::size_t i, const GLMat4& m)
 	{
-		set_uniform_value(uint32(uniforms_.size()) - 1, v);
+		glUniformMatrix4fv(uniforms_[i], 1, false, m.data());
 	}
 
+	inline void set_uniform_value(std::size_t i, const GLMat3& m)
+	{
+		glUniformMatrix3fv(uniforms_[i], 1, false, m.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLVec2d& v)
+	{
+		GLVec2 vf = v.cast<float>();
+		glUniform2fv(uniforms_[i], 1, vf.data());
+	}
+	inline void set_uniform_value(std::size_t i, const GLVec3d& v)
+	{
+		GLVec3 vf = v.cast<float>();
+		glUniform3fv(uniforms_[i], 1, vf.data());
+	}
+	inline void set_uniform_value(std::size_t i, const GLVec4d& v)
+	{
+		GLVec4 vf = v.cast<float>();
+		glUniform4fv(uniforms_[i], 1, vf.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLMat4d& m)
+	{
+		GLMat4 mf = m.cast<float>();
+		glUniformMatrix4fv(uniforms_[i], 1, false, mf.data());
+	}
+
+	inline void set_uniform_value(std::size_t i, const GLMat3d& m)
+	{
+		GLMat3 mf = m.cast<float>();
+		glUniformMatrix3fv(uniforms_[i], 1, false, mf.data());
+	}
+
+
+
+
+	
 	template <typename T, typename... Ts>
 	void set_uniforms_values(T v, Ts... vs)
 	{
-		set_uniform_value(uint32(uniforms_.size()) - 1 - sizeof...(Ts), v);
-		set_uniforms_values(vs...);
+		int32 max_uniforms_size = std::min(1 + sizeof...(Ts), uniforms_.size());
+		set_uniforms_values_rec(max_uniforms_size, v, vs...);
 	}
 
 	void get_matrices_uniforms();
@@ -474,6 +524,8 @@ public:
 	 * @param all vbos in order of attribs
 	 */
 	virtual void set_vbos(const std::vector<VBO*>& vbos);
+
+	void set_vbos_stride(const std::vector<std::tuple<VBO*, int, int>>& vbos);
 
 	// /**
 	//  * @brief set one vbo into the vao

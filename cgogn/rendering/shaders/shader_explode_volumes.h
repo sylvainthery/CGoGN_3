@@ -26,6 +26,7 @@
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
 
 namespace cgogn
 {
@@ -55,17 +56,13 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
 	};
 
 public:
-	GLColor color_;
-	GLVec3 light_position_;
-	float32 explode_;
-	GLVec4 plane_clip_;
-	GLVec4 plane_clip2_;
+//	std::shared_ptr<ExplodeVolumeData> data_;
+	ExplodeVolumeData* data_;
 
 	using ShaderType = ShaderExplodeVolumes;
 
 	inline ShaderParamExplodeVolumes(ShaderType* sh)
-		: ShaderParam(sh), color_(0.9f, 0, 0, 1), light_position_(10, 100, 1000), explode_(0.9f),
-		  plane_clip_(0, 0, 0, 0), plane_clip2_(0, 0, 0, 0)
+		: ShaderParam(sh), data_(nullptr)
 	{
 		for (auto& v : vbos_)
 			v = nullptr;

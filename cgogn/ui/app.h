@@ -24,6 +24,8 @@
 #ifndef CGOGN_UI_WINDOW_H_
 #define CGOGN_UI_WINDOW_H_
 
+#define GLFW_EXPOSE_NATIVE_X11
+
 #include <cgogn/core/utils/numerics.h>
 #include <cgogn/core/utils/type_traits.h>
 

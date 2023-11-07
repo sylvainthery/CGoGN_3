@@ -97,7 +97,10 @@ private:
 	{
 		for (View* v : linked_views_)
 		{
-			parameters_[v][m];
+			auto& p = parameters_[v][m];
+
+			p.topo_drawer_->reset_all_colors(rendering::GLVec3(1.0f,1.0f,1.0f));
+
 			std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
 			if (vertex_position)
 				set_vertex_position(*v, *m, vertex_position);

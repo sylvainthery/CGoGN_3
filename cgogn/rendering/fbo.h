@@ -45,14 +45,19 @@ class CGOGN_RENDERING_EXPORT FBO
 	GLint prev_viewport[4];
 
 public:
-	FBO(const std::vector<Texture2D*>& textures, bool add_depth, FBO* from);
+	FBO(const std::vector<std::shared_ptr<Texture2D>>& textures, bool add_depth = false, FBO* from =  nullptr);
+
+	FBO(const std::shared_ptr<Texture2D>& textures, bool add_depth = false, FBO* from = nullptr);
 
 	inline void bind()
 	{
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prev_id_);
 		glGetIntegerv(GL_VIEWPORT, prev_viewport);
 		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, id_);
-		glViewport(0, 0, tex_[0]->width(), tex_[0]->height());
+		if (depth_tex_ != nullptr)
+			glViewport(0, 0, depth_tex_->width(), depth_tex_->height());
+		else
+			glViewport(0, 0, tex_[0]->width(), tex_[0]->height());
 	}
 
 	/**
@@ -81,7 +86,7 @@ public:
 
 	void resize(int w, int h);
 
-	inline std::shared_ptr<Texture2D> texture(std::size_t i)
+	inline std::shared_ptr<Texture2D>& texture(std::size_t i)
 	{
 		return tex_[i];
 	}
@@ -100,12 +105,19 @@ public:
 		return tex_.front()->height();
 	}
 
-	inline std::shared_ptr<Texture2D> depth_texture() const
+	inline std::shared_ptr<Texture2D>& getTexture(int i) 
+	{
+		return tex_[i];
+	}
+
+	inline std::shared_ptr<Texture2D>& getDepthTexture() 
 	{
 		return depth_tex_;
 	}
 
 protected:
+	void init(const std::vector<std::shared_ptr<Texture2D>>& textures, bool add_depth, FBO* from);
+
 	GLuint id_;
 	GLuint depth_render_buffer_;
 	std::shared_ptr<Texture2D> depth_tex_;

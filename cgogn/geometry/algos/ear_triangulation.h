@@ -242,6 +242,11 @@ class EarTriangulation
 			const Vec3& P3 = POSITION(Vertex(c));
 
 			Scalar val = ear_angle(P1, P2, P3);
+
+			// do not use remove ears from vertices of valence 2
+			if ((phi2(m_, phi1(m_, phi2(m_, b))) == a))
+				val = 10.0;
+
 			VertexPoly* vp = new VertexPoly(Vertex(b), val, Scalar((P3 - P1).squaredNorm()), vpp);
 
 			if (vp->value_ > Scalar(5)) // concav angle
@@ -414,6 +419,84 @@ public:
 		}
 	}
 
+
+	template <typename FUNC>
+	void append_3indices(std::vector<uint32>& table_indices,
+						 const typename mesh_traits<MESH>::template Attribute<Vec3>* position, const FUNC& post_func)
+	{
+		if (nb_verts_ < 3)
+			return;
+
+		auto addIndices = [&](Vertex x) {
+			table_indices.push_back(index_of(m_, x));
+			Dart dp = phi_1(m_, x.dart_);
+			Dart dn = phi1(m_, x.dart_);
+			Vec3 Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
+			Vec3 Vn = (value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized();
+			Vec3 N = Vn.cross(Vp);
+			while ((N.dot(normalPoly_) < 0.2) && (dn != dp))
+			{
+				dn = phi1(m_, dn);
+				dp = phi_1(m_, dp);
+				Vp = (value<Vec3>(m_, position, Vertex(dp)) - value<Vec3>(m_, position, x)).normalized();
+				Vn = (value<Vec3>(m_, position, Vertex(dn)) - value<Vec3>(m_, position, x)).normalized();
+				N = Vn.cross(Vp);
+			}
+			if (dn==dp)
+				dn = phi_1(m_, dn);
+
+			table_indices.push_back(index_of(m_, Vertex(dp)));
+			table_indices.push_back(index_of(m_, Vertex(dn)));
+		};
+
+		if (nb_verts_ == 3)
+		{
+			foreach_incident_vertex(m_, face_, [&](Vertex v) -> bool {
+				addIndices(v);
+				return true;
+			});
+			post_func();
+			return;
+		}
+
+		while (nb_verts_ > 3)
+		{
+			// take best (and valid!) ear
+			typename VPMS::iterator be_it = ears_.begin(); // best ear
+			VertexPoly* be = *be_it;
+	
+			addIndices(be->vert_);
+			addIndices(be->next_->vert_);
+			addIndices(be->prev_->vert_);
+			post_func();
+			--nb_verts_;
+
+			if (nb_verts_ > 3) // do not recompute if only one triangle left
+			{
+				// remove ears and two sided ears
+				ears_.erase(be_it); // from map of ears
+				ears_.erase(be->next_->ear_);
+				ears_.erase(be->prev_->ear_);
+				be = VertexPoly::erase(be); // and remove ear vertex from polygon
+				recompute_2_ears(be);
+			}
+			else // finish (no need to update ears)
+			{
+				// remove ear from polygon
+				be = VertexPoly::erase(be);
+				// last triangle
+				addIndices(be->vert_);
+				addIndices(be->next_->vert_);
+				addIndices(be->prev_->vert_);
+				post_func();
+				// release memory of last triangle in polygon
+				delete be->next_;
+				delete be->prev_;
+				delete be;
+			}
+		}
+	}
+
 	/**
 	 * @brief apply ear triangulation to the face
 	 */
@@ -466,6 +549,22 @@ void append_ear_triangulation(const MESH& mesh, const typename mesh_traits<MESH>
 {
 	EarTriangulation<MESH> tri(const_cast<MESH&>(mesh), f, position);
 	tri.append_indices(table_indices, post_func);
+}
+
+/**
+ * @brief compute ear triangulation with 3 indices out per vertex for normal on face vertices computation
+ * @param map
+ * @param f face
+ * @param position
+ * @param table_indices table of indices (vertex embedding) to append
+ */
+template <typename MESH, typename FUNC>
+void append_ear_triangulation3(const MESH& mesh, const typename mesh_traits<MESH>::Face f,
+							  const typename mesh_traits<MESH>::template Attribute<Vec3>* position,
+							  std::vector<uint32>& table_indices, const FUNC& post_func)
+{
+	EarTriangulation tri(const_cast<MESH&>(mesh), f, position);
+	tri.append_3indices(table_indices,position, post_func);
 }
 
 /**
