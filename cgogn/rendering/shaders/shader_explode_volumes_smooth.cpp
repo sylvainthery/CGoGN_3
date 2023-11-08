@@ -22,6 +22,7 @@
  *******************************************************************************/
 
 #include <cgogn/rendering/shaders/shader_explode_volumes_smooth.h>
+#include <cgogn/rendering/shaders/shader_shadows.h>
 
 namespace cgogn
 {
@@ -90,27 +91,14 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 
 		uniform vec4 color;
 		uniform vec3 light_position;
-
-		uniform bool with_shadow;
-		uniform float bias_k;
-		uniform sampler2DShadow TUshadow;
-		uniform mat4 shadow_matrix;
-
-		float compute_shadow(float dnl)
-		{
-			if (!with_shadow)
-				return 1.0;
-			float bias_shd = bias_k+bias_k*tan(acos(dnl));
-			vec4 ShCoord = shadow_matrix*vec4(position,1); 
-			return texture(TUshadow, ShCoord.xyz/ShCoord.w - vec3(0,0,bias_shd));
-		}
-		
-		void main()
+)";
+	src_shadows;
+R"(		void main()
 		{
 			vec3 N = normalize(normal);
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.1 + 0.1*max(0.0,N.z) + 0.8 * dnl * compute_shadow(dnl);
+			float lambert = 0.2 + 0.8 * dnl * compute_shadow(dnl);
 			frag_out = vec4(lambert * color.rgb, color.a);
 		}
 	)";
@@ -118,8 +106,8 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 	load(vertex_shader_source, fragment_shader_source);
 	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", 
 				 "color", "light_position", "explode", "plane_clip", "plane_clip2",
-		"with_shadow", "shadow_matrix", "TUshadow", "bias_k");
-
+				 "with_shadow", "shadow_matrix", "TUshadow", "bias_k",
+				 "TUpoisson", "nb_samples");
 	nb_attributes_ = 2;
 }
 
@@ -127,8 +115,8 @@ void ShaderParamExplodeVolumesSmooth::set_uniforms()
 {
 	if (sha_data_ != nullptr)
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
-									 data_->plane_clip_, data_->plane_clip2_, true, sha_data_->shadow_matrix_,
-									 sha_data_->fbo_shadows_->getDepthTexture()->bind(0), sha_data_->bias_k_);
+									 data_->plane_clip_, data_->plane_clip2_,									 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0), sha_data_->bias_k_,
+									 sha_data_->tex_poisson_.bind(1), sha_data_->nb_samples_);
 	else
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_,false);

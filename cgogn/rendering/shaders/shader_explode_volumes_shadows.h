@@ -58,9 +58,7 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesGenerateShadows : public S
 	};
 
 public:
-	//std::shared_ptr<ExplodeVolumeData> data_;
 	ExplodeVolumeData* data_;
-
 
 	using ShaderType = ShaderExplodeVolumesGenerateShadows;
 
@@ -77,58 +75,6 @@ public:
 };
 
 
-
-DECLARE_SHADER_CLASS(ExplodeVolumesShadows, true, CGOGN_STR(ExplodeVolumesShadows))
-
-class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumesShadows : public ShaderParam
-{
-	void set_uniforms() override;
-
-	std::array<VBO*, 3> vbos_;
-
-	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
-	{
-		vbos_[i] = vbo;
-	}
-
-	void bind_texture_buffers() override;
-	void release_texture_buffers() override;
-
-	enum VBOName : int32
-	{
-		VERTEX_POSITION = 0,
-		VOLUME_CENTER,
-		VOLUME_CLIPPING
-	};
-
-	//std::array<ShaderParam*,3> params_smooth_shadows_;
-
-
-public:
-
-	ExplodeVolumeData* data_;
-	ShadowData* sha_data_;
-
-	using ShaderType = ShaderExplodeVolumesShadows;
-
-	inline ShaderParamExplodeVolumesShadows(ShaderType* sh) : ShaderParam(sh), data_(nullptr), sha_data_(nullptr)
-	{
-		for (auto& v : vbos_)
-			v = nullptr;
-	}
-
-	inline ~ShaderParamExplodeVolumesShadows() override
-	{
-	}
-
-	//inline void set_version(ShaderParam* p_smooth, ShaderParam* p_shadows, ShaderParam* p_smooth_shadows)
-	//{
-	//	params_smooth_shadows_[0] = p_smooth;
-	//	params_smooth_shadows_[1] = p_shadows;
-	//	params_smooth_shadows_[2] = p_smooth_shadows;
-	//}
-	//inline ShaderParam get_version()
-};
 
 } // namespace rendering
 

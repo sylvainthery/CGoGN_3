@@ -103,11 +103,11 @@ class VolumeRender : public ViewModule
 		float lightPosY_;
 		float lightPosZ_;
 		float Zplaneshift_;
-		float vm_diag_;
+		float vm_bias;
 
 		ViewParameters()
 			: use_shadows_(false), light_on_cam_(true), lightPosX_(1), lightPosY_(5), lightPosZ_(1), Zplaneshift_(1),
-			  vm_diag_(11)
+			  vm_bias(11)
 		{
 //			sha_data_ = std::make_shared<rendering::ShadowData>();
 			param_FS_ = rendering::ShaderFullScreenTexture::generate_param();
@@ -149,62 +149,6 @@ class VolumeRender : public ViewModule
 			  vertex_scale_factor_(1.0), auto_update_volume_scalar_min_max_(true), clipping_plane_(false),
 			  clip_only_volumes_(true), show_frame_manipulator_(false), manipulating_frame_(false)
 		{
-			//param_point_sprite_ = rendering::ShaderPointSprite::generate_param();
-			//param_point_sprite_->color_ = rendering::GLColor(1, 0.5f, 0, 1);
-
-			//param_bold_line_ = rendering::ShaderBoldLine::generate_param();
-			//param_bold_line_->color_ = {1.0f, 1.0f, 1.0f, 1.0f};
-			//param_bold_line_->width_ = 2.0f;
-
-			//param_volume_generate_shadows_ = rendering::ShaderExplodeVolumesGenerateShadows::generate_param();
-
-			//params_volumes_.reserve(16);
-
-			//param_volume_ = rendering::ShaderExplodeVolumesShadows::generate_param();
-			//params_volumes_.push_back(param_volume_.get());
-
-			//param_volume_shadows_ = rendering::ShaderExplodeVolumesShadows::generate_param();
-			//params_volumes_.push_back(param_volume_shadows_.get());
-
-			//param_volume_smooth_ = rendering::ShaderExplodeVolumesSmooth::generate_param();
-			//params_volumes_.push_back(param_volume_smooth_.get());
-
-			//param_volume_smooth_shadows_ = rendering::ShaderExplodeVolumesSmooth::generate_param();
-			//params_volumes_.push_back(param_volume_smooth_shadows_.get());
-
-			//
-			//param_volume_color_ = rendering::ShaderExplodeVolumesColor::generate_param();
-			//params_volumes_.push_back(param_volume_color_.get());
-
-			//param_volume_color_shadows_ = rendering::ShaderExplodeVolumesColor::generate_param();
-			//params_volumes_.push_back(param_volume_color_shadows_.get());
-
-			//param_volume_color_smooth_ = rendering::ShaderExplodeVolumesColorSmooth::generate_param();
-			//params_volumes_.push_back(param_volume_color_smooth_.get());
-
-			//param_volume_color_smooth_shadows_ = rendering::ShaderExplodeVolumesColorSmooth::generate_param();
-			//params_volumes_.push_back(param_volume_color_smooth_shadows_.get());
-
-
-			//param_volume_scalar_ = rendering::ShaderExplodeVolumesScalar::generate_param();
-			//params_volumes_.push_back(param_volume_scalar_.get());
-
-			//param_volume_scalar_shadows_ = rendering::ShaderExplodeVolumesScalar::generate_param();
-			//params_volumes_.push_back(param_volume_scalar_shadows_.get());
-
-			//param_volume_scalar_smooth_ = rendering::ShaderExplodeVolumesScalarSmooth::generate_param();
-			//params_volumes_.push_back(param_volume_scalar_smooth_.get());
-
-			//param_volume_scalar_smooth_shadows_ = rendering::ShaderExplodeVolumesScalarSmooth::generate_param();
-			//params_volumes_.push_back(param_volume_smooth_shadows_.get());
-
-			//for (int i=0; i<params_volumes_.size(); ++i)
-			//{
-			//	params_volumes_[i].data_ = &data_;
-			//	if (i % 2 == 1)
-			//		params_volumes_[i].sha_data_ = &sha_data_;
-			//}
-
 
 			data_.color_ = {0.4f, 0.8f, 1.0f, 1.0f};
 			data_.color_line_ = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -227,12 +171,12 @@ class VolumeRender : public ViewModule
 
 			params_volumes_.reserve(16);
 
-			param_volume_ = rendering::ShaderExplodeVolumesShadows::generate_param();
+			param_volume_ = rendering::ShaderExplodeVolumes::generate_param();
 			param_volume_->data_ = &data_;
 			param_volume_->sha_data_ = nullptr;
 			params_volumes_.push_back(param_volume_.get());
 
-			param_volume_shadows_ = rendering::ShaderExplodeVolumesShadows::generate_param();
+			param_volume_shadows_ = rendering::ShaderExplodeVolumes::generate_param();
 			param_volume_shadows_->data_ = &data_;
 			param_volume_shadows_->sha_data_ = sha_data_ptr;
 			params_volumes_.push_back(param_volume_shadows_.get());
@@ -313,8 +257,8 @@ class VolumeRender : public ViewModule
 		std::unique_ptr<rendering::ShaderBoldLine::Param> param_bold_line_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesGenerateShadows::Param> param_volume_generate_shadows_;
 
-		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volume_;
-		std::unique_ptr<rendering::ShaderExplodeVolumesShadows::Param> param_volume_shadows_;
+		std::unique_ptr<rendering::ShaderExplodeVolumes::Param> param_volume_;
+		std::unique_ptr<rendering::ShaderExplodeVolumes::Param> param_volume_shadows_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesSmooth::Param> param_volume_smooth_;
 		std::unique_ptr<rendering::ShaderExplodeVolumesSmooth::Param> param_volume_smooth_shadows_;
 
@@ -993,9 +937,9 @@ protected:
 			{
 				auto bb = mesh_provider_->meshes_bb();
 				auto diag = (bb.second - bb.first).norm();
-				if (ImGui::SliderFloat("Bias", &vp.vm_diag_, 7,20))
+				if (ImGui::SliderFloat("Bias", &vp.vm_bias, 15,27))
 				{
-					vp.sha_data_.bias_k_ = float(diag) / std::pow(2.0f, vp.vm_diag_);
+					vp.sha_data_.bias_k_ = float(diag) / std::pow(2.0f, vp.vm_bias);
 					need_update = true;
 				}
 				if (ImGui::SliderInt("samples", &vp.sha_data_.nb_samples_, 1, 9))
@@ -1050,12 +994,8 @@ protected:
 					need_update |= ImGui::Checkbox("Cast Shadow", &p.cast_shadow_);
 
 					if (ImGui::Checkbox("Smooth faces", &p.smooth_volume_faces_))
-					{
-						auto& md = mesh_provider_->mesh_data(*selected_mesh_);
-						md.mesh_render()->set_smooth_volume_face(p.smooth_volume_faces_, *selected_mesh_,
-																 p.vertex_position_.get());
 						need_update = true;
-					}
+
 					if (ImGui::Checkbox("shadowable", &p.receive_shadows_))
 						need_update = true;
 

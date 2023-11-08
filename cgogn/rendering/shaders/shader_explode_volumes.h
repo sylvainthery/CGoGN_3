@@ -56,8 +56,8 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
 	};
 
 public:
-//	std::shared_ptr<ExplodeVolumeData> data_;
 	ExplodeVolumeData* data_;
+	ShadowData* sha_data_;
 
 	using ShaderType = ShaderExplodeVolumes;
 

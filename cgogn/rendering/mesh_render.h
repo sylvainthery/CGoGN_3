@@ -163,7 +163,7 @@ void MeshRender::init_ear_triangles(const MESH& m, TablesIndices& table_indices,
 //	}
 
 template <bool EMB, typename MESH>
-void MeshRender::init_volumes(const MESH& m, TablesIndices& table_indices_f, TablesIndices& table_indices_e,
+void MeshRender::init_volumes(const MESH& m, TablesIndices& table_indices_f, TablesIndices& table_indices_fs, TablesIndices& table_indices_e,
 							  TablesIndices& table_indices_v, TablesIndices& table_emb_vol,
 							  const typename mesh_traits<MESH>::template Attribute<geometry::Vec3>* position)
 {
@@ -188,50 +188,40 @@ void MeshRender::init_volumes(const MESH& m, TablesIndices& table_indices_f, Tab
 				ivol = index_of(m, vol);
 
 			auto& vertices = vvertices[worker_index];
-			if (smooth_volume_faces_)
-			{
-				foreach_incident_face(m, vol, [&](Face f) -> bool {
-					auto& tif = table_indices_f[worker_index];
-					if (codegree(m, f) == 3)
-					{
-						vertices.clear();
-						append_incident_vertices(m, f, vertices);
-						tif.push_back(index_of(m, vertices[0]));
-						tif.push_back(index_of(m, vertices[2]));
-						tif.push_back(index_of(m, vertices[1]));
+			foreach_incident_face(m, vol, [&](Face f) -> bool {
+				auto& tif = table_indices_f[worker_index];
+				auto& tifs = table_indices_fs[worker_index];
+				if (codegree(m, f) == 3)
+				{
+					vertices.clear();
+					append_incident_vertices(m, f, vertices);
 
-						tif.push_back(index_of(m, vertices[1]));
-						tif.push_back(index_of(m, vertices[0]));
-						tif.push_back(index_of(m, vertices[2]));
+					tif.push_back(index_of(m, vertices[0]));
+					tif.push_back(index_of(m, vertices[1]));
+					tif.push_back(index_of(m, vertices[2]));
+					tif.push_back(ivol);
 
-						tif.push_back(index_of(m, vertices[2]));
-						tif.push_back(index_of(m, vertices[1]));
-						tif.push_back(index_of(m, vertices[0]));
-						tif.push_back(ivol);
-					}
-					else
-						geometry::append_ear_triangulation3(m, f, position, tif, [&]() { tif.push_back(ivol); });
-					return true;
-				});
-			}
-			else
-			{
-				foreach_incident_face(m, vol, [&](Face f) -> bool {
-					auto& tif = table_indices_f[worker_index];
-					if (codegree(m, f) == 3)
-					{
-						vertices.clear();
-						append_incident_vertices(m, f, vertices);
-						tif.push_back(index_of(m, vertices[0]));
-						tif.push_back(index_of(m, vertices[1]));
-						tif.push_back(index_of(m, vertices[2]));
-						tif.push_back(ivol);
-					}
-					else
-						geometry::append_ear_triangulation(m, f, position, tif, [&]() { tif.push_back(ivol); });
-					return true;
-				});
-			}
+					tifs.push_back(index_of(m, vertices[0]));
+					tifs.push_back(index_of(m, vertices[2]));
+					tifs.push_back(index_of(m, vertices[1]));
+
+					tifs.push_back(index_of(m, vertices[1]));
+					tifs.push_back(index_of(m, vertices[0]));
+					tifs.push_back(index_of(m, vertices[2]));
+
+					tifs.push_back(index_of(m, vertices[2]));
+					tifs.push_back(index_of(m, vertices[1]));
+					tifs.push_back(index_of(m, vertices[0]));
+					tifs.push_back(ivol);
+				}
+				else
+				{
+					geometry::append_ear_triangulation3(m, f, position, tifs, [&]() { tifs.push_back(ivol); });
+					geometry::append_ear_triangulation(m, f, position, tif, [&]() { tif.push_back(ivol); });
+				}
+				return true;
+			});
+
 
 			foreach_incident_edge(m, vol, [&](Edge e) -> bool {
 				vertices.clear();
@@ -354,6 +344,10 @@ void MeshRender::init_primitives(const MESH& m, DrawingType prim,
 	for (auto& t : table_indices)
 		t.reserve(1024u);
 
+	TablesIndices table_indices_smooth(nbw);
+	for (auto& t : table_indices_smooth)
+		t.reserve(1024u);
+
 	TablesIndices table_indices_emb(nbw);
 	for (auto& t : table_indices_emb)
 		t.reserve(1024u);
@@ -424,21 +418,24 @@ void MeshRender::init_primitives(const MESH& m, DrawingType prim,
 	case VOLUMES_VERTICES:
 	case VOLUMES_EDGES:
 	case VOLUMES_FACES:
+	case VOLUMES_SMOOTH_FACES:
 	case INDEX_VOLUMES:
 		if constexpr (mesh_traits<MESH>::dimension >= 3)
 		{
 			if (is_indexed<typename mesh_traits<MESH>::Volume>(m))
 			{
-				init_volumes<true>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb, position);
+				init_volumes<true>(m, table_indices, table_indices_smooth, table_indices_e, table_indices_v, table_indices_emb, position);
 				func_update_ebo(VOLUMES_FACES, table_indices);
+				func_update_ebo(VOLUMES_SMOOTH_FACES, table_indices_smooth);
 				func_update_ebo(VOLUMES_EDGES, table_indices_e);
 				func_update_ebo(VOLUMES_VERTICES, table_indices_v);
 				func_update_ebo(INDEX_VOLUMES, table_indices_emb);
 			}
 			else
 			{
-				init_volumes<false>(m, table_indices, table_indices_e, table_indices_v, table_indices_emb, position);
+				init_volumes<false>(m, table_indices, table_indices_smooth, table_indices_e, table_indices_v, table_indices_emb, position);
 				func_update_ebo3(VOLUMES_FACES, table_indices, table_indices_emb, 4);
+				func_update_ebo3(VOLUMES_SMOOTH_FACES, table_indices_smooth, table_indices_emb, 4);
 				func_update_ebo3(VOLUMES_EDGES, table_indices_e, table_indices_emb, 3);
 				func_update_ebo3(VOLUMES_VERTICES, table_indices_v, table_indices_emb, 2);
 				func_update_ebo2(INDEX_VOLUMES, table_indices_emb);

@@ -64,6 +64,7 @@ enum DrawingType : uint32
 	TRIANGLES_TB,
 
 	VOLUMES_FACES_TB,
+	VOLUMES_SMOOTH_FACES_TB,
 	VOLUMES_EDGES_TB,
 	VOLUMES_VERTICES_TB,
 
@@ -88,7 +89,7 @@ inline int32* operator&(DrawingType& d)
 static std::vector<std::string> primitives_names = {
 	"POINTS",			"LINES",		  "TRIANGLES",		  "VOLUMES_FACES",	  "VOLUMES_SMOOTH_FACES", "VOLUMES_EDGES",
 	"VOLUMES_VERTICES", "INDEX_EDGES",	  "INDEX_FACES",	  "INDEX_VOLUMES",	  "POINTS_TB",
-	"LINES_TB",			"TRIANGLES_TB",	  "VOLUMES_FACES_TB", "VOLUMES_EDGES_TB", "VOLUMES_VERTICES_TB",
+	"LINES_TB",			"TRIANGLES_TB",	  "VOLUMES_FACES_TB","VOLUMES_SMOOTH_FACES_TB", "VOLUMES_EDGES_TB", "VOLUMES_VERTICES_TB",
 	"INDEX_EDGES_TB",	"INDEX_FACES_TB", "INDEX_VOLUMES_TB"};
 
 class CGOGN_RENDERING_EXPORT MeshRender
@@ -102,18 +103,6 @@ public:
 	MeshRender();
 	~MeshRender();
 	CGOGN_NOT_COPYABLE_NOR_MOVABLE(MeshRender);
-
-	template <typename MESH>
-	inline void set_smooth_volume_face(bool b, const MESH& m,
-									   const typename mesh_traits<MESH>::template Attribute<geometry::Vec3>* position)
-	{
-		smooth_volume_faces_ = b;
-		if (b)
-			init_primitives(m, DrawingType::VOLUMES_SMOOTH_FACES, position);
-		else
-			init_primitives(m, DrawingType::VOLUMES_FACES, position);
-
-	}
 
 
 	inline bool is_primitive_uptodate(DrawingType prim)
@@ -152,7 +141,7 @@ protected:
 							const typename mesh_traits<MESH>::template Attribute<geometry::Vec3>* position);
 
 	template <bool EMB, typename MESH>
-	void init_volumes(const MESH& m, TablesIndices& table_indices_f, TablesIndices& table_indices_e,
+	void init_volumes(const MESH& m, TablesIndices& table_indices_f, TablesIndices& table_indices_fs, TablesIndices& table_indices_e,
 					  TablesIndices& table_indices_v, TablesIndices& table_emb_vol,
 					  const typename mesh_traits<MESH>::template Attribute<geometry::Vec3>* position);
 

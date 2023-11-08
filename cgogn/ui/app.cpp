@@ -164,7 +164,7 @@ App::App()
 		std::cerr << "Failed to create Window!" << std::endl;
 
 	glfwMakeContextCurrent(window_);
-	glfwSwapInterval(1); // Enable vsync
+	glfwSwapInterval(0); // Enable vsync
 
 	bool err = gl3wInit() != 0;
 	if (err)
