@@ -91,9 +91,11 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 
 		uniform vec4 color;
 		uniform vec3 light_position;
-)";
-	src_shadows;
-R"(		void main()
+
+//Shadows_code_here
+
+
+	void main()
 		{
 			vec3 N = normalize(normal);
 			vec3 L = normalize(light_position - position);
@@ -103,20 +105,36 @@ R"(		void main()
 		}
 	)";
 
-	load(vertex_shader_source, fragment_shader_source);
+	std::string frag_src_with_shadows(fragment_shader_source);
+	frag_src_with_shadows.insert(frag_src_with_shadows.find("//Shadows_code_here") + 20, src_shadows);
+
+
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	std::cout << frag_src_with_shadows << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+
+	load(vertex_shader_source, frag_src_with_shadows.c_str());
+
 	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", 
 				 "color", "light_position", "explode", "plane_clip", "plane_clip2",
-				 "with_shadow", "shadow_matrix", "TUshadow", "bias_k",
-				 "TUpoisson", "nb_samples");
+				 SHADOWS_UNIFORMS_STRINGS);
+
+		print_uniforms();
+
 	nb_attributes_ = 2;
 }
 
 void ShaderParamExplodeVolumesSmooth::set_uniforms()
 {
+	std::cout << "ShaderParamExplodeVolumesSmooth::set_uniforms" << std::endl;
+
 	if (sha_data_ != nullptr)
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
-									 data_->plane_clip_, data_->plane_clip2_,									 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0), sha_data_->bias_k_,
-									 sha_data_->tex_poisson_.bind(1), sha_data_->nb_samples_);
+		true, SHADOWS_PARAMETERS);
 	else
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_,false);

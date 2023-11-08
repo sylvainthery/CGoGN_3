@@ -210,6 +210,19 @@ public:
 		get_uniforms(pn...);
 	}
 
+	void print_uniforms()
+	{
+		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+		for (const auto& uni : uniforms_)
+			std::cout << uni << " / ";
+		std::cout << std::endl;
+		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	}
+
 	inline void set_uniform_value(std::size_t i, const float32 v)
 	{
 		glUniform1f(uniforms_[i], v);
@@ -284,7 +297,9 @@ public:
 	template <typename T, typename... Ts>
 	void set_uniforms_values(T v, Ts... vs)
 	{
+
 		int32 max_uniforms_size = std::min(1 + sizeof...(Ts), uniforms_.size());
+		std::cout << "set uniforms values: " << max_uniforms_size << std::endl;
 		set_uniforms_values_rec(max_uniforms_size, v, vs...);
 	}
 
