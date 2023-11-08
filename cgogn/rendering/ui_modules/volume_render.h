@@ -997,7 +997,9 @@ protected:
 				{
 					vp.sha_data_.bias_k_ = float(diag) / std::pow(2.0f, vp.vm_diag_);
 					need_update = true;
-				}	
+				}
+				if (ImGui::SliderInt("samples", &vp.sha_data_.nb_samples_, 1, 9))
+					need_update = true;
 			}
 			if (ImGui::Checkbox("Light on cam", &vp.light_on_cam_))
 				need_update = true;

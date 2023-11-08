@@ -71,10 +71,8 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 
 	const char* fragment_shader_source = R"(
 		#version 330
-//		out vec3 frago;
 		void main()
 		{
-			//frago = vec3(1,0,1);//mix(vec3(1,0,1),vec3(1,0,0),abs(gl_FragCoord.z));
 		}
 	)";
 
@@ -166,15 +164,33 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 		uniform bool with_shadow;
 		uniform float bias_k;
 		uniform sampler2DShadow TUshadow;
+		uniform sampler2D TUpoisson;
 		uniform mat4 shadow_matrix;
-	
+		uniform int nb_samples;
+
+		float random(vec3 seed)
+		{
+			float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
+			return fract(sin(dot_product) * 43758.5453);
+		}
+
 		float compute_shadow(float dnl)
 		{
 			if (!with_shadow)
 				return 1.0;
+
 			float bias_shd = bias_k+bias_k*tan(acos(dnl));
-			vec4 ShCoord = shadow_matrix*vec4(position,1); 
-			return texture(TUshadow, ShCoord.xyz/ShCoord.w - vec3(0,0,bias_shd));
+			vec4 sh_coord = shadow_matrix*vec4(position,1); 
+			float sc = 3.0/textureSize(TUshadow,0).x;	
+			vec3 shc =	vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w - bias_shd);
+			float shad = texture(TUshadow, shc);
+			for (int i=1;i<nb_samples;i++)
+			{
+				int index = int(15.99*random(gl_FragCoord.xyz));
+				vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w - bias_shd);
+				shad += texture(TUshadow, shc);
+			}
+			return shad/float(nb_samples);
 		}
 	
 		void main()
@@ -189,7 +205,9 @@ ShaderExplodeVolumesShadows::ShaderExplodeVolumesShadows()
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_position", "explode", "plane_clip", "plane_clip2", "with_shadow", "shadow_matrix", "TUshadow","bias_k");
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color", "light_position",
+				 "explode", "plane_clip", "plane_clip2", "with_shadow", "shadow_matrix", "TUshadow", "bias_k",
+				 "TUpoisson", "nb_samples");
 	nb_attributes_ = 2; // ???
 }
 
@@ -198,8 +216,8 @@ void ShaderParamExplodeVolumesShadows::set_uniforms()
 	if (sha_data_ != nullptr)
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_,
 								 data_->explode_, data_->plane_clip_, data_->plane_clip2_,
-								 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0),
-			sha_data_->bias_k_);
+								 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0), sha_data_->bias_k_,
+									 sha_data_->tex_poisson_.bind(1), sha_data_->nb_samples_);
 	else
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_, false);

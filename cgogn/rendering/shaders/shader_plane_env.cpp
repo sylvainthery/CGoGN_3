@@ -57,9 +57,7 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 
 	const char* fragment_shader_source = R"(
 		#version 330
-		uniform sampler2DShadow TUshadow;
 		uniform sampler2D TUcolor;
-		uniform mat4 shadow_matrix;
 		uniform vec3 light_position;
 	
 		in vec3 position;
@@ -67,10 +65,33 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 
 		out vec4 frag_out;
 
-		float compute_shadow(vec3 P)
+		uniform bool with_shadow;
+		uniform sampler2DShadow TUshadow;
+		uniform sampler2D TUpoisson;
+		uniform mat4 shadow_matrix;
+		uniform int nb_samples;
+
+		float random(vec3 seed)
 		{
-			vec4 ShCoord = shadow_matrix*vec4(P,1); 
-			return texture(TUshadow, ShCoord.xyz/ShCoord.w);
+			float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
+			return fract(sin(dot_product) * 43758.5453);
+		}
+
+		float compute_shadow(float dnl)
+		{
+			if (!with_shadow)
+				return 1.0;
+
+			vec4 sh_coord = shadow_matrix*vec4(position,1); 
+			float sc = 7.0/textureSize(TUshadow,0).x;	
+			float shad = texture(TUshadow, vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w));
+			for (int i=1;i<nb_samples;i++)
+			{
+				int index = int(15.99*random(gl_FragCoord.xyz));
+				vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w);
+				shad += texture(TUshadow, shc);
+			}
+			return shad/float(nb_samples);
 		}
 
 		void main()
@@ -78,7 +99,7 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.1*max(0.0,N.z) + 0.7 * dnl * compute_shadow(position);
+			float lambert = 0.2 + 0.1*max(0.0,N.z) + 0.7 * dnl * compute_shadow(dnl);
 			frag_out = vec4(vec3(lambert * texture(TUcolor,tc).r), 1.0);
 		}
 
@@ -86,15 +107,20 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("transfo", "scale_xy", "shadow_matrix", "TUcolor", "TUshadow",
-				 "light_position");
+	get_uniforms("transfo", "scale_xy", "TUcolor", "light_position", "with_shadow",
+				 "shadow_matrix", "TUshadow", "TUpoisson", "nb_samples");
 	nb_attributes_ = 0;
 }
 
 void ShaderParamPlaneShadow::set_uniforms()
 {
-	shader_->set_uniforms_values(transfo_, scale_xy_, sha_data_->shadow_matrix_, tex_col_->bind(1),
-										   sha_data_->fbo_shadows_->getDepthTexture()->bind(0),light_position_);
+	if (sha_data_ != nullptr)
+		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(1), light_position_,
+								 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0),
+								 sha_data_->tex_poisson_.bind(1), sha_data_->nb_samples_);
+	else
+		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(1), light_position_, false);
+
 }
 
 } // namespace rendering
