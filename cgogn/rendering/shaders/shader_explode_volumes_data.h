@@ -69,10 +69,10 @@ struct ShadowData
 		  nb_samples_(4), bias_k_(0.0001f), use_shadows_(false)
 	{
 		std::vector<float> pois = {
-			-0.94201624, -0.39906216, 0.94558609,  -0.76890725, -0.094184101, -0.92938870, 0.34495938, 0.29387760,
-			-0.91588581, 0.45771432,  -0.81544232, -0.87912464, -0.38277543,  0.27676845,  0.97484398, 0.75648379,
-			0.44323325,	 -0.97511554, 0.53742981,  -0.47373420, -0.26496911,  -0.41893023, 0.79197514, 0.19090188,
-			-0.24188840, 0.99706507,  -0.81409955, 0.91437590,	0.19984126,	  0.78641367,  0.14383161, -0.14100790};
+			-0.94201624f, -0.39906216f, 0.94558609f,  -0.76890725f, -0.094184101, -0.92938870f, 0.34495938f, 0.29387760f,
+			-0.91588581f, 0.45771432f,  -0.81544232f, -0.87912464f, -0.38277543,  0.27676845f,  0.97484398f, 0.75648379f,
+			0.44323325f,	 -0.97511554f, 0.53742981f,  -0.47373420f, -0.26496911,  -0.41893023, 0.79197514, 0.19090188f,
+			-0.24188840f, 0.99706507f,  -0.81409955, 0.91437590f,	0.19984126f,	  0.78641367f,  0.14383161f, -0.14100790f};
 		tex_poisson_.allocate(16, 1, GL_RG32F, GL_RG, reinterpret_cast<uint8*>(pois.data()), GL_FLOAT);
 	}
 
@@ -98,6 +98,23 @@ struct ShadowData
 		fbo_shadows_ = nullptr;
 	}
 };
+
+// A METTRE EN MODULE
+struct LightData
+{
+	bool light_on_cam_;
+	rendering::GLVec3d light_world_coord_;
+	rendering::GLVec3d light_eye_coord_;
+
+	inline void update(const rendering::GLMat4d& modelview_mat, const rendering::GLMat4d& inv_modelview_mat)
+	{
+		if (light_on_cam_)
+			light_world_coord_ = rendering::homoTransform(inv_modelview_mat, light_eye_coord_);
+		else
+			light_eye_coord_ = rendering::homoTransform(modelview_mat, light_world_coord_);
+	}
+};
+
 
 
 } // namespace rendering

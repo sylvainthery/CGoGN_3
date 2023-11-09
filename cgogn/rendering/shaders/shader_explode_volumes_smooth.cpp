@@ -109,13 +109,13 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 	frag_src_with_shadows.insert(frag_src_with_shadows.find("//Shadows_code_here") + 20, src_shadows);
 
 
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	std::cout << frag_src_with_shadows << std::endl;
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	//std::cout << frag_src_with_shadows << std::endl;
+	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 
 	load(vertex_shader_source, frag_src_with_shadows.c_str());
 
@@ -123,7 +123,6 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 				 "color", "light_position", "explode", "plane_clip", "plane_clip2",
 				 SHADOWS_UNIFORMS_STRINGS);
 
-		print_uniforms();
 
 	nb_attributes_ = 2;
 }
@@ -134,7 +133,7 @@ void ShaderParamExplodeVolumesSmooth::set_uniforms()
 
 	if (sha_data_ != nullptr)
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
-		true, SHADOWS_PARAMETERS);
+									 data_->plane_clip_, data_->plane_clip2_, true, SHADOWS_PARAMETERS);
 	else
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_,false);

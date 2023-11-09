@@ -64,6 +64,8 @@ namespace ui
 using geometry::Vec3;
 using geometry::Scalar;
 
+
+
 template <typename MESH>
 class VolumeRender : public ViewModule
 {
@@ -93,8 +95,11 @@ class VolumeRender : public ViewModule
 	struct ViewParameters
 	{
 		std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_FS_;
-		//std::shared_ptr<rendering::ShadowData> sha_data_;
+		
 		rendering::ShadowData sha_data_;
+
+		rendering::LightData light_data;
+
 		bool use_shadows_;
 		std::unique_ptr<rendering::ShaderPlaneShadow::Param> param_plane_;
 
@@ -757,9 +762,6 @@ protected:
 
 			if (p.render_volumes_)
 			{
-			//  ???
-			//	glEnable(GL_POLYGON_OFFSET_FILL);
-			//	glPolygonOffset(1.0f, 1.5f);
 				p.data_.light_position_ = lightPos.cast<float>();
 
 				int32 index_shader = 0;
