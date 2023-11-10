@@ -117,7 +117,7 @@ void ShaderParamPlaneShadow::set_uniforms()
 	if (sha_data_ != nullptr)
 		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(1), light_position_,
 								 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0),
-								 sha_data_->tex_poisson_.bind(1), sha_data_->nb_samples_);
+									 sha_data_->tex_poisson_->bind(1), sha_data_->nb_samples_);
 	else
 		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(1), light_position_, false);
 

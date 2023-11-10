@@ -21,55 +21,58 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_SHADERS_SHADOWS_H_
-#define CGOGN_RENDERING_SHADERS_SHADOWS_H_
+#ifndef CGOGN_RENDERING_SHADOWS_H_
+#define CGOGN_RENDERING_SHADOWS_H_
+
+#include <memory>
+#include <cgogn/geometry/types/vector_traits.h>
+#include <cgogn/rendering/fbo.h>
+#include <cgogn/rendering/types.h>
+
 
 namespace cgogn
 {
 
 namespace rendering
 {
-XXXXXX
-const char* src_shadows = R"(
-		uniform bool with_shadow;
-		uniform float bias_k;
-		uniform sampler2DShadow TUshadow;
-		uniform sampler2D TUpoisson;
-		uniform mat4 shadow_matrix;
-		uniform int nb_samples;
 
-		float random(vec3 seed)
-		{
-			float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
-			return fract(sin(dot_product) * 43758.5453);
-		}
+struct ShadowData
+{
+	bool started_;
+	GLMat4d shadow_matrix_;
+	std::shared_ptr<cgogn::rendering::FBO> fbo_shadows_;
 
-		float compute_shadow(float dnl)
-		{
-			if (!with_shadow)
-				return 1.0;
+	static cgogn::rendering::Texture2D* tex_poisson_;
 
-			float bias_shd = bias_k+bias_k*tan(acos(dnl));
-			vec4 sh_coord = shadow_matrix*vec4(position,1);
-			float sc = 2.0/textureSize(TUshadow,0).x;
-			vec3 shc =	vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w - bias_shd);
-			float shad = texture(TUshadow, shc);
-			for (int i=1;i<nb_samples;i++)
-			{
-				int index = int(15.99*random(gl_FragCoord.xyz));
-				vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w - bias_shd);
-				shad += texture(TUshadow, shc);
-			}
-			return shad/float(nb_samples);
-		}
-)";
+	int nb_samples_;
+	float32 bias_k_;
+
+	ShadowData();
+
+	inline bool is_started() const
+	{
+		return fbo_shadows_ != nullptr;
+	}
+
+	void start();
+
+	inline void stop()
+	{
+		fbo_shadows_ = nullptr;
+	}
+};
+
+
+
+std::string insert_shadow_code(const std::string& frag_src, const std::string& shadow_comment);
 
 #define SHADOWS_UNIFORMS_STRINGS "with_shadow","shadow_matrix","TUshadow","bias_k","TUpoisson","nb_samples"
-#define SHADOWS_PARAMETERS sha_data_->shadow_matrix_,\
-sha_data_->fbo_shadows_->getDepthTexture()->bind(0),\
-sha_data_->bias_k_,\
-sha_data_->tex_poisson_.bind(1),\
-sha_data_->nb_samples_
+
+#define SHADOWS_PARAMETERS(ptr) ptr->shadow_matrix_,\
+ptr->fbo_shadows_->getDepthTexture()->bind(0),\
+ptr->bias_k_,\
+ptr->tex_poisson_->bind(1),\
+ptr->nb_samples_
 
 
 } // namespace rendering

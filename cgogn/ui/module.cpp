@@ -23,6 +23,11 @@
 
 #include <cgogn/ui/app.h>
 #include <cgogn/ui/module.h>
+#include <cgogn/rendering/types.h>
+
+using cgogn::rendering::GLVec3d;
+using cgogn::rendering::GLVec4d;
+using cgogn::rendering::GLMat4d;
 
 namespace cgogn
 {
@@ -101,7 +106,7 @@ void ViewModule::draw(View*)
 {
 }
 
-void ViewModule::draw_shadowmap(const rendering::GLMat4& proj, const rendering::GLMat4& view)
+void ViewModule::draw_shadowmap(View*, const GLMat4d&, const GLMat4d&)
 {
 }
 

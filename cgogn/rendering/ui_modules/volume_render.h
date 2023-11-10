@@ -46,6 +46,8 @@
 #include <cgogn/rendering/shaders/shader_point_sprite.h>
 #include <cgogn/rendering/shaders/shader_plane_env.h>
 #include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
+#include <cgogn/rendering/shadows.h>
+#include <cgogn/rendering/ui_modules/lighting.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/algos/length.h>
@@ -95,10 +97,10 @@ class VolumeRender : public ViewModule
 	struct ViewParameters
 	{
 		std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_FS_;
-		
+
 		rendering::ShadowData sha_data_;
 
-		rendering::LightData light_data;
+		LightData light_data;
 
 		bool use_shadows_;
 		std::unique_ptr<rendering::ShaderPlaneShadow::Param> param_plane_;

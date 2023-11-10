@@ -22,7 +22,7 @@
  *******************************************************************************/
 
 #include <cgogn/rendering/shaders/shader_explode_volumes_smooth.h>
-#include <cgogn/rendering/shaders/shader_shadows.h>
+#include <cgogn/rendering/shadows.h>
 
 namespace cgogn
 {
@@ -94,7 +94,6 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 
 //Shadows_code_here
 
-
 	void main()
 		{
 			vec3 N = normalize(normal);
@@ -105,23 +104,15 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 		}
 	)";
 
-	std::string frag_src_with_shadows(fragment_shader_source);
-	frag_src_with_shadows.insert(frag_src_with_shadows.find("//Shadows_code_here") + 20, src_shadows);
 
 
-	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	//std::cout << frag_src_with_shadows << std::endl;
-	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
-	//std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+//	std::string frag_src_with_shadows(fragment_shader_source);
+//	frag_src_with_shadows.insert(frag_src_with_shadows.find("//Shadows_code_here") + 20, src_shadows);
 
-	load(vertex_shader_source, frag_src_with_shadows.c_str());
+	load(vertex_shader_source, insert_shadow_code(fragment_shader_source,"//Shadows_code_here"));
 
-	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", 
-				 "color", "light_position", "explode", "plane_clip", "plane_clip2",
-				 SHADOWS_UNIFORMS_STRINGS);
+	sha_get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping",
+				 "color", "light_position", "explode", "plane_clip", "plane_clip2");
 
 
 	nb_attributes_ = 2;
@@ -129,14 +120,8 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 
 void ShaderParamExplodeVolumesSmooth::set_uniforms()
 {
-	std::cout << "ShaderParamExplodeVolumesSmooth::set_uniforms" << std::endl;
-
-	if (sha_data_ != nullptr)
-		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
-									 data_->plane_clip_, data_->plane_clip2_, true, SHADOWS_PARAMETERS);
-	else
-		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
-									 data_->plane_clip_, data_->plane_clip2_,false);
+	shader_->sha_set_uniforms_values(sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+									 data_->plane_clip_, data_->plane_clip2_);
 
 }
 

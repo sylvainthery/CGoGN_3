@@ -140,7 +140,7 @@ void ShaderParamExplodeVolumes::set_uniforms()
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_,
 									 data_->explode_, data_->plane_clip_, data_->plane_clip2_,
 									 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(0), sha_data_->bias_k_,
-									 sha_data_->tex_poisson_.bind(1), sha_data_->nb_samples_);
+									 sha_data_->tex_poisson_->bind(1), sha_data_->nb_samples_);
 	else
 		shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_, false);

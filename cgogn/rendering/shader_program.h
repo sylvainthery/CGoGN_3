@@ -25,6 +25,8 @@
 #define CGOGN_RENDERING_SHADERS_SHADER_PROGRAM_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
+#include <cgogn/rendering/shadows.h>
+
 
 #include <cgogn/rendering/types.h>
 #include <cgogn/rendering/vao.h>
@@ -210,6 +212,12 @@ public:
 		get_uniforms(pn...);
 	}
 
+	template <typename T1, typename... Ts>
+	void sha_get_uniforms(T1 p1, Ts... pn)
+	{
+		get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
+	}
+
 	void print_uniforms()
 	{
 
@@ -288,16 +296,25 @@ public:
 	}
 
 
-
-
 	
 	template <typename T, typename... Ts>
-	void set_uniforms_values(T v, Ts... vs)
+	inline void set_uniforms_values(T v, Ts... vs)
 	{
 
 		int32 max_uniforms_size = std::min(1 + sizeof...(Ts), uniforms_.size());
 		set_uniforms_values_rec(max_uniforms_size, v, vs...);
 	}
+
+	template <typename T, typename... Ts>
+	inline void sha_set_uniforms_values(ShadowData* sha_ptr, T v, Ts... vs)
+	{
+		if (sha_ptr != nullptr)
+			set_uniforms_values(v, vs..., true, sha_ptr->shadow_matrix_,
+								SHADOWS_PARAMETERS(sha_ptr));
+		else
+			set_uniforms_values(v, vs..., false);
+	}
+
 
 	void get_matrices_uniforms();
 

@@ -35,6 +35,10 @@
 #include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
 #include <cgogn/rendering/types.h>
 
+using cgogn::rendering::GLVec3d;
+using cgogn::rendering::GLVec4d;
+using cgogn::rendering::GLMat4d;
+
 namespace cgogn
 {
 
@@ -122,16 +126,16 @@ public:
 
 	void update_scene_bb();
 
-	virtual bool pixel_scene_position(int32 x, int32 y, rendering::GLVec3d& P) const override;
-	virtual std::pair<rendering::GLVec3d, rendering::GLVec3d> pixel_ray(int32 x, int32 y) const override;
-	rendering::GLVec3d unproject(int32 x, int32 y, float64 z) const;
+	virtual bool pixel_scene_position(int32 x, int32 y, GLVec3d& P) const override;
+	virtual std::pair<GLVec3d, GLVec3d> pixel_ray(int32 x, int32 y) const override;
+	GLVec3d unproject(int32 x, int32 y, float64 z) const;
 
 	inline void stop_event()
 	{
 		event_stopped_ = true;
 	}
 
-	void draw_shadowmap(const rendering::GLMat4& proj, const rendering::GLMat4& view);
+	void draw_shadowmap(const GLMat4d& proj, const GLMat4d& view);
 
 
 	//void compute_hbao();

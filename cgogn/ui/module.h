@@ -28,8 +28,13 @@
 
 #include <cgogn/core/utils/numerics.h>
 #include <cgogn/geometry/types/vector_traits.h>
+#include <cgogn/rendering/types.h>
 
 #include <vector>
+
+using cgogn::rendering::GLVec3d;
+using cgogn::rendering::GLVec4d;
+using cgogn::rendering::GLMat4d;
 
 namespace cgogn
 {
@@ -69,10 +74,10 @@ protected:
 // ViewModule
 /*****************************************************************************/
 
-namespace rendering
-{
-class GLMat4;
-}
+//namespace rendering
+//{
+//class GLMat4;
+//}
 
 class CGOGN_UI_EXPORT ViewModule : public Module
 {
@@ -97,7 +102,7 @@ protected:
 	virtual void key_release_event(View* view, int32 key_code);
 
 	virtual void draw(View* view);
-	virtual void draw_shadowmap(View* view, const rendering::GLMat4& proj, const rendering::GLMat4& view);
+	virtual void draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view);
 
 	std::vector<View*> linked_views_;
 };

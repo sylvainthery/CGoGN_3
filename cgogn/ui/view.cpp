@@ -183,7 +183,7 @@ void View::draw()
 
 
 
-void View::draw_shadowmap(const cgogn::rendering::GLMat4& proj, const cgogn::rendering::GLMat4& view)
+void View::draw_shadowmap(const cgogn::rendering::GLMat4d& proj, const cgogn::rendering::GLMat4d& view)
 {
 	for (ViewModule* m : linked_view_modules_)
 		m->draw_shadowmap(this,proj,view);

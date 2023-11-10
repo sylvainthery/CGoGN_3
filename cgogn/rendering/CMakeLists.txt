@@ -38,6 +38,8 @@ set(src_list
 #		"${CMAKE_CURRENT_LIST_DIR}/hbao.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/shadows.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shadows.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/graph_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/point_cloud_render.h"
