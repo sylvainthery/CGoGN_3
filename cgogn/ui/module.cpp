@@ -101,6 +101,10 @@ void ViewModule::draw(View*)
 {
 }
 
+void ViewModule::draw_shadowmap(const rendering::GLMat4& proj, const rendering::GLMat4& view)
+{
+}
+
 /*****************************************************************************/
 // ProviderModule
 /*****************************************************************************/

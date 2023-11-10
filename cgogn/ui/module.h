@@ -69,6 +69,11 @@ protected:
 // ViewModule
 /*****************************************************************************/
 
+namespace rendering
+{
+class GLMat4;
+}
+
 class CGOGN_UI_EXPORT ViewModule : public Module
 {
 	friend class View;
@@ -92,6 +97,7 @@ protected:
 	virtual void key_release_event(View* view, int32 key_code);
 
 	virtual void draw(View* view);
+	virtual void draw_shadowmap(View* view, const rendering::GLMat4& proj, const rendering::GLMat4& view);
 
 	std::vector<View*> linked_views_;
 };

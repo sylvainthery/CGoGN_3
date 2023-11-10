@@ -649,6 +649,19 @@ protected:
 		start_timer= std::chrono::high_resolution_clock::now();
 	}
 
+	void draw_shadowmap(View* view, const rendering::GLMat4& mproj, const rendering::GLMat4& mview)
+	{
+		for (auto& [m, p] : parameters_[view])
+		{
+			if (p.render_volumes_& p.cast_shadow_)
+			{
+				p.param_volume_generate_shadows_->bind(mproj,mview);
+				mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+				p.param_volume_generate_shadows_->release();
+			}
+		}
+	}
+
 	void draw(View* view) override
 	{
 		auto* cv = app_.current_view();

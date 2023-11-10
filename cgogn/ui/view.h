@@ -131,6 +131,9 @@ public:
 		event_stopped_ = true;
 	}
 
+	void draw_shadowmap(const rendering::GLMat4& proj, const rendering::GLMat4& view);
+
+
 	//void compute_hbao();
 
 	void save_screenshot();

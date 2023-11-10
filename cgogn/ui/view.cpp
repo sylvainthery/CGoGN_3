@@ -25,6 +25,10 @@
 
 #include <cgogn/rendering/gl_image.h>
 
+using cgogn::rendering::GLVec3d;
+using cgogn::rendering::GLVec4d;
+using cgogn::rendering::GLMat4d;
+
 namespace cgogn
 {
 
@@ -35,12 +39,12 @@ View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
 	  param_full_screen_texture_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false)
 {
-	tex_ = std::make_shared<rendering::Texture2D>();
+	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
 
-	fbo_ = std::make_unique<rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{tex_}, true, nullptr);
+	fbo_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_}, true, nullptr);
 
-	param_full_screen_texture_ = rendering::ShaderFullScreenTexture::generate_param();
+	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
 	param_full_screen_texture_->unit_ = 0;
 	param_full_screen_texture_->texture_ = fbo_->texture(0);
 }
@@ -177,6 +181,15 @@ void View::draw()
 	param_full_screen_texture_->draw();
 }
 
+
+
+void View::draw_shadowmap(const cgogn::rendering::GLMat4& proj, const cgogn::rendering::GLMat4& view)
+{
+	for (ViewModule* m : linked_view_modules_)
+		m->draw_shadowmap(this,proj,view);
+}
+
+
 void View::link_module(ViewModule* m)
 {
 	if (std::find(linked_view_modules_.begin(), linked_view_modules_.end(), m) == linked_view_modules_.end())
@@ -222,7 +235,7 @@ void View::update_scene_bb()
 	request_update();
 }
 
-bool View::pixel_scene_position(int32 x, int32 y, rendering::GLVec3d& P) const
+bool View::pixel_scene_position(int32 x, int32 y, GLVec3d& P) const
 {
 	float z[4];
 	GLint xs, ys;
@@ -245,9 +258,9 @@ bool View::pixel_scene_position(int32 x, int32 y, rendering::GLVec3d& P) const
 	yogl = (float64(ys) / viewport_height_) * 2.0 - 1.0;
 	zogl = float64(*z) * 2.0 - 1.0;
 
-	rendering::GLVec4d Q(xogl, yogl, zogl, 1.0);
+	GLVec4d Q(xogl, yogl, zogl, 1.0);
 	rendering::GLMat4d im = (camera().projection_matrix_d() * camera().modelview_matrix_d()).inverse();
-	rendering::GLVec4d P4 = im * Q;
+	GLVec4d P4 = im * Q;
 	if (P4.w() != 0.0)
 	{
 		P.x() = P4.x() / P4.w();
@@ -259,7 +272,7 @@ bool View::pixel_scene_position(int32 x, int32 y, rendering::GLVec3d& P) const
 	return false;
 }
 
-std::pair<rendering::GLVec3d, rendering::GLVec3d> View::pixel_ray(int32 x, int32 y) const
+std::pair<GLVec3d, GLVec3d> View::pixel_ray(int32 x, int32 y) const
 {
 	float64 xs = float64(float64(x - x_offset_) / float64(width_) * viewport_width_);
 	float64 ys = float64(float64(height_ - (y - y_offset_)) / float64(height_) * viewport_height_);
@@ -268,26 +281,26 @@ std::pair<rendering::GLVec3d, rendering::GLVec3d> View::pixel_ray(int32 x, int32
 	float64 yogl = (ys / viewport_height_) * 2.0 - 1.0;
 
 	rendering::GLMat4d im = (camera().projection_matrix_d() * camera().modelview_matrix_d()).inverse();
-	rendering::GLVec4d Q(xogl, yogl, 1.0, 1.0);
-	rendering::GLVec4d P4 = im * Q;
+	GLVec4d Q(xogl, yogl, 1.0, 1.0);
+	GLVec4d P4 = im * Q;
 
-	rendering::GLVec3d P1(P4.x() / P4.w(), P4.y() / P4.w(), P4.z() / P4.w());
+	GLVec3d P1(P4.x() / P4.w(), P4.y() / P4.w(), P4.z() / P4.w());
 
 	Q.z() = -1;
 	P4 = im * Q;
-	rendering::GLVec3d P2(P4.x() / P4.w(), P4.y() / P4.w(), P4.z() / P4.w());
+	GLVec3d P2(P4.x() / P4.w(), P4.y() / P4.w(), P4.z() / P4.w());
 	return std::make_pair(P1, P2);
 }
 
-rendering::GLVec3d View::unproject(int32 x, int32 y, float64 z) const
+GLVec3d View::unproject(int32 x, int32 y, float64 z) const
 {
 	float64 xogl = (double(x - x_offset_) / double(width_)) * 2.0 - 1.0;
 	float64 yogl = (double(height_ - (y - y_offset_)) / double(height_)) * 2.0 - 1.0;
 	float64 zogl = z * 2.0 - 1.0;
 
-	rendering::GLVec4d Q(xogl, yogl, zogl, 1.0);
+	GLVec4d Q(xogl, yogl, zogl, 1.0);
 	rendering::GLMat4d im = (camera().projection_matrix_d() * camera().modelview_matrix_d()).inverse();
-	rendering::GLVec4d res = im * Q;
+	GLVec4d res = im * Q;
 	res /= res.w();
 	return res.head(3);
 }
