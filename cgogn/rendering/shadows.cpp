@@ -113,15 +113,6 @@ float compute_shadow(float dnl)
 	return frag_src_with_shadows;
 }
 
-#define SHADOWS_UNIFORMS_STRINGS "with_shadow","shadow_matrix","TUshadow","bias_k","TUpoisson","nb_samples"
-
-#define SHADOWS_PARAMETERS(ptr) ptr->shadow_matrix_,\
-ptr->fbo_shadows_->getDepthTexture()->bind(0),\
-ptr->bias_k_,\
-ptr->tex_poisson_.bind(1),\
-ptr->nb_samples_
-
-
 } // namespace rendering
 
 } // namespace cgogn

@@ -309,8 +309,7 @@ public:
 	inline void sha_set_uniforms_values(ShadowData* sha_ptr, T v, Ts... vs)
 	{
 		if (sha_ptr != nullptr)
-			set_uniforms_values(v, vs..., true, sha_ptr->shadow_matrix_,
-								SHADOWS_PARAMETERS(sha_ptr));
+			set_uniforms_values(v, vs..., true, SHADOWS_PARAMETERS(sha_ptr));
 		else
 			set_uniforms_values(v, vs..., false);
 	}

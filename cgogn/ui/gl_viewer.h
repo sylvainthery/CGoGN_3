@@ -27,6 +27,9 @@
 #include <GL/gl3w.h>
 
 #include <cgogn/ui/camera.h>
+#include <cgogn/ui/light.h>
+#include <cgogn/rendering/shadows.h>
+
 #include <cgogn/ui/cgogn_ui_export.h>
 #include <cgogn/ui/inputs.h>
 
@@ -58,6 +61,7 @@ public:
 	{
 		return camera_;
 	}
+
 	inline void save_camera()
 	{
 		std::ofstream out_file;
@@ -69,6 +73,7 @@ public:
 		}
 		camera_saved_ = camera_;
 	}
+
 	inline void restore_camera()
 	{
 		camera_ = camera_saved_;
@@ -85,14 +90,17 @@ public:
 	{
 		return camera_.projection_matrix();
 	}
+
 	inline const rendering::GLMat4d& projection_matrix_d() const
 	{
 		return camera_.projection_matrix_d();
 	}
+
 	inline const rendering::GLMat4& modelview_matrix() const
 	{
 		return camera_.modelview_matrix();
 	}
+
 	inline const rendering::GLMat4d& modelview_matrix_d() const
 	{
 		return camera_.modelview_matrix_d();
@@ -104,18 +112,21 @@ public:
 	{
 		camera_.set_scene_radius(radius);
 	}
+
 	inline void set_scene_center(const rendering::GLVec3d& center)
 	{
 		scene_center_ = center;
 		if (!camera_.pivot_point_initialized())
 			camera_.set_pivot_point(scene_center_);
 	}
+
 	inline void set_scene_center(const rendering::GLVec3& center)
 	{
 		scene_center_ = center.cast<float64>();
 		if (!camera_.pivot_point_initialized())
 			camera_.set_pivot_point(scene_center_);
 	}
+
 	inline void show_entire_scene()
 	{
 		camera_.show_entire_scene();
@@ -126,6 +137,7 @@ public:
 	{
 		return viewport_width_;
 	}
+
 	inline int32 viewport_height() const
 	{
 		return viewport_height_;
@@ -135,14 +147,17 @@ public:
 	{
 		return inputs_->shift_pressed_;
 	}
+
 	inline bool control_pressed() const
 	{
 		return inputs_->control_pressed_;
 	}
+
 	inline bool alt_pressed() const
 	{
 		return inputs_->alt_pressed_;
 	}
+
 	inline bool meta_pressed() const
 	{
 		return inputs_->meta_pressed_;
@@ -157,25 +172,39 @@ public:
 	{
 		return inputs_->previous_mouse_x_;
 	}
+
 	inline int32 previous_mouse_y() const
 	{
 		return inputs_->previous_mouse_y_;
 	}
 
 	virtual bool pixel_scene_position(int32 x, int32 y, rendering::GLVec3d& P) const = 0;
+
 	virtual std::pair<rendering::GLVec3d, rendering::GLVec3d> pixel_ray(int32 x, int32 y) const = 0;
 
 	inline void set_wheel_sensitivity(float64 s)
 	{
 		inputs_->wheel_sensitivity_ = s * 0.005;
 	}
+
 	inline void set_mouse_sensitivity(float64 s)
 	{
 		inputs_->mouse_sensitivity_ = s * 0.005;
 	}
+
 	inline void set_spin_sensitivity(float64 s)
 	{
 		inputs_->spin_sensitivity_ = s * 0.025;
+	}
+
+	LightData& get_light()
+	{
+		return light_;
+	}
+
+	cgogn::rendering::ShadowData& get_shadow()
+	{
+		return shadow_;
 	}
 
 protected:
@@ -194,6 +223,7 @@ protected:
 	{
 		return current_frame_ != &camera_;
 	}
+
 	void spin();
 
 	Camera camera_;
@@ -203,6 +233,9 @@ protected:
 	int32 viewport_width_;
 	int32 viewport_height_;
 	float64 spinning_speed_;
+
+	LightData light_;
+	cgogn::rendering::ShadowData shadow_;
 
 	Inputs* inputs_;
 

@@ -90,6 +90,12 @@ using Transfo3d = Eigen::Affine3d;
 
 using Transfo3f = Eigen::Affine3f;
 
+inline GLVec3 homoTransform(const GLMat4& m, const GLVec3& p)
+{
+	GLVec4 p4(p.x(), p.y(), p.z(), 1.0);
+	GLVec4 q = m * p4;
+	return GLVec3{q[0], q[1], q[2]};
+}
 inline GLVec3d homoTransform(const GLMat4d& m, const GLVec3d& p)
 {
 	GLVec4d p4(p.x(), p.y(), p.z(),1.0);

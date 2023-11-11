@@ -47,7 +47,7 @@
 #include <cgogn/rendering/shaders/shader_plane_env.h>
 #include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
 #include <cgogn/rendering/shadows.h>
-#include <cgogn/rendering/ui_modules/lighting.h>
+//#include <cgogn/rendering/ui_modules/lighting.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/algos/length.h>
@@ -98,28 +98,25 @@ class VolumeRender : public ViewModule
 	{
 		std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_FS_;
 
-		rendering::ShadowData sha_data_;
+		//rendering::ShadowData sha_data_;
+		//LightData light_data;
 
-		LightData light_data;
-
-		bool use_shadows_;
 		std::unique_ptr<rendering::ShaderPlaneShadow::Param> param_plane_;
 
-		bool light_on_cam_;
-		float lightPosX_;
-		float lightPosY_;
-		float lightPosZ_;
+		//bool light_on_cam_;
+		//float lightPosX_;
+		//float lightPosY_;
+		//float lightPosZ_;
 		float Zplaneshift_;
 		float vm_bias;
 
 		ViewParameters()
-			: use_shadows_(false), light_on_cam_(true), lightPosX_(1), lightPosY_(5), lightPosZ_(1), Zplaneshift_(1),
-			  vm_bias(11)
+			: Zplaneshift_(1),  vm_bias(27)
 		{
 //			sha_data_ = std::make_shared<rendering::ShadowData>();
 			param_FS_ = rendering::ShaderFullScreenTexture::generate_param();
 			param_plane_ = rendering::ShaderPlaneShadow::generate_param();
-			param_plane_->sha_data_ = &sha_data_;
+//			param_plane_->sha_data_ = ???; // plus tard
 			param_plane_->tex_col_ = std::make_shared<rendering::Texture2D>();
 
 			std::vector<uint8> tex_data;
@@ -171,15 +168,15 @@ class VolumeRender : public ViewModule
 			param_bold_line_->width_ = 2.0f;
 
 			param_volume_line_ = rendering::ShaderExplodeVolumesLine::generate_param();
-			param_volume_line_->data_ = &data_;
+			param_volume_line_->data_ = &this->data_;
 
 			param_volume_generate_shadows_ = rendering::ShaderExplodeVolumesGenerateShadows::generate_param();
-			param_volume_generate_shadows_->data_ = &data_;
+			param_volume_generate_shadows_->data_ = &this->data_;
 
 			params_volumes_.reserve(16);
 
 			param_volume_ = rendering::ShaderExplodeVolumes::generate_param();
-			param_volume_->data_ = &data_;
+			param_volume_->data_ = &this->data_;
 			param_volume_->sha_data_ = nullptr;
 			params_volumes_.push_back(param_volume_.get());
 
@@ -334,7 +331,9 @@ private:
 		{
 			Parameters& p = parameters_[v][m];
 			ViewParameters& vp = view_parameters_[v];
-			p.init_shaders(&vp.sha_data_);
+			cgogn::rendering::ShadowData* shadata = &(v->get_shadow());
+			vp.param_plane_->sha_data_ = shadata;
+			p.init_shaders(shadata);
 
 			p.volume_center_ = add_attribute<Vec3, Volume>(*m, "__volume_center");
 			p.volume_clipping_position_ = add_attribute<Vec3, Volume>(*m, "__volume_clipping_position");
@@ -591,11 +590,11 @@ public:
 	{
 		if (sha)
 		{
-			view_parameters_[view].sha_data_.start();
+			view->get_shadow().start();
 		}
 		else
 		{
-			view_parameters_[view].sha_data_.stop();
+			view->get_shadow().stop();
 		}
 	}
 
@@ -667,31 +666,36 @@ protected:
 	void draw(View* view) override
 	{
 		auto* cv = app_.current_view();
+		if (cv == nullptr)
+		{
+			std::cerr << "WARNING CurrentView NULL" << std::endl;
+			return;
+		}
 		ViewParameters& vp = view_parameters_[cv];
 		const Camera& cam = cv->camera();
 		float64 sr = cam.scene_radius(); 
 
-		rendering::GLVec3d lightPos;
-		rendering::GLVec3d worldLightPos;
-		if (vp.light_on_cam_)
-		{
-			lightPos = rendering::GLVec3d(vp.lightPosX_, vp.lightPosY_, vp.lightPosZ_) * sr;
-			worldLightPos = rendering::homoTransform(cam.modelview_matrix_d().inverse(), lightPos);
-		}
-		else
-		{
-			worldLightPos = cam.pivot_point() +rendering::GLVec3d(vp.lightPosX_, vp.lightPosY_, vp.lightPosZ_) * sr;
-			lightPos = rendering::homoTransform(cam.modelview_matrix_d(), worldLightPos);
-		}
+		//rendering::GLVec3d lightPos;
+		//rendering::GLVec3d worldLightPos;
+		//if (vp.light_on_cam_)
+		//{
+		//	lightPos = rendering::GLVec3d(vp.lightPosX_, vp.lightPosY_, vp.lightPosZ_) * sr;
+		//	worldLightPos = rendering::homoTransform(cam.modelview_matrix_d().inverse(), lightPos);
+		//}
+		//else
+		//{
+		//	worldLightPos = cam.pivot_point() +rendering::GLVec3d(vp.lightPosX_, vp.lightPosY_, vp.lightPosZ_) * sr;
+		//	lightPos = rendering::homoTransform(cam.modelview_matrix_d(), worldLightPos);
+		//}
 
-
-		if (vp.use_shadows_)
+		cgogn::rendering::ShadowData& sha_data = cv->get_shadow();
+		if (sha_data.is_started())
 		{
 			double angle = App::frame_time_ * 0.2;
 
 			auto orthographic = [&](float64 zcenter) {
 				float64 znear = zcenter - sr;
-				float64 zfar = zcenter + 5.0 * sr;
+				float64 zfar = zcenter + 3.0 * sr;
 				float64 ihw = 1.0 / sr;
 				float64 r_inv = 1.0 / (znear - zfar);
 				rendering::GLMat4d m;
@@ -717,11 +721,13 @@ protected:
 			rendering::GLMat4d biasmat;
 			biasmat << 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0;
 
-			rendering::GLVec3d center = cam.pivot_point();
-			rendering::GLMat4d light_projection_matrix = orthographic((worldLightPos-center).norm());
-			rendering::GLMat4d light_view_matrix = look_at(worldLightPos, center, rendering::GLVec3d(0,1,0));
+			cgogn::rendering::GLVec3d center = cam.pivot_point();
+			cgogn::rendering::GLVec3 wlpf = cv->get_light().getWorldCoord(); 
+			cgogn::rendering::GLVec3d wlp = wlpf.cast<double>();
+			cgogn::rendering::GLMat4d light_projection_matrix = orthographic((wlp - center).norm());
+			cgogn::rendering::GLMat4d light_view_matrix = look_at(wlp, center, rendering::GLVec3d(0, 1, 0));
 
-			vp.sha_data_.fbo_shadows_->bind();
+			sha_data.fbo_shadows_->bind();
 
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_DEPTH_BUFFER_BIT);
@@ -730,23 +736,24 @@ protected:
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_FRONT);
 
-			for (auto& [m, p] : parameters_[view])
-			{
-				if (p.render_volumes_& p.cast_shadow_)
-				{
-					MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
-					p.param_volume_generate_shadows_->bind(light_projection_matrix.cast<float>(),
-														   light_view_matrix.cast<float>());
-					md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
-					p.param_volume_generate_shadows_->release();
-				}
-			}
-			vp.sha_data_.fbo_shadows_->release();
-//			glDepthFunc(GL_LESS);
+			//for (auto& [m, p] : parameters_[view])
+			//{
+			//	if (p.render_volumes_& p.cast_shadow_)
+			//	{
+			//		MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
+			//		p.param_volume_generate_shadows_->bind(light_projection_matrix.cast<float>(),
+			//											   light_view_matrix.cast<float>());
+			//		md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
+			//		p.param_volume_generate_shadows_->release();
+			//	}
+			//}
+			draw_shadowmap(cv, light_projection_matrix.cast<float>(), light_view_matrix.cast<float>());
+
+			sha_data.fbo_shadows_->release();
+			//			glDepthFunc(GL_LESS);
 			glDisable(GL_CULL_FACE);
 
-			vp.sha_data_.shadow_matrix_ =
-				biasmat * light_projection_matrix * light_view_matrix * cam.modelview_matrix_d().inverse();
+			sha_data.shadow_matrix_ = biasmat * light_projection_matrix * light_view_matrix * cam.modelview_matrix_d().inverse();
 
 
 			// IF  USEPLANE ...
@@ -761,7 +768,7 @@ protected:
 
 			vp.param_plane_->transfo_ = trf.matrix();
 			vp.param_plane_->scale_xy_ = 20.0f;
-			vp.param_plane_->light_position_ = lightPos.cast<float>();
+			vp.param_plane_->light_position_ = wlpf;
 			vp.param_plane_->draw(view->projection_matrix(), cam.modelview_matrix());
 			glEnable(GL_DEPTH_TEST);
 			glDisable(GL_CULL_FACE);
@@ -770,14 +777,14 @@ protected:
 		for (auto& [m, p] : parameters_[view])
 		{
 			MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
-			int32 indss = (p.smooth_volume_faces_ ? 2 : 0) + ((vp.use_shadows_&&p.receive_shadows_) ? 1 : 0);
+			int32 indss = (p.smooth_volume_faces_ ? 2 : 0) + ((sha_data.is_started() && p.receive_shadows_) ? 1 : 0);
 
 			const rendering::GLMat4& proj_matrix = view->projection_matrix();
 			const rendering::GLMat4& view_matrix = view->modelview_matrix();
 
 			if (p.render_volumes_)
 			{
-				p.data_.light_position_ = lightPos.cast<float>();
+				p.data_.light_position_ = view->get_light().getWorldCoord();
 
 				int32 index_shader = 0;
 				switch (p.color_per_cell_)
@@ -942,35 +949,53 @@ protected:
 
 		if (selected_view_)
 		{
+			cgogn::rendering::ShadowData& sha_data = selected_view_->get_shadow();
+
 			ImGui::LabelText("fps", "%5f", float(app_.fps()));
 			ImGui::Separator();
 			ViewParameters& vp = view_parameters_[selected_view_];
-			if (ImGui::Checkbox("Shadows", &vp.use_shadows_))
+			bool shsta = sha_data.is_started();
+			if (ImGui::Checkbox("Shadows", &shsta))
 			{
-				set_shadows(selected_view_, vp.use_shadows_);
+				if (shsta)
+					sha_data.start();
+				else
+					sha_data.stop();
 				need_update = true;
 			}
-			if (vp.use_shadows_)
+			if (shsta)
 			{
 				auto bb = mesh_provider_->meshes_bb();
 				auto diag = (bb.second - bb.first).norm();
-				if (ImGui::SliderFloat("Bias", &vp.vm_bias, 15,27))
+				float loc_bias = std::log(float(diag) / sha_data.bias_k_) / std::log(2.0f);
+				if (ImGui::SliderFloat("Bias", &vp.vm_bias, 15, 27))
 				{
-					vp.sha_data_.bias_k_ = float(diag) / std::pow(2.0f, vp.vm_bias);
+					sha_data.bias_k_ = float(diag) / std::pow(2.0f, vp.vm_bias);
 					need_update = true;
 				}
-				if (ImGui::SliderInt("samples", &vp.sha_data_.nb_samples_, 1, 9))
+				if (ImGui::SliderInt("samples", &sha_data.nb_samples_, 1, 9))
 					need_update = true;
 			}
-			if (ImGui::Checkbox("Light on cam", &vp.light_on_cam_))
-				need_update = true;
+			LightData& LD = selected_view_->get_light();
 
-			if (ImGui::SliderFloat("Light_X", &vp.lightPosX_, -10.0f, 10.0f))
+			if (ImGui::Checkbox("Light on cam", &LD.light_on_cam_))
 				need_update = true;
-			if (ImGui::SliderFloat("Light_Y", &vp.lightPosY_, -10.0f, 10.0f))
-				need_update = true;
-			if (ImGui::SliderFloat("Light_Z", &vp.lightPosZ_, 0.0f, 20.0f))
-				need_update = true;
+			if (LD.light_on_cam_)
+			{
+				if (ImGui::SliderFloat2("Light_eye_POS", LD.eye_polar_.data(), float(-M_PI), float(M_PI)))
+				{
+					LD.post_polar_modification();
+					need_update = true;
+				}
+			}
+			else
+			{
+				if (ImGui::SliderFloat2("Light_world_POS", LD.world_polar_.data(), float(-M_PI), float(M_PI)))
+				{
+					LD.post_polar_modification();
+					need_update = true;
+				}
+			}
 
 			ImGui::Separator();
 			if (ImGui::SliderFloat("PlaneZ", &vp.Zplaneshift_, 0.0f, 2.0f))
@@ -978,7 +1003,7 @@ protected:
 
 			if (selected_view_ && selected_mesh_)
 			{
-				Parameters& p = parameters_[selected_view_][selected_mesh_];	
+				Parameters& p = parameters_[selected_view_][selected_mesh_];
 
 				imgui_combo_attribute<Vertex, Vec3>(*selected_mesh_, p.vertex_position_, "Position",
 													[&](const std::shared_ptr<Attribute<Vec3>>& attribute) {
@@ -1018,11 +1043,11 @@ protected:
 
 					if (ImGui::SliderFloat("Explode", &p.data_.explode_, 0.01f, 1.0f))
 						need_update = true;
-					
+
 					auto bb = mesh_provider_->meshes_bb();
 
-					//View* view = app_.current_view();
-					//ViewParameters& vp = view_parameters_[view];
+					// View* view = app_.current_view();
+					// ViewParameters& vp = view_parameters_[view];
 
 					need_update |= ImGui::Checkbox("Volume lines", &p.render_volume_lines_);
 					if (p.render_volume_lines_)
@@ -1144,14 +1169,17 @@ protected:
 				if (remain > 0)
 					need_update = true;
 
-				if (need_update)
-					for (View* v : linked_views_)
-						v->request_update();
-
+	
 				// ViewParameters& vp = view_parameters_[selected_view_];
 				// if (vp.use_shadows_)
 				//	selected_view_->request_update();
 			}
+
+			if (need_update)
+				selected_view_->request_update();
+				//for (view* v : linked_views_)
+				//	v->request_update();
+
 		}
 	}
 

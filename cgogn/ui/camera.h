@@ -39,9 +39,14 @@ namespace cgogn
 
 namespace ui
 {
+//forward
+//class LightData;
 
 class CGOGN_UI_EXPORT Camera : public MovingFrame
 {
+	friend class LightData;
+
+
 public:
 	enum Type
 	{
@@ -60,8 +65,10 @@ private:
 	float64 focal_distance_;
 	mutable rendering::GLMat4d proj_d_;
 	mutable rendering::GLMat4d mv_d_;
+	mutable rendering::GLMat4d inv_mv_d_;
 	mutable rendering::GLMat4 proj_;
 	mutable rendering::GLMat4 mv_;
+	mutable rendering::GLMat4 inv_mv_;
 
 	rendering::GLMat4d perspective(float64 znear, float64 zfar) const;
 	rendering::GLMat4d orthographic(float64 znear, float64 zfar) const;
@@ -93,7 +100,9 @@ public:
 		rendering::Transfo3d m = Eigen::Translation3d(rendering::GLVec3d(0.0, 0.0, -focal_distance_)) * frame_ *
 								 Eigen::Translation3d(-pivot_point_);
 		mv_d_ = m.matrix();
+		inv_mv_d_ = mv_d_.inverse();
 		mv_ = mv_d_.cast<float32>();
+		inv_mv_ = inv_mv_d_.cast<float32>();
 	}
 
 	inline void set_type(Type type)
