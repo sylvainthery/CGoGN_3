@@ -169,12 +169,7 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
 	sha_get_uniforms(this, "TUd", "TUn", "projv", "fn", "color", "light_position");
 }
-void ShaderParamExplodeVolumes2::set_uniforms()
-{
-	GLMat4& proj = cam_->projection_matrix();
-	cam_->
-	sha_set_uniforms_values(tex_depth_->bind(0), tex_normals_->bind(1),GLVec2(proj[0][0],proj[1][1]),GLVec3([ -2.0*zfar*znearn, zfar+znear, zfar-znear ];)
-}
+
 
 } // namespace rendering
 
