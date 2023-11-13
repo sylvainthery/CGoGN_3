@@ -25,25 +25,27 @@
 #include <cgogn/rendering/shadows.h>
 #include <cgogn/rendering/types.h>
 
+
 namespace cgogn
 {
 
 namespace rendering
 {
 
-Texture2D* ShadowData::tex_poisson_ = nullptr;
+std::unique_ptr<Texture2D> ShadowData::tex_poisson_ = nullptr;
 
-ShadowData::ShadowData() : fbo_shadows_(nullptr), nb_samples_(4), bias_k_(1e-27f)
+
+ShadowData::ShadowData() : fbo_shadows_(nullptr), nb_samples_(4), bias_k_(0.0f)
 {
 	std::vector<float> pois = {-0.94201624f, -0.39906216f, 0.94558609f,	 -0.76890725f, -0.094184101, -0.92938870f,
 							   0.34495938f,	 0.29387760f,  -0.91588581f, 0.45771432f,  -0.81544232f, -0.87912464f,
-							   -0.38277543,	 0.27676845f,  0.97484398f,	 0.75648379f,  0.44323325f,	 -0.97511554f,
-							   0.53742981f,	 -0.47373420f, -0.26496911,	 -0.41893023,  0.79197514,	 0.19090188f,
-							   -0.24188840f, 0.99706507f,  -0.81409955,	 0.91437590f,  0.19984126f,	 0.78641367f,
+							   -0.38277543f, 0.27676845f,  0.97484398f,	 0.75648379f,  0.44323325f,	 -0.97511554f,
+							   0.53742981f,	 -0.47373420f, -0.26496911f,  -0.41893023f,  0.79197514f, 0.19090188f,
+							   -0.24188840f, 0.99706507f,  -0.81409955f, 0.91437590f,  0.19984126f,	 0.78641367f,
 							   0.14383161f,	 -0.14100790f};
 	if (tex_poisson_ == nullptr)
 	{
-		tex_poisson_ = new Texture2D();
+		tex_poisson_ = std::make_unique<cgogn::rendering::Texture2D>();
 		tex_poisson_->bind();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -51,7 +53,7 @@ ShadowData::ShadowData() : fbo_shadows_(nullptr), nb_samples_(4), bias_k_(1e-27f
 	}
 }
 
-void ShadowData::start()
+void ShadowData::start(double bias_k)
 {
 	fbo_shadows_ = std::make_shared<cgogn::rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{},
 														   true, nullptr);
@@ -62,12 +64,10 @@ void ShadowData::start()
 	fbo_shadows_->getDepthTexture()->release();
 	int max_tex_sz;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_sz);
-	int sz = std::min(max_tex_sz, 4096);
+	int sz = std::min(max_tex_sz, 8192);
 	fbo_shadows_->resize(sz, sz);
-	started_ = true;
+	bias_k_ = float(bias_k);
 }
-
-
 
 
 std::string insert_shadow_code(const std::string& frag_src, const std::string& shadow_comment)
@@ -81,10 +81,10 @@ uniform sampler2D TUpoisson;
 uniform mat4 shadow_matrix;
 uniform int nb_samples;
 
-float random(vec3 seed)
+float random(vec3 seed,int i)
 {
-	float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
-	return fract(sin(dot_product) * 43758.5453);
+	float dp = dot(vec4(seed,3.721*float(i)), vec4(12.9898,78.233,45.164,17.371));
+	return fract(sin(dp) * 43758.5453);
 }
 
 float compute_shadow(float dnl)
@@ -92,15 +92,16 @@ float compute_shadow(float dnl)
 	if (!with_shadow)
 		return 1.0;
 
-	float bias_shd = bias_k+bias_k*tan(acos(dnl));
+	float bias_shd =bias_k ;//bias_k*tan(acos(dnl)); // 
 	vec4 sh_coord = shadow_matrix*vec4(position,1);
-	float sc = 2.0/textureSize(TUshadow,0).x;
-	vec3 shc =	vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w - bias_shd);
+	float sc = 9.0/textureSize(TUshadow,0).x;
+	vec3 shc =	vec3(sh_coord.xy, sh_coord.z  - bias_shd);
 	float shad = texture(TUshadow, shc);
 	for (int i=1;i<nb_samples;i++)
 	{
-		int index = int(15.99*random(gl_FragCoord.xyz));
-		vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w - bias_shd);
+		int index = int(15.99*random(gl_FragCoord.xyz,i));
+//		vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w - bias_shd);
+		vec3 shc =	vec3(sh_coord.xy + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z - bias_shd);
 		shad += texture(TUshadow, shc);
 	}
 	return shad/float(nb_samples);
@@ -112,6 +113,7 @@ float compute_shadow(float dnl)
 	frag_src_with_shadows.insert(i, src_shadows);
 	return frag_src_with_shadows;
 }
+
 
 } // namespace rendering
 

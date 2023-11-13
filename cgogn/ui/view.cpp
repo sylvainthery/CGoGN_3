@@ -47,6 +47,9 @@ View::View(Inputs* inputs, const std::string& name)
 	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
 	param_full_screen_texture_->unit_ = 0;
 	param_full_screen_texture_->texture_ = fbo_->texture(0);
+
+	light_.link(camera_);
+	sha_plane_.init(&shadow_);
 }
 
 View::~View()
@@ -154,12 +157,86 @@ void View::key_release_event(int32 key_code)
 	event_stopped_ = false;
 }
 
+
+std::pair<GLVec3d, GLVec3d> View::compute_bb()
+{
+	GLVec3d bb_min, bb_max;
+	for (uint32 i = 0; i < 3; ++i)
+	{
+		bb_min[i] = std::numeric_limits<float64>::max();
+		bb_max[i] = std::numeric_limits<float64>::lowest();
+	}
+
+	for (const auto& pm : linked_provider_modules_)
+	{
+		const auto& pmbb = pm->meshes_bb();
+		for (uint32 i = 0; i < 3; ++i)
+		{
+			if (pmbb.first[i] < bb_min[i])
+				bb_min[i] = pmbb.first[i];
+			if (pmbb.second[i] > bb_max[i])
+				bb_max[i] = pmbb.second[i];
+		}
+	}
+	return std::make_pair(bb_min, bb_max);
+}
+
 void View::draw()
 {
 	if (closing_)
 		return;
-
 	spin();
+
+	if (need_redraw_) //AND NEED SHADOW UPDATE
+	{
+		float64 sr = camera().scene_radius();
+		if (shadow_.is_started())
+		{
+			GLVec3d center = camera().pivot_point();
+			GLVec3 wlpf = light_.getWorldCoord();
+			GLVec3d wlp = wlpf.cast<double>();
+
+
+			auto orthographic = [&](float64 zcenter) {
+				float64 znear = zcenter - sr;
+				float64 zfar = zcenter + 4.0 * sr;
+				float64 ihw = 1.0 / sr;
+				float64 r_inv = 1.0 / (znear - zfar);
+				GLMat4d m;
+				m << ihw, 0, 0, 0, 0, ihw, 0, 0, 0, 0, 2.0 * r_inv, (znear + zfar) * r_inv, 0, 0, 0, 1;
+				return m;
+			};
+
+			auto look_at = [](const GLVec3d& eye, const GLVec3d& at, const GLVec3d& up) {
+				GLVec3d zAxis = (eye - at).normalized();
+				GLVec3d xAxis = up.cross(zAxis).normalized();
+				GLVec3d yAxis = zAxis.cross(xAxis).normalized();
+				GLMat4d trf;
+				trf.block<1, 3>(0, 0) = xAxis.transpose();
+				trf.block<1, 3>(1, 0) = yAxis.transpose();
+				trf.block<1, 3>(2, 0) = zAxis.transpose();
+				trf.block<3, 1>(0, 3) = GLVec3d(-xAxis.dot(eye), -yAxis.dot(eye), -zAxis.dot(eye));
+				trf.block<1, 4>(3, 0) = GLVec4d(0, 0, 0, 1).transpose();
+				return trf;
+			};
+
+			GLMat4d biasmat;
+			biasmat << 0.5, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 1.0;
+
+			GLMat4d light_projection_matrix = orthographic((wlp - center).norm());
+			GLMat4d light_view_matrix = look_at(wlp, center, rendering::GLVec3d(0, 1, 0));
+			shadow_.shadow_matrix_ =
+				biasmat * light_projection_matrix * light_view_matrix * camera().modelview_matrix_d().inverse();
+
+			shadow_.fbo_shadows_->bind();
+			glEnable(GL_DEPTH_TEST);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			for (ViewModule* m : linked_view_modules_)
+				m->draw_shadowmap(this, light_projection_matrix.cast<float>(), light_view_matrix.cast<float>());
+			shadow_.fbo_shadows_->release();
+		}
+	}
+
 	glViewport(viewport_x_offset_, viewport_y_offset_, viewport_width_, viewport_height_);
 	if (need_redraw_)
 	{
@@ -168,8 +245,19 @@ void View::draw()
 			fbo_->bind();
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 			GLenum idbuf = GL_COLOR_ATTACHMENT0;
 			glDrawBuffers(1, &idbuf);
+
+			if (shadow_.is_started())
+			{
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_BACK);
+				auto bb = compute_bb();
+				sha_plane_.drawZ(bb, 0.1f, camera_.projection_matrix(), camera_.modelview_matrix(),
+								 light_.getEyeCoord());
+			}
+
 			for (ViewModule* m : linked_view_modules_)
 				m->draw(this);
 			glDisable(GL_DEPTH_TEST);
@@ -186,7 +274,7 @@ void View::draw()
 void View::draw_shadowmap(const cgogn::rendering::GLMat4d& proj, const cgogn::rendering::GLMat4d& view)
 {
 	for (ViewModule* m : linked_view_modules_)
-		m->draw_shadowmap(this,proj,view);
+		m->draw_shadowmap(this, proj.cast<float>(), view.cast<float>());
 }
 
 
@@ -329,3 +417,4 @@ void View::save_screenshot()
 } // namespace ui
 
 } // namespace cgogn
+                               

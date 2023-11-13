@@ -105,13 +105,9 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 	)";
 
 
-
-//	std::string frag_src_with_shadows(fragment_shader_source);
-//	frag_src_with_shadows.insert(frag_src_with_shadows.find("//Shadows_code_here") + 20, src_shadows);
-
 	load(vertex_shader_source, insert_shadow_code(fragment_shader_source,"//Shadows_code_here"));
 
-	sha_get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping",
+	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_clipping",
 				 "color", "light_position", "explode", "plane_clip", "plane_clip2");
 
 
@@ -120,7 +116,7 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 
 void ShaderParamExplodeVolumesSmooth::set_uniforms()
 {
-	shader_->sha_set_uniforms_values(sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+	sha_set_uniforms_values(shader_, sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_);
 
 }

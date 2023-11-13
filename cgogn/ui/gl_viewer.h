@@ -27,8 +27,6 @@
 #include <GL/gl3w.h>
 
 #include <cgogn/ui/camera.h>
-#include <cgogn/ui/light.h>
-#include <cgogn/rendering/shadows.h>
 
 #include <cgogn/ui/cgogn_ui_export.h>
 #include <cgogn/ui/inputs.h>
@@ -197,15 +195,6 @@ public:
 		inputs_->spin_sensitivity_ = s * 0.025;
 	}
 
-	LightData& get_light()
-	{
-		return light_;
-	}
-
-	cgogn::rendering::ShadowData& get_shadow()
-	{
-		return shadow_;
-	}
 
 protected:
 	virtual void resize_event(int32 viewport_width, int32 viewport_height);
@@ -233,9 +222,6 @@ protected:
 	int32 viewport_width_;
 	int32 viewport_height_;
 	float64 spinning_speed_;
-
-	LightData light_;
-	cgogn::rendering::ShadowData shadow_;
 
 	Inputs* inputs_;
 

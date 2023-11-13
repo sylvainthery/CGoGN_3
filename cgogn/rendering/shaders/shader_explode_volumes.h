@@ -26,6 +26,7 @@
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
 #include <cgogn/rendering/shader_program.h>
+#include <cgogn/rendering/shadows.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
 
 namespace cgogn
@@ -62,7 +63,7 @@ public:
 	using ShaderType = ShaderExplodeVolumes;
 
 	inline ShaderParamExplodeVolumes(ShaderType* sh)
-		: ShaderParam(sh), data_(nullptr)
+		: ShaderParam(sh), data_(nullptr), sha_data_(nullptr)
 	{
 		for (auto& v : vbos_)
 			v = nullptr;
@@ -71,6 +72,24 @@ public:
 	inline ~ShaderParamExplodeVolumes() override
 	{
 	}
+};
+
+DECLARE_SHADER_CLASS(ExplodeVolumes2, true, CGOGN_STR(ExplodeVolumes2))
+
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes2 : public ShaderParam
+{
+	void set_uniforms() override;
+
+public:
+	ShadowData* sha_data_;
+
+	using ShaderType = ShaderExplodeVolumes2;
+
+	inline ShaderParamExplodeVolumes2(ShaderType* sh) : ShaderParam(sh), sha_data_(nullptr)
+	{}
+
+	inline ~ShaderParamExplodeVolumes2() override
+	{}
 };
 
 } // namespace rendering

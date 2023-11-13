@@ -32,6 +32,9 @@
 
 #include <vector>
 
+using cgogn::rendering::GLMat4;
+using cgogn::rendering::GLVec3;
+using cgogn::rendering::GLVec4;
 using cgogn::rendering::GLVec3d;
 using cgogn::rendering::GLVec4d;
 using cgogn::rendering::GLMat4d;
@@ -102,7 +105,10 @@ protected:
 	virtual void key_release_event(View* view, int32 key_code);
 
 	virtual void draw(View* view);
-	virtual void draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view);
+	//virtual void draw_shadowmap(View* view, const GLt4d& mat_proj, const GLMat4d& mat_view);
+	
+	virtual void draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view) = 0;
+	
 
 	std::vector<View*> linked_views_;
 };

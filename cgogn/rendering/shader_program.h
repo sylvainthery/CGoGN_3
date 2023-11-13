@@ -25,7 +25,7 @@
 #define CGOGN_RENDERING_SHADERS_SHADER_PROGRAM_H_
 
 #include <cgogn/rendering/cgogn_rendering_export.h>
-#include <cgogn/rendering/shadows.h>
+//#include <cgogn/rendering/shadows.h>
 
 
 #include <cgogn/rendering/types.h>
@@ -212,11 +212,11 @@ public:
 		get_uniforms(pn...);
 	}
 
-	template <typename T1, typename... Ts>
-	void sha_get_uniforms(T1 p1, Ts... pn)
-	{
-		get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
-	}
+	//template <typename T1, typename... Ts>
+	//void sha_get_uniforms(T1 p1, Ts... pn)
+	//{
+	//	get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
+	//}
 
 	void print_uniforms()
 	{
@@ -305,14 +305,14 @@ public:
 		set_uniforms_values_rec(max_uniforms_size, v, vs...);
 	}
 
-	template <typename T, typename... Ts>
-	inline void sha_set_uniforms_values(ShadowData* sha_ptr, T v, Ts... vs)
-	{
-		if (sha_ptr != nullptr)
-			set_uniforms_values(v, vs..., true, SHADOWS_PARAMETERS(sha_ptr));
-		else
-			set_uniforms_values(v, vs..., false);
-	}
+	//template <typename T, typename... Ts>
+	//inline void sha_set_uniforms_values(ShadowData* sha_ptr, T v, Ts... vs)
+	//{
+	//	if (sha_ptr != nullptr)
+	//		set_uniforms_values(v, vs..., true, SHADOWS_PARAMETERS(sha_ptr));
+	//	else
+	//		set_uniforms_values(v, vs..., false);
+	//}
 
 
 	void get_matrices_uniforms();

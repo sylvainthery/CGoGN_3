@@ -40,6 +40,8 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shadows.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shadows.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/shadows_plane.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shadows_plane.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/graph_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/point_cloud_render.h"
@@ -47,7 +49,6 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/vector_per_vertex_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/topo_render.h"
-		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/lighting.h"
 
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.cpp"

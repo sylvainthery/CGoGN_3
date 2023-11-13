@@ -27,13 +27,17 @@
 #include <cgogn/ui/cgogn_ui_export.h>
 
 #include <cgogn/core/utils/numerics.h>
+#include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
 
 #include <cgogn/ui/gl_viewer.h>
 #include <cgogn/ui/module.h>
 
 #include <cgogn/rendering/fbo.h>
-#include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
+
 #include <cgogn/rendering/types.h>
+#include <cgogn/ui/light.h>
+#include <cgogn/rendering/shadows.h>
+#include <cgogn/rendering/shadows_plane.h>
 
 using cgogn::rendering::GLVec3d;
 using cgogn::rendering::GLVec4d;
@@ -142,6 +146,23 @@ public:
 
 	void save_screenshot();
 
+	inline cgogn::ui::LightData& get_light()
+	{
+		return light_;
+	}
+
+	inline cgogn::rendering::ShadowData& get_shadow()
+	{
+		return shadow_;
+	}
+
+	inline cgogn::rendering::ShadowsPlane& get_plane_shadow()
+	{
+		return sha_plane_;
+	}
+
+	std::pair<GLVec3d, GLVec3d> compute_bb();
+
 protected:
 	std::string name_;
 
@@ -162,6 +183,11 @@ protected:
 	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
 	std::unique_ptr<rendering::FBO> fbo_;
 	std::shared_ptr<rendering::Texture2D> tex_;
+
+	cgogn::ui::LightData light_;
+	cgogn::rendering::ShadowData shadow_;
+	cgogn::rendering::ShadowsPlane sha_plane_;
+
 
 	std::vector<ViewModule*> linked_view_modules_;
 	std::vector<ProviderModule*> linked_provider_modules_;

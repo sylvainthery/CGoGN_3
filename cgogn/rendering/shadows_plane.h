@@ -21,15 +21,17 @@
  *                                                                              *
  *******************************************************************************/
 
-#ifndef CGOGN_RENDERING_SHADOWS_DATA_H_
-#define CGOGN_RENDERING_SHADOWS_DATA_H_
+#ifndef CGOGN_RENDERING_SHADOWS_PLANE_H_
+#define CGOGN_RENDERING_SHADOWS_PLANE_H_
 
-#include <memory>
-#include <cgogn/geometry/types/vector_traits.h>
-#include <cgogn/rendering/fbo.h>
+//#include <memory>
 #include <cgogn/rendering/types.h>
-#include <cgogn/rendering/shader_program.h>
+#include <cgogn/rendering/fbo.h>
+#include <cgogn/rendering/shaders/shader_plane_env.h>
 
+
+using cgogn::rendering::GLVec3;
+using cgogn::rendering::GLMat4;
 
 
 namespace cgogn
@@ -38,66 +40,17 @@ namespace cgogn
 namespace rendering
 {
 
-struct ShadowData
+struct ShadowsPlane
 {
-	static std::unique_ptr<cgogn::rendering::Texture2D> tex_poisson_;
+	static std::shared_ptr<cgogn::rendering::Texture2D> tex_plane_;
+	std::unique_ptr<cgogn::rendering::ShaderParamPlaneShadow> param_plane_;
 
-	std::shared_ptr<cgogn::rendering::FBO> fbo_shadows_;
-	GLMat4d shadow_matrix_;
-	int nb_samples_;
-	float32 bias_k_;
-
-	ShadowData();
-
-	inline bool is_started() const
-	{
-		return fbo_shadows_ != nullptr;
-	}
-
-	void start(double bias_k);
-
-	inline void stop()
-	{
-		fbo_shadows_ = nullptr;
-	}
+	ShadowsPlane();
+	void init(cgogn::rendering::ShadowData* sha_dat_ptr);
+	void drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, const GLMat4& projm, const GLMat4& mvm,
+			   const GLVec3& light_position);
 };
 
-//struct ShadowPlane
-//{
-//	static std::unique_ptr<cgogn::rendering::Texture2D> tex_plane_;
-//	std::unique_ptr < cgogn::rendering::ShaderParamPlaneShadow> param_plane_;
-//
-//	ShadowPlane();
-//	void init(cgogn::rendering::ShadowData* sha_dat_ptr);
-//	void draw();
-//};
-
-
-std::string insert_shadow_code(const std::string& frag_src, const std::string& shadow_comment);
-
-#define SHADOWS_UNIFORMS_STRINGS "with_shadow","shadow_matrix","TUshadow","bias_k","TUpoisson","nb_samples"
-
-#define SHADOWS_PARAMETERS(ptr) ptr->shadow_matrix_,\
-ptr->fbo_shadows_->getDepthTexture()->bind(0),\
-ptr->bias_k_,\
-ptr->tex_poisson_->bind(1),\
-ptr->nb_samples_
-
-
-template <typename T1, typename... Ts>
-void sha_get_uniforms(cgogn::rendering::ShaderProgram* prg, T1 p1, Ts... pn)
-{
-	prg->get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
-}
-
-template <typename T, typename... Ts>
- inline void sha_set_uniforms_values(cgogn::rendering::ShaderProgram* prg, ShadowData* sha_ptr, T v, Ts... vs)
-{
-	if (sha_ptr != nullptr)
-		prg->set_uniforms_values(v, vs..., true, SHADOWS_PARAMETERS(sha_ptr));
-	else
-		prg->set_uniforms_values(v, vs..., false);
-}
 
 } // namespace rendering
 
