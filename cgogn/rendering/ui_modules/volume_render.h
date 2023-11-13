@@ -265,6 +265,8 @@ private:
 						}
 						v->request_update();
 					}));
+
+			v->get_light().update();
 		}
 	}
 

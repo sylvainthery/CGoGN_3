@@ -105,11 +105,10 @@ void ViewModule::key_release_event(View*, int32)
 void ViewModule::draw(View*)
 {
 }
-//
-//void ViewModule::draw_shadowmap(View*, const GLMat4d&, const GLMat4d&)
-//{
-//	std::cout << "ViewModule::draw_shadowmap" << std::endl;
-//}
+
+void ViewModule::draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view)
+{
+}
 
 /*****************************************************************************/
 // ProviderModule

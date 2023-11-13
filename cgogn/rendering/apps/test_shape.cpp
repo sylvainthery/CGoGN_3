@@ -30,11 +30,20 @@
 using namespace ::cgogn;
 using namespace ::cgogn::rendering;
 
+namespace cgogn
+{
+namespace ui
+{
+class View;
+}
+}
+
 class ShapeRender : public ui::ViewModule
 {
+
 public:
-	ShapeRender(const ui::App & app)
-		: ViewModule(app, "Test Shape"), app_(app), shape_(nullptr)
+	ShapeRender(const ui::App & app):
+		  ui::ViewModule(app, "Test Shape"), app_(app), shape_(nullptr)
 	{}
 
 	~ShapeRender()	{}
@@ -93,3 +102,5 @@ int main(int argc, char** argv)
 	//app.show_gui(false);
 	return app.launch();
 }
+
+

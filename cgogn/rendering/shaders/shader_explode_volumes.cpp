@@ -29,7 +29,6 @@ namespace rendering
 {
 
 ShaderExplodeVolumes* ShaderExplodeVolumes::instance_ = nullptr;
-ShaderExplodeVolumes2* ShaderExplodeVolumes2::instance_ = nullptr;
 
 ShaderExplodeVolumes::ShaderExplodeVolumes()
 {
@@ -78,17 +77,27 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 		#version 330
 
 		in vec3 position;
-		out vec3 frag_out;
+		out vec4 frag_out;
+
+		uniform vec4 color;
+		uniform vec3 light_position;
+
+//Shadows_code_here
+
 
 		void main()
 		{
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
-			frag_out = N;
+			vec3 L = normalize(light_position - position);
+
+			float dnl = max(0.0, dot(N, L));
+			float lambert = 0.2 + 0.8 * dnl * compute_shadow(dnl);
+			frag_out = vec4(lambert * color.rgb, color.a);
 		}
 	)";
 
 	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color",
+	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color",
 					 "light_position", "explode", "plane_clip", "plane_clip2");
 	nb_attributes_ = 2; // ???
 }
@@ -113,68 +122,6 @@ void ShaderParamExplodeVolumes::release_texture_buffers()
 	vbos_[VOLUME_CLIPPING]->release_texture_buffer(13);
 }
 
-
-
-ShaderExplodeVolumes2::ShaderExplodeVolumes2()
-{
-	const char* vertex_shader_source = R"(
-		#version 330
-		out vec2 tc;
-		void main()
-		{
-			uint vid = uint(gl_VertexID);
-			tc = vec2(vid%2u, vid/2u);
-			gl_Position = vec4(2.0*tc-1.0, 0.0, 1.0);
-		}
-	)";
-
-	const char* fragment_shader_source = R"(
-		#version 330
-		in vec2 tc;
-		out vec4 frag_out;
-
-		uniform sampler2D TUd;
-		uniform sampler2D TUn;
-		uniform vec2 projv;// [ projection_matrix[0][0],projection_matrix.data[1][1] ];
-		uniform vec3 fn; // [ -2.0*zfar*znearn, zfar+znear, zfar-znear ];
-		uniform vec4 color;
-		uniform vec3 light_position;
-
-//Shadows_code_here
-
-		vec3 XYZfromDepth(vec2 uv, float d)
-		{
-			float z_n = 2.0 * d - 1.0;
-			float z = fn.x / (fn.y - z_n * (fn.z));
-			return vec3((-2.0*uv-1.0)/projv*z, z);
-		}
-
-		
-		void main()
-		{
-			float depth = texture(TUdepth,tc).r;
-			
-			if (depth>=1.0)
-				discard;
-
-			vec3 P = XYZfromDepth(tc,depth);
-			vec3 L = normalize(light_position - P);
-			vec3 N = normalize(texture(TUn,tc).rgb;
-			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + + 0.8 * dnl * compute_shadow2(P, dnl);
-			frag_out = vec4(lambert * color.rgb, color.a);
-		}
-	)";
-
-	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-	sha_get_uniforms(this, "TUd", "TUn", "projv", "fn", "color", "light_position");
-}
-void ShaderParamExplodeVolumes2::set_uniforms()
-{
-	GLMat4& proj = cam_->projection_matrix();
-	cam_->
-	sha_set_uniforms_values(tex_depth_->bind(0), tex_normals_->bind(1),GLVec2(proj[0][0],proj[1][1]),GLVec3([ -2.0*zfar*znearn, zfar+znear, zfar-znear ];)
-}
 
 } // namespace rendering
 

@@ -105,7 +105,7 @@ public:
 		}
 	}
 
-	inline const GLVec3& getWorldCoord() const
+	inline GLVec3 getWorldCoord() const
 	{
 		if (light_on_cam_)
 			return cgogn::rendering::homoTransform(cam_->mv_.inverse(),eye_coord_);

@@ -107,7 +107,7 @@ protected:
 	virtual void draw(View* view);
 	//virtual void draw_shadowmap(View* view, const GLt4d& mat_proj, const GLMat4d& mat_view);
 	
-	virtual void draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view) = 0;
+	virtual void draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view);
 	
 
 	std::vector<View*> linked_views_;

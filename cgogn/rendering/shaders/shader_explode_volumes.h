@@ -10,24 +10,68 @@
  * This library is distributed in the hope that it will be useful, but WITHOUT  *
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
- * for more details.            
+ * for more details.                                                            *
+ *                                                                              *
+ * You should have received a copy of the GNU Lesser General Public License     *
+ * along with this library; if not, write to the Free Software Foundation,      *
+ * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA.           *
+ *                                                                              *
+ * Web site: http://cgogn.unistra.fr/                                           *
+ * Contact information: cgogn@unistra.fr                                        *
+ *                                                                              *
+ *******************************************************************************/
 
+#ifndef CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
+#define CGOGN_RENDERING_SHADERS_EXPLODE_VOLUMES_H_
 
-	using ShaderType = ShaderExplodeVolumes2;
+#include <cgogn/rendering/cgogn_rendering_export.h>
+#include <cgogn/rendering/shader_program.h>
+#include <cgogn/rendering/shadows.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_data.h>
 
-	inline ShaderParamExplodeVolumes2(ShaderType* sh) : ShaderParam(sh), sha_data_(nullptr)
-	{}
+namespace cgogn
+{
 
-	inline ~ShaderParamExplodeVolumes2() override
-	{}
+namespace rendering
+{
 
-	inline void draw()
+DECLARE_SHADER_CLASS(ExplodeVolumes, true, CGOGN_STR(ExplodeVolumes))
+
+class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes : public ShaderParam
+{
+	void set_uniforms() override;
+
+	std::array<VBO*, 3> vbos_;
+	inline void set_texture_buffer_vbo(uint32 i, VBO* vbo) override
 	{
-		bind();
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		release();
+		vbos_[i] = vbo;
+	}
+	void bind_texture_buffers() override;
+	void release_texture_buffers() override;
+
+	enum VBOName : int32
+	{
+		VERTEX_POSITION = 0,
+		VOLUME_CENTER,
+		VOLUME_CLIPPING
+	};
+
+public:
+	ExplodeVolumeData* data_;
+	ShadowData* sha_data_;
+
+	using ShaderType = ShaderExplodeVolumes;
+
+	inline ShaderParamExplodeVolumes(ShaderType* sh)
+		: ShaderParam(sh), data_(nullptr), sha_data_(nullptr)
+	{
+		for (auto& v : vbos_)
+			v = nullptr;
 	}
 
+	inline ~ShaderParamExplodeVolumes() override
+	{
+	}
 };
 
 } // namespace rendering
