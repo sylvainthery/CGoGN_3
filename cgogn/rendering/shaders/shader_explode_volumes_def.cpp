@@ -242,7 +242,7 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 		void main()
 		{
 			float depth = texture(TUd,tc).r;
-			
+
 			if (depth>=1.0)
 				discard;
 
@@ -251,7 +251,7 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 			vec3 N = normalize(texture(TUn,tc).rgb);
 			float dnl = max(0.0, dot(N, L));
 			float lambert = 0.2 + + 0.8 * dnl * compute_shadow(position, dnl);
-			frag_out = vec4(lambert * color.rgb*0.00001+vec3(lambert), color.a);
+			frag_out = vec4(lambert * color.rgb, color.a);
 		}
 	)";
 

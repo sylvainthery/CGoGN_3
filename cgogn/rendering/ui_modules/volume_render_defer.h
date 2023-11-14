@@ -196,17 +196,17 @@ class VolumeRenderDef : public ViewModule
 		}
 
 
-		template <typename TS1, typename TS2>
-		void register_shader_explvol()
-		{
-			auto s = TS1::generate_param();
-			s->data_ = &this->data_;
-			params_volumes_.push_back(std::move(s));
+//		template <typename TS1, typename TS2>
+//		void register_shader_explvol()
+//		{
+//			auto s = TS1::generate_param();
+//			s->data_ = &this->data_;
+//			params_volumes_.push_back(std::move(s));
 
-			auto s2 = TS2::generate_param();
-			s2->sha_data_ = this->sha_data_;
-			params_volumes_.push_back(std::move(s2));
-		}
+//			auto s2 = TS2::generate_param();
+//			s2->sha_data_ = this->sha_data_;
+//			params_volumes_.push_back(std::move(s2));
+//		}
 
 		void init_shaders(rendering::ShadowData* sha_data_ptr)
 		{
@@ -295,13 +295,13 @@ public:
 		: ViewModule(app, "VolumeRender (" + std::string{mesh_traits<MESH>::name} + ")"),
 		  selected_view_(app.current_view()), selected_mesh_(nullptr)
 	{
-		std::shared_ptr<rendering::Texture2D> t1 = std::make_shared<rendering::Texture2D>();
-		t1->allocate(0, 0, GL_RGB32F, GL_RGB);
-		fbo_normals_ = std::make_unique<rendering::FBO>(t1, false, nullptr);
+//		std::shared_ptr<rendering::Texture2D> t1 = std::make_shared<rendering::Texture2D>();
+//		t1->allocate(0, 0, GL_RGB32F, GL_RGB);
+//		fbo_normals_ = std::make_unique<rendering::FBO>(t1, false, nullptr);
 
-		std::shared_ptr<rendering::Texture2D> t2 = std::make_shared<rendering::Texture2D>();
-		t2->allocate(0, 0, GL_RGB8, GL_RGB, nullptr, GL_UNSIGNED_BYTE);
-		fbo_colors_ = std::make_unique<rendering::FBO>(t2, false, nullptr);
+//		std::shared_ptr<rendering::Texture2D> t2 = std::make_shared<rendering::Texture2D>();
+//		t2->allocate(0, 0, GL_RGB8, GL_RGB, nullptr, GL_UNSIGNED_BYTE);
+//		fbo_colors_ = std::make_unique<rendering::FBO>(t2, false, nullptr);
 
 		outline_engine_ = rendering::Outliner::instance();
 		// compute_volume_center_engine_ = std::make_unique<rendering::ComputeVolumeCenterEngine>();
@@ -660,8 +660,8 @@ public:
 
 				glEnable(GL_CULL_FACE);
 				glCullFace(GL_BACK);
-				::cgogn::rendering::ShadowData* sha = (view->get_shadow().is_started() && p.receive_shadows_) ? &view->get_shadow() : nullptr;
-				p.params_defer->draw(proj_matrix, view_matrix, p.smooth_volume_faces_,sha,
+				::cgogn::rendering::ShadowData* sha = (view->get_shadow().is_started() && p.receive_shadows_) ? &(view->get_shadow()) : nullptr;
+				p.params_defer->draw(proj_matrix, view_matrix, p.smooth_volume_faces_, sha,
 					[&](){
 					if (p.smooth_volume_faces_)
 						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
