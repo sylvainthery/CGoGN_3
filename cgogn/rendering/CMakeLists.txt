@@ -48,6 +48,7 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/surface_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/vector_per_vertex_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render.h"
+		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render_defer.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/topo_render.h"
 
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.h"
@@ -97,6 +98,8 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_data.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_def.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_def.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_smooth.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_explode_volumes_smooth.cpp"

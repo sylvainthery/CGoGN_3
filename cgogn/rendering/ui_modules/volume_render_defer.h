@@ -35,7 +35,7 @@
 #include <cgogn/rendering/frame_manipulator.h>
 #include <cgogn/rendering/shaders/outliner.h>
 #include <cgogn/rendering/shaders/shader_bold_line.h>
-#include <cgogn/rendering/shaders/shader_explode_volumes.h>
+#include <cgogn/rendering/shaders/shader_explode_volumes_def.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_smooth.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_color.h>
 #include <cgogn/rendering/shaders/shader_explode_volumes_line.h>
@@ -57,11 +57,99 @@
 namespace cgogn
 {
 
+
 namespace ui
 {
 
 using geometry::Vec3;
 using geometry::Scalar;
+
+struct DeferExplodeVolumes
+{
+	std::unique_ptr<::cgogn::rendering::ShaderParamExplodeVolumes1> pass1_;
+	std::unique_ptr<::cgogn::rendering::ShaderParamExplodeVolumes1smooth> pass1s_;
+	std::unique_ptr<::cgogn::rendering::ShaderParamExplodeVolumes2> pass2_;
+
+	std::shared_ptr<::cgogn::rendering::Texture2D> tex_n_;
+	std::unique_ptr<::cgogn::rendering::FBO> fbo_;
+
+	inline DeferExplodeVolumes(::cgogn::rendering::ExplodeVolumeData* data)
+		: pass1_(nullptr), pass1s_(nullptr), pass2_(nullptr), tex_n_(nullptr), fbo_(nullptr)
+
+	{
+		tex_n_ = std::make_shared<::cgogn::rendering::Texture2D>(
+			std::vector<std::pair<GLenum, GLint>>{{GL_TEXTURE_MIN_FILTER, GL_NEAREST},
+																			  {GL_TEXTURE_MAG_FILTER, GL_NEAREST},
+																			  {GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE},
+																			  {GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE}});
+		tex_n_->allocate(0, 0, GL_RGB32F, GL_RGB);
+		fbo_ = std::make_unique<::cgogn::rendering::FBO>(tex_n_, true);
+
+		pass1_ = ::cgogn::rendering::ShaderExplodeVolumes1::generate_param();
+		pass1_->data_ = data;
+		pass1s_ = ::cgogn::rendering::ShaderExplodeVolumes1smooth::generate_param();
+		pass1s_->data_ = data;
+		pass2_ = ::cgogn::rendering::ShaderExplodeVolumes2::generate_param();
+		pass2_->tex_n_ = tex_n_;
+		pass2_->tex_d_ = fbo_->getDepthTexture();
+		pass2_->data_ = data;
+	}
+
+	void set_vbos(const std::vector<::cgogn::rendering::VBO*>& vbos)
+	{
+		pass1_->set_vbos(vbos);
+		pass1s_->set_vbos(vbos);
+	}
+
+	template <typename FUNC>
+	inline void draw(const GLMat4& mproj, const GLMat4& mview, bool smooth, ::cgogn::rendering::ShadowData* sha,
+					 const FUNC& fd)
+	{
+		GLint prev_viewport[4];
+		glGetIntegerv(GL_VIEWPORT, prev_viewport);
+
+		if (fbo_->width() != prev_viewport[2] || fbo_->height() != prev_viewport[3])
+		{
+			fbo_->resize(prev_viewport[2], prev_viewport[3]);
+		}
+
+		fbo_->getDepthTexture()->bind();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+		fbo_->getDepthTexture()->release();
+
+		fbo_->bind();
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		if (smooth)
+		{
+			pass1s_->bind(mproj, mview);
+			fd();
+			pass1s_->release();
+		}
+		else
+		{
+			pass1_->bind(mproj, mview);
+			fd();
+			pass1_->release();
+		}
+		fbo_->release();
+
+		fbo_->getDepthTexture()->bind();
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+		fbo_->getDepthTexture()->release();
+
+		float32 znear = mproj(2,3) / (mproj(2,2) - 1.0);
+		float32 zfar = ((mproj(2,2) - 1.0) * znear) / (mproj(2,2) + 1.0);
+
+		pass2_->projv_ = ::cgogn::rendering::GLVec2(mproj(0, 0), mproj(1, 1));
+		pass2_->fn_ = ::cgogn::rendering::GLVec3(-2.0 * zfar * znear, zfar + znear, zfar - znear);
+		pass2_->sha_data_ = sha;
+		pass2_->bind();
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		pass2_->release();
+	}
+};
+
 
 
 template <typename MESH>
@@ -136,13 +224,14 @@ class VolumeRenderDef : public ViewModule
 			param_volume_generate_shadows_->data_ = &this->data_;
 
 			sha_data_ = sha_data_ptr;
-			register_shader_explvol<rendering::ShaderExplodeVolumes, rendering::ShaderExplodeVolumes2,
-									rendering::ShaderExplodeVolumes3>();
+			//register_shader_explvol<rendering::ShaderExplodeVolumes, rendering::ShaderExplodeVolumes2,
+			//						rendering::ShaderExplodeVolumes3>();
 			//register_shader_explvol<rendering::ShaderExplodeVolumesSmooth>();
 			//register_shader_explvol<rendering::ShaderExplodeVolumesColor>();
 			//register_shader_explvol<rendering::ShaderExplodeVolumesColorSmooth>();
 			//register_shader_explvol<rendering::ShaderExplodeVolumesScalar>();
 			//register_shader_explvol<rendering::ShaderExplodeVolumesScalarSmooth>();
+			params_defer = std::make_unique<DeferExplodeVolumes>(&this->data_);
 
 		}
 
@@ -174,7 +263,9 @@ class VolumeRenderDef : public ViewModule
 
 		std::unique_ptr<rendering::ShaderExplodeVolumesLine::Param> param_volume_line_;
 
-		std::vector < std::unique_ptr<rendering::ShaderParam>> params_volumes_;
+//		std::vector < std::unique_ptr<rendering::ShaderParam>> params_volumes_;
+		std::unique_ptr<DeferExplodeVolumes> params_defer;
+
 
 		bool render_vertices_;
 		bool render_edges_;
@@ -200,15 +291,23 @@ class VolumeRenderDef : public ViewModule
 	};
 
 public:
-	VolumeRender(const App& app)
+	VolumeRenderDef(const App& app)
 		: ViewModule(app, "VolumeRender (" + std::string{mesh_traits<MESH>::name} + ")"),
 		  selected_view_(app.current_view()), selected_mesh_(nullptr)
 	{
+		std::shared_ptr<rendering::Texture2D> t1 = std::make_shared<rendering::Texture2D>();
+		t1->allocate(0, 0, GL_RGB32F, GL_RGB);
+		fbo_normals_ = std::make_unique<rendering::FBO>(t1, false, nullptr);
+
+		std::shared_ptr<rendering::Texture2D> t2 = std::make_shared<rendering::Texture2D>();
+		t2->allocate(0, 0, GL_RGB8, GL_RGB, nullptr, GL_UNSIGNED_BYTE);
+		fbo_colors_ = std::make_unique<rendering::FBO>(t2, false, nullptr);
+
 		outline_engine_ = rendering::Outliner::instance();
 		// compute_volume_center_engine_ = std::make_unique<rendering::ComputeVolumeCenterEngine>();
 	}
 
-	~VolumeRender()
+	~VolumeRenderDef()
 	{
 	}
 
@@ -306,16 +405,18 @@ public:
 
 		p.param_volume_line_->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
-		for (int i = 0; i < 4; ++i)
-			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
+		p.params_defer->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
-		for (int i = 4; i < 8; ++i)
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
+		//for (int i = 0; i < 4; ++i)
+		//	p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
-		for (int i = 8; i < 12; ++i)
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_, p.volume_clipping_position_vbo_});
+		//for (int i = 4; i < 8; ++i)
+		//	p.params_volumes_[i]->set_vbos(
+		//		{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
+
+		//for (int i = 8; i < 12; ++i)
+		//	p.params_volumes_[i]->set_vbos(
+		//		{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_, p.volume_clipping_position_vbo_});
 
 		Scalar size = (md.bb_max_ - md.bb_min_).norm() / 25;
 		Vec3 position = 0.2 * md.bb_min_ + 0.8 * md.bb_max_;
@@ -360,17 +461,19 @@ public:
 		p.param_volume_generate_shadows_->set_vbos(
 			{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
-		for (int i = 0; i < 4; ++i)
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
+		p.params_defer->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
-		for (int i = 4; i < 8; ++i)
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
+		//for (int i = 0; i < 4; ++i)
+		//	p.params_volumes_[i]->set_vbos(
+		//		{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_clipping_position_vbo_});
 
-		for (int i = 8; i < 12; ++i)
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_, p.volume_clipping_position_vbo_});
+		//for (int i = 4; i < 8; ++i)
+		//	p.params_volumes_[i]->set_vbos(
+		//		{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_, p.volume_clipping_position_vbo_});
+
+		//for (int i = 8; i < 12; ++i)
+		//	p.params_volumes_[i]->set_vbos(
+		//		{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_, p.volume_clipping_position_vbo_});
 
 		v.request_update();
 	}
@@ -390,11 +493,11 @@ public:
 		else
 			p.volume_color_vbo_ = nullptr;
 
-		for (int i = 4; i < 8; ++i)
-		{
-			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
-			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
-		}
+		//for (int i = 4; i < 8; ++i)
+		//{
+		//	p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
+		//	p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
+		//}
 
 		v.request_update();
 	}
@@ -422,12 +525,12 @@ public:
 			p.data_.color_map_.max_value_ = 1.0f;
 		}
 
-		for (int i = 8; i < 12; ++i)
-		{
-			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
-		}
+		//for (int i = 8; i < 12; ++i)
+		//{
+		//	p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
+		//	p.params_volumes_[i]->set_vbos(
+		//		{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
+		//}
 	}
 
 	void set_volume_explode(View& v, const MESH& m, float expl)
@@ -487,7 +590,7 @@ protected:
 			app_.module("MeshProvider (" + std::string{mesh_traits<MESH>::name} + ")"));
 		mesh_provider_->foreach_mesh([this](MESH& m, const std::string&) { init_mesh(&m); });
 		connections_.push_back(boost::synapse::connect<typename MeshProvider<MESH>::mesh_added>(
-			mesh_provider_, this, &VolumeRender<MESH>::init_mesh));
+			mesh_provider_, this, &VolumeRenderDef<MESH>::init_mesh));
 
 		start_timer= std::chrono::high_resolution_clock::now();
 	}
@@ -553,8 +656,21 @@ public:
 					break;
 				}
 
-				rendering::ShaderParam* param_vol = p.params_volumes_[index_shader].get();
-				if (param_vol->attributes_initialized())
+//				rendering::ShaderParam* param_vol = p.params_volumes_[index_shader].get();
+
+				glEnable(GL_CULL_FACE);
+				glCullFace(GL_BACK);
+				::cgogn::rendering::ShadowData* sha = (view->get_shadow().is_started() && p.receive_shadows_) ? &view->get_shadow() : nullptr;
+				p.params_defer->draw(proj_matrix, view_matrix, p.smooth_volume_faces_,sha,
+					[&](){
+					if (p.smooth_volume_faces_)
+						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
+					else
+						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
+
+					});
+
+	/*			if (param_vol->attributes_initialized())
 				{		
 					glEnable(GL_CULL_FACE);
 					glCullFace(GL_BACK);
@@ -565,7 +681,7 @@ public:
 					else
 						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
 					param_vol->release();
-				}
+				}*/
 
 
 				if (p.render_volume_lines_ && p.param_volume_line_->attributes_initialized())
@@ -948,15 +1064,11 @@ private:
 	std::unordered_map<const MESH*, std::vector<std::shared_ptr<boost::synapse::connection>>> mesh_connections_;
 	MeshProvider<MESH>* mesh_provider_;
 
+	std::unique_ptr<rendering::FBO> fbo_normals_;
+	std::unique_ptr<rendering::FBO> fbo_colors_;
+
 	rendering::Outliner* outline_engine_;
 	// std::unique_ptr<rendering::ComputeVolumeCenterEngine> compute_volume_center_engine_;
-
-	std::shared_ptr<rendering::Texture2D> t1 = std::make_shared<rendering::Texture2D>();
-	t1->allocate(0, 0, GL_RGB32F, GL_RGB, nullptr, GL_FLOAT);
-	fbo_normals_ = new rendering::FBO(t1, false, nullptr);
-	std::shared_ptr<rendering::Texture2D> t2 = std::make_shared<rendering::Texture2D>();
-	t2->allocate(0, 0, GL_RGB8, GL_RGB, nullptr, GL_UNSIGNED_BYTE);
-	fbo_colors_ = new rendering::FBO(t2, false, nullptr);
 };
 
 } // namespace ui

@@ -99,7 +99,7 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.1*max(0.0,N.z) + 0.7 * dnl * compute_shadow(dnl);
+			float lambert = 0.2 + 0.1*max(0.0,N.z) + 0.7 * dnl * compute_shadow( dnl);
 			frag_out = vec4(vec3(lambert * texture(TUcolor,tc).r), 1.0);
 		}
 

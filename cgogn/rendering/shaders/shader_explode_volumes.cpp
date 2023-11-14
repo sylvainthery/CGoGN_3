@@ -91,7 +91,7 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			vec3 L = normalize(light_position - position);
 
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(dnl);
+			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
 			frag_out = vec4(lambert * color.rgb, color.a);
 		}
 	)";
