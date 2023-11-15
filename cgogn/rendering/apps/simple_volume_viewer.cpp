@@ -31,7 +31,7 @@
 #include <cgogn/ui/view.h>
 
 #include <cgogn/core/ui_modules/mesh_provider.h>
-#include <cgogn/rendering/ui_modules/volume_render_defer.h>
+#include <cgogn/rendering/ui_modules/volume_render.h>
 
 #include <cgogn/geometry/algos/centroid.h>
 #include <cgogn/geometry/functions/distance.h>
@@ -53,7 +53,6 @@ int main(int argc, char** argv)
 
 	using Vec3 = cgogn::geometry::Vec3;
 	using Scalar = cgogn::geometry::Scalar;
-
 	std::string filename;
 	std::string filename2;
 	if (argc < 2)
@@ -71,7 +70,7 @@ int main(int argc, char** argv)
 	app.set_window_size(1000, 800);
 
 	cgogn::ui::MeshProvider<Mesh> mp(app);
-	cgogn::ui::VolumeRenderDef<Mesh> vr(app);
+	cgogn::ui::VolumeRender<Mesh> vr(app);
 
 	app.init_modules();
 

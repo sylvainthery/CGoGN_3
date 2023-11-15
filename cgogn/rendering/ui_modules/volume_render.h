@@ -397,7 +397,7 @@ public:
 		for (int i = 4; i < 8; ++i)
 		{
 			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
-			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
+//			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_color_vbo_});
 		}
 
 		v.request_update();
@@ -429,8 +429,7 @@ public:
 		for (int i = 8; i < 12; ++i)
 		{
 			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
-			p.params_volumes_[i]->set_vbos(
-				{p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
+//			p.params_volumes_[i]->set_vbos({p.vertex_position_vbo_, p.volume_center_vbo_, p.volume_scalar_vbo_});
 		}
 	}
 
@@ -571,6 +570,7 @@ public:
 					glCullFace(GL_BACK);
 					glDepthFunc(GL_LEQUAL);
 					glDepthMask(GL_FALSE);
+					std::cout << "MODELBVIEW " << std::endl << view_matrix << std::endl;
 					param_vol->bind(proj_matrix, view_matrix);
 					if (p.smooth_volume_faces_)
 						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
