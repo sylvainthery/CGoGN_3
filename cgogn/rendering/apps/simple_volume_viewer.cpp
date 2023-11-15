@@ -55,10 +55,11 @@ int main(int argc, char** argv)
 	using Scalar = cgogn::geometry::Scalar;
 
 	std::string filename;
+	std::string filename2;
 	if (argc < 2)
 	{
 		filename = std::string(DEFAULT_MESH_PATH) + std::string("tet/hex_dominant.meshb");
-//		filename = std::string(DEFAULT_MESH_PATH) + std::string("tet/hand.tet");
+		filename2 = std::string(DEFAULT_MESH_PATH) + std::string("tet/hand.tet");
 	}
 	else
 		filename = std::string(argv[1]);
@@ -85,17 +86,38 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
+
 	std::shared_ptr<Attribute<Scalar>> volume_scalar = cgogn::add_attribute<Scalar, Volume>(*m, "scalar");
 	std::shared_ptr<Attribute<Vec3>> volume_color = cgogn::add_attribute<Vec3, Volume>(*m, "color");
 
-	auto bb = mp.meshes_bb();
-	Vec3 shiftVec = (bb.second - bb.first) / 4;
 
-	std::shared_ptr<Attribute<Vec3>> vertex_position2 = cgogn::add_attribute<Vec3, Vertex>(*m, "position_2");
+	cgogn::foreach_cell(*m, [&](Volume v) -> bool {
+		Vec3 c(0, 0, 0);
+		c[rand() % 3] = 1;
+		cgogn::value<Vec3>(*m, volume_color, v) = c;
+		cgogn::value<Scalar>(*m, volume_scalar, v) = double(rand()) / RAND_MAX;
+		return true;
+	});
+
+
+	std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
+
+	auto bb = mp.meshes_bb();
+	Vec3 shiftVec = (bb.second - bb.first) ;
+
+	//cgogn::foreach_cell(*m, [&](Vertex v) -> bool {
+	//	cgogn::value<Vec3>(*m, vertex_position, v) -= shiftVec;
+	//	return true;
+	//});
+
+	//mp.emit_attribute_changed(*m, vertex_position.get());
+
+	shiftVec /= 8.0;
+
+	std::shared_ptr<Attribute<Vec3>> vertex_positionb = cgogn::add_attribute<Vec3, Vertex>(*m, "position_2");
 
 	cgogn::foreach_cell(*m, [&](Vertex v) -> bool {
-		cgogn::value<Vec3>(*m, vertex_position2, v) = cgogn::value<Vec3>(*m, vertex_position, v) +shiftVec;
+		cgogn::value<Vec3>(*m, vertex_positionb, v) = cgogn::value<Vec3>(*m, vertex_position, v) + shiftVec;
 		return true;
 	});
 
@@ -107,22 +129,10 @@ int main(int argc, char** argv)
 	});
 
 
-	cgogn::foreach_cell(*m, [&](Volume v) -> bool {
-		Vec3 c(0, 0, 0);
-		c[rand() % 3] = 1;
-		cgogn::value<Vec3>(*m, volume_color, v) = c;
-		cgogn::value<Scalar>(*m, volume_scalar, v) = double(rand()) / RAND_MAX;
-		return true;
-	});
-
-	mp.set_mesh_bb_vertex_position(*m, vertex_position);
+	//Mesh* m2 = mp.load_volume_from_file(filename);
+	//std::shared_ptr<Attribute<Vec3>> vertex_position2 = cgogn::get_attribute<Vec3, Vertex>(*m2, "position");
 
 
-
-	vr.set_vertex_position(*v1, *m, vertex_position);
-//	vr.set_vertex_clipping_position(*v1, *m, vertex_position_clip);
-	vr.set_volume_scalar(*v1, *m, volume_scalar);
-	vr.set_volume_color(*v1, *m, volume_color);
 
 	/********************************/
 

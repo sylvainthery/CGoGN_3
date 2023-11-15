@@ -605,6 +605,12 @@ protected:
 		if (selected_mesh_)
 		{
 			MeshData<MESH>& md = mesh_data(*selected_mesh_);
+			if (md.bb_vertex_position_ == nullptr)
+				std::cout << "vertex_position BB NULL" << std::endl;
+			else
+				std::cout << "vertex_position BB: " << md.bb_vertex_position_.get()->name() << std::endl;
+
+
 
 			imgui_combo_attribute<Vertex, Vec3>(*selected_mesh_, md.bb_vertex_position_, "Position",
 												[&](const std::shared_ptr<Attribute<Vec3>>& attribute) {

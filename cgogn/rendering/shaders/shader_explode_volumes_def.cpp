@@ -211,9 +211,8 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 		out vec2 tc;
 		void main()
 		{
-			vec2 p = 2.0 * vec2(gl_VertexID % 2, gl_VertexID / 2);
-			tc = p;
-			gl_Position = vec4(2.0 * p - 1.0, 0.0, 1.0);
+			tc = 2.0 * vec2(gl_VertexID % 2, gl_VertexID / 2);
+			gl_Position = vec4(2.0 * tc - 1.0, 0.0, 1.0);
 		}
 	)";
 
@@ -251,7 +250,7 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 			vec3 N = normalize(texture(TUn,tc).rgb);
 			float dnl = max(0.0, dot(N, L));
 			float lambert = 0.2 + + 0.8 * dnl * compute_shadow(position, dnl);
-			frag_out = vec4(lambert * color.rgb, color.a);
+			frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(1,0,1,1);
 		}
 	)";
 

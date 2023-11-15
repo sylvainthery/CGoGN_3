@@ -113,10 +113,6 @@ struct DeferExplodeVolumes
 			fbo_->resize(prev_viewport[2], prev_viewport[3]);
 		}
 
-		fbo_->getDepthTexture()->bind();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		fbo_->getDepthTexture()->release();
-
 		fbo_->bind();
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -128,15 +124,14 @@ struct DeferExplodeVolumes
 		}
 		else
 		{
-			pass1_->bind(mproj, mview);
-			fd();
-			pass1_->release();
+			if (pass1_->attributes_initialized())
+			{
+				pass1_->bind(mproj, mview);
+				fd();
+				pass1_->release();
+			}
 		}
 		fbo_->release();
-
-		fbo_->getDepthTexture()->bind();
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-		fbo_->getDepthTexture()->release();
 
 		float32 znear = mproj(2,3) / (mproj(2,2) - 1.0);
 		float32 zfar = ((mproj(2,2) - 1.0) * znear) / (mproj(2,2) + 1.0);

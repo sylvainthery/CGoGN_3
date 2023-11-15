@@ -49,10 +49,8 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 
 		void main()
 		{
-			int ind_v = int(texelFetch(vertex_ind, 4 * gl_InstanceID + gl_VertexID).r);
 			int ind_c = int(texelFetch(vertex_ind, 4 * gl_InstanceID + 3).r);
 
-			vec3 position_in = texelFetch(vertex_position, ind_v).rgb;
 			vec3 center = texelFetch(volume_center, ind_c).rgb;
 			vec3 clip_center = texelFetch(volume_clipping, ind_c).rgb;
 
@@ -60,6 +58,8 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 			float d2 = dot(plane_clip2, vec4(clip_center, 1.0));
 			if (d <= 0.0 && d2 <= 0.0)
 			{
+				int ind_v = int(texelFetch(vertex_ind, 4 * gl_InstanceID + gl_VertexID).r);
+				vec3 position_in = texelFetch(vertex_position, ind_v).rgb;
 				vec3 explode_position = mix(center, position_in, explode);
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				gl_Position = projection_matrix * position4;

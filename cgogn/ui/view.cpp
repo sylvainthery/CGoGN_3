@@ -189,10 +189,14 @@ void View::draw()
 
 	if (need_redraw_) //AND NEED SHADOW UPDATE
 	{
-		float64 sr = camera().scene_radius();
+		auto bb = compute_bb();
+
+	//	float64 sr = camera().scene_radius();
+		float64 sr = (bb.second - bb.first).norm() / 2.0; 
 		if (shadow_.is_started())
 		{
-			GLVec3d center = camera().pivot_point();
+		//	GLVec3d center = camera().pivot_point();
+			GLVec3d center = (bb.first + bb.second) / 2.0;
 			GLVec3 wlpf = light_.getWorldCoord();
 			GLVec3d wlp = wlpf.cast<double>();
 

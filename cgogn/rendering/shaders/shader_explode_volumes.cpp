@@ -70,7 +70,7 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			{
 				gl_Position = vec4(0.0, 0.0, 0.0, 1.0); // check
 			}
-		}
+		}	
 	)";
 
 	const char* fragment_shader_source = R"(
@@ -104,7 +104,9 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 
 void ShaderParamExplodeVolumes::set_uniforms()
 {
-	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+	//shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+	//						data_->plane_clip_, data_->plane_clip2_);
+	sha_set_uniforms_values(shader_,sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 							data_->plane_clip_, data_->plane_clip2_);
 }
 

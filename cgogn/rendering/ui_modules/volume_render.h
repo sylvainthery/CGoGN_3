@@ -497,7 +497,7 @@ protected:
 	}
 
 public:
-	void draw_shadowmap(View* view, const GLMat4& mproj, const GLMat4& mview) override
+	void draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view) override
 	{
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -506,7 +506,7 @@ public:
 		{
 			if (p.render_volumes_& p.cast_shadow_)
 			{
-				p.param_volume_generate_shadows_->bind(mproj,mview);
+				p.param_volume_generate_shadows_->bind(mat_proj,mat_view);
 				mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
 				p.param_volume_generate_shadows_->release();
 			}
@@ -556,19 +556,29 @@ public:
 					}
 					break;
 				}
+				
+				if (p.param_volume_generate_shadows_->attributes_initialized())
+				{
+					p.param_volume_generate_shadows_->bind(proj_matrix, view_matrix);
+					mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+					p.param_volume_generate_shadows_->release();
+				}
 
 				rendering::ShaderParam* param_vol = p.params_volumes_[index_shader].get();
 				if (param_vol->attributes_initialized())
 				{		
 					glEnable(GL_CULL_FACE);
 					glCullFace(GL_BACK);
-
+					glDepthFunc(GL_LEQUAL);
+					glDepthMask(GL_FALSE);
 					param_vol->bind(proj_matrix, view_matrix);
 					if (p.smooth_volume_faces_)
 						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
 					else
 						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
 					param_vol->release();
+					glDepthFunc(GL_LESS);
+					glDepthMask(GL_TRUE);
 				}
 
 
