@@ -98,7 +98,7 @@ class VolumeRender : public ViewModule
 			  volume_clipping_position_(nullptr), volume_clipping_position_vbo_(nullptr), volume_scalar_(nullptr),
 			  volume_scalar_vbo_(nullptr), volume_color_(nullptr), volume_color_vbo_(nullptr), volume_center_(nullptr),
 			  volume_center_vbo_(nullptr), render_vertices_(false), render_edges_(false), render_volumes_(true),
-			  render_volume_lines_(true), cast_shadow_(false), receive_shadows_(false), smooth_volume_faces_(false),
+			  render_volume_lines_(false), cast_shadow_(false), receive_shadows_(false), smooth_volume_faces_(false),
 			  color_per_cell_(GLOBAL), color_type_(SCALAR),
 			  vertex_scale_factor_(1.0), auto_update_volume_scalar_min_max_(true), clipping_plane_(false),
 			  clip_only_volumes_(true), show_frame_manipulator_(false), manipulating_frame_(false)
@@ -555,30 +555,17 @@ public:
 					}
 					break;
 				}
-				
-				if (p.param_volume_generate_shadows_->attributes_initialized())
-				{
-					p.param_volume_generate_shadows_->bind(proj_matrix, view_matrix);
-					mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
-					p.param_volume_generate_shadows_->release();
-				}
+
 
 				rendering::ShaderParam* param_vol = p.params_volumes_[index_shader].get();
 				if (param_vol->attributes_initialized())
 				{		
-					glEnable(GL_CULL_FACE);
-					glCullFace(GL_BACK);
-					glDepthFunc(GL_LEQUAL);
-					glDepthMask(GL_FALSE);
-					std::cout << "MODELBVIEW " << std::endl << view_matrix << std::endl;
 					param_vol->bind(proj_matrix, view_matrix);
 					if (p.smooth_volume_faces_)
 						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
 					else
 						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
 					param_vol->release();
-					glDepthFunc(GL_LESS);
-					glDepthMask(GL_TRUE);
 				}
 
 
@@ -756,12 +743,12 @@ public:
 			{
 				auto bb = selected_view_->compute_bb();
 				auto diag = (bb.second - bb.first).norm();
-				float loc_bias = std::log(float(diag) / sha_data.bias_k_) / std::log(2.0f);
-				if (ImGui::SliderFloat("Bias", &loc_bias, 8, 27))
-				{
-					sha_data.bias_k_ = float(diag) / std::pow(2.0f, loc_bias);
-					need_update = true;
-				}
+				//float loc_bias = std::log(float(diag) / sha_data.bias_k_) / std::log(2.0f);
+				//if (ImGui::SliderFloat("Bias", &loc_bias, 8, 27))
+				//{
+				//	sha_data.bias_k_ = float(diag) / std::pow(2.0f, loc_bias);
+				//	need_update = true;
+				//}
 				if (ImGui::SliderInt("samples", &sha_data.nb_samples_, 1, 9))
 					need_update = true;
 			}

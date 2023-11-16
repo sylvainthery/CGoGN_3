@@ -92,9 +92,9 @@ float compute_shadow(vec3 P, float dnl)
 	if (!with_shadow)
 		return 1.0;
 
-	float bias_shd =bias_k ;//bias_k*tan(acos(dnl)); // 
+	float bias_shd = bias_k + bias_k*tan(acos(dnl)); // 
 	vec4 sh_coord = shadow_matrix*vec4(P,1);
-	float sc = 9.0/textureSize(TUshadow,0).x;
+	float sc = 3.0/textureSize(TUshadow,0).x;
 	vec3 shc =	vec3(sh_coord.xy, sh_coord.z  - bias_shd);
 	float shad = texture(TUshadow, shc);
 	for (int i=1;i<nb_samples;i++)

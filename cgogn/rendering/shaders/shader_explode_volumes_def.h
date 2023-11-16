@@ -116,7 +116,6 @@ class CGOGN_RENDERING_EXPORT ShaderParamExplodeVolumes2 : public ShaderParam
 public:
 	std::shared_ptr<Texture2D> tex_n_;
 	std::shared_ptr<Texture2D> tex_d_;
-	GLint unit_;
 	GLVec3 fn_;
 	GLVec2 projv_;
 	ExplodeVolumeData* data_;
@@ -124,7 +123,8 @@ public:
 
 	using ShaderType = ShaderExplodeVolumes2;
 
-	inline ShaderParamExplodeVolumes2(ShaderType* sh) : ShaderParam(sh), sha_data_(nullptr)
+	inline ShaderParamExplodeVolumes2(ShaderType* sh)
+		: ShaderParam(sh), tex_n_(nullptr), tex_d_(nullptr), sha_data_(nullptr)
 	{
 	}
 

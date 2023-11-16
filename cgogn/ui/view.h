@@ -139,7 +139,7 @@ public:
 		event_stopped_ = true;
 	}
 
-	void draw_shadowmap(const GLMat4d& proj, const GLMat4d& view);
+	//void draw_shadowmap(const GLMat4d& proj, const GLMat4d& view);
 
 
 	//void compute_hbao();

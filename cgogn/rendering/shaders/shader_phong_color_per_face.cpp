@@ -107,8 +107,6 @@ ShaderPhongColorPerFace::ShaderPhongColorPerFace()
 	load(vertex_shader_source, fragment_shader_source);
 	get_uniforms("vertex_ind", "face_ind", "vertex_position", "vertex_normal", "face_color", "light_position",
 				 "ambiant_color", "specular_color", "specular_coef", "double_side");
-
-	nb_attributes_ = 3;
 }
 
 void ShaderParamPhongColorPerFace::set_uniforms()

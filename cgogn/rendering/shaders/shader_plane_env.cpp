@@ -109,7 +109,6 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 	load(vertex_shader_source, fragment_shader_source);
 	get_uniforms("transfo", "scale_xy", "TUcolor", "light_position", "with_shadow",
 				 "shadow_matrix", "TUshadow", "TUpoisson", "nb_samples");
-	nb_attributes_ = 0;
 }
 
 void ShaderParamPlaneShadow::set_uniforms()

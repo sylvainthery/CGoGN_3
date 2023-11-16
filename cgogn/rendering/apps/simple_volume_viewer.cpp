@@ -85,10 +85,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-
 	std::shared_ptr<Attribute<Scalar>> volume_scalar = cgogn::add_attribute<Scalar, Volume>(*m, "scalar");
 	std::shared_ptr<Attribute<Vec3>> volume_color = cgogn::add_attribute<Vec3, Volume>(*m, "color");
-
 
 	cgogn::foreach_cell(*m, [&](Volume v) -> bool {
 		Vec3 c(0, 0, 0);
@@ -102,16 +100,16 @@ int main(int argc, char** argv)
 	std::shared_ptr<Attribute<Vec3>> vertex_position = cgogn::get_attribute<Vec3, Vertex>(*m, "position");
 
 	auto bb = mp.meshes_bb();
-	Vec3 shiftVec = (bb.second - bb.first) ;
+	Vec3 shiftVec = (bb.second - bb.first) /2.0 ;
 
-	//cgogn::foreach_cell(*m, [&](Vertex v) -> bool {
-	//	cgogn::value<Vec3>(*m, vertex_position, v) -= shiftVec;
-	//	return true;
-	//});
+	cgogn::foreach_cell(*m, [&](Vertex v) -> bool {
+		cgogn::value<Vec3>(*m, vertex_position, v) -= shiftVec;
+		return true;
+	});
 
-	//mp.emit_attribute_changed(*m, vertex_position.get());
+	mp.emit_attribute_changed(*m, vertex_position.get());
 
-	shiftVec /= 8.0;
+	shiftVec /= 4.0;
 
 	std::shared_ptr<Attribute<Vec3>> vertex_positionb = cgogn::add_attribute<Vec3, Vertex>(*m, "position_2");
 
@@ -128,8 +126,8 @@ int main(int argc, char** argv)
 	});
 
 
-	//Mesh* m2 = mp.load_volume_from_file(filename);
-	//std::shared_ptr<Attribute<Vec3>> vertex_position2 = cgogn::get_attribute<Vec3, Vertex>(*m2, "position");
+	Mesh* m2 = mp.load_volume_from_file(filename);
+//	std::shared_ptr<Attribute<Vec3>> vertex_position2 = cgogn::get_attribute<Vec3, Vertex>(*m2, "position");
 
 
 

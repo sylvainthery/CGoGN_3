@@ -61,7 +61,7 @@ ShaderExplodeVolumes1::ShaderExplodeVolumes1()
 			{
 				int ind_v = int(texelFetch(vertex_ind, 4 * gl_InstanceID + gl_VertexID).r);
 				vec3 position_in = texelFetch(vertex_position, ind_v).rgb;
-				vec3 explode_position = mix(center, position_in, explode);
+				vec3 explode_position = (explode>0.98) ? position_in : mix(center, position_in, explode);
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				position = position4.xyz;
 				gl_Position = projection_matrix * position4;
@@ -88,7 +88,6 @@ ShaderExplodeVolumes1::ShaderExplodeVolumes1()
 
 	load(vertex_shader_source,fragment_shader_source);
 	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "explode", "plane_clip", "plane_clip2");
-	nb_attributes_ = 2; // ???
 }
 
 void ShaderParamExplodeVolumes1::set_uniforms()
@@ -176,8 +175,6 @@ ShaderExplodeVolumes1smooth::ShaderExplodeVolumes1smooth()
 	load(vertex_shader_source, fragment_shader_source);
 
 	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "explode", "plane_clip", "plane_clip2");
-
-	nb_attributes_ = 2;
 }
 
 void ShaderParamExplodeVolumes1smooth::set_uniforms()
@@ -211,7 +208,7 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 		out vec2 tc;
 		void main()
 		{
-			tc = 2.0 * vec2(gl_VertexID % 2, gl_VertexID / 2);
+			tc = 2.0* vec2(gl_VertexID % 2, gl_VertexID / 2);
 			gl_Position = vec4(2.0 * tc - 1.0, 0.0, 1.0);
 		}
 	)";
@@ -233,24 +230,26 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 
 		vec3 XYZfromDepth(vec2 uv, float d)
 		{
-			float z_n = 2.0 * d - 1.0;
-			float z = fn.x / (fn.y - z_n * (fn.z));
-			return vec3((-2.0*uv-1.0)/projv*z, z);
+			float z_s = 2.0 * d - 1.0;
+			float z = fn.x / (fn.y - z_s * (fn.z));
+			return vec3(-(2.0*uv-1.0)/projv, 1.0) * z;
 		}
+
 		
 		void main()
 		{
 			float depth = texture(TUd,tc).r;
 
-			if (depth>=1.0)
+			if (depth >= 1.0)
 				discard;
 
 			vec3 position = XYZfromDepth(tc,depth);
 			vec3 L = normalize(light_position - position);
 			vec3 N = normalize(texture(TUn,tc).rgb);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + + 0.8 * dnl * compute_shadow(position, dnl);
-			frag_out = vec4(lambert * color.rgb, color.a)*0.000001+vec4(1,0,1,1);
+			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			frag_out = vec4(lambert * color.rgb, color.a);
+
 		}
 	)";
 
@@ -260,7 +259,7 @@ ShaderExplodeVolumes2::ShaderExplodeVolumes2()
 
 void ShaderParamExplodeVolumes2::set_uniforms()
 {
-	sha_set_uniforms_values(shader_,sha_data_, tex_d_->bind(0), tex_n_->bind(1),projv_,fn_,
+	sha_set_uniforms_values(shader_,sha_data_, tex_d_->bind(0), tex_n_->bind(1), projv_, fn_,
 		data_->color_, data_->light_position_);
 }
 

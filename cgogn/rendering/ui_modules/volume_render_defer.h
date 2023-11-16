@@ -89,8 +89,9 @@ struct DeferExplodeVolumes
 		pass1_->data_ = data;
 		pass1s_ = ::cgogn::rendering::ShaderExplodeVolumes1smooth::generate_param();
 		pass1s_->data_ = data;
+
 		pass2_ = ::cgogn::rendering::ShaderExplodeVolumes2::generate_param();
-		pass2_->tex_n_ = tex_n_;
+		pass2_->tex_n_ = fbo_->getTexture(0);
 		pass2_->tex_d_ = fbo_->getDepthTexture();
 		pass2_->data_ = data;
 	}
@@ -115,7 +116,7 @@ struct DeferExplodeVolumes
 
 		fbo_->bind();
 		glEnable(GL_DEPTH_TEST);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
 		if (smooth)
 		{
 			pass1s_->bind(mproj, mview);
@@ -134,7 +135,7 @@ struct DeferExplodeVolumes
 		fbo_->release();
 
 		float32 znear = mproj(2,3) / (mproj(2,2) - 1.0);
-		float32 zfar = ((mproj(2,2) - 1.0) * znear) / (mproj(2,2) + 1.0);
+		float32 zfar = mproj(2,3) / (mproj(2,2) + 1.0);
 
 		pass2_->projv_ = ::cgogn::rendering::GLVec2(mproj(0, 0), mproj(1, 1));
 		pass2_->fn_ = ::cgogn::rendering::GLVec3(-2.0 * zfar * znear, zfar + znear, zfar - znear);
@@ -656,14 +657,12 @@ public:
 				glEnable(GL_CULL_FACE);
 				glCullFace(GL_BACK);
 				::cgogn::rendering::ShadowData* sha = (view->get_shadow().is_started() && p.receive_shadows_) ? &(view->get_shadow()) : nullptr;
-				p.params_defer->draw(proj_matrix, view_matrix, p.smooth_volume_faces_, sha,
-					[&](){
-					if (p.smooth_volume_faces_)
-						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
-					else
-						md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
-
-					});
+				if (p.smooth_volume_faces_)
+					p.params_defer->draw(proj_matrix, view_matrix, p.smooth_volume_faces_, sha,
+										 [&]() { md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_); });
+				else
+					p.params_defer->draw(proj_matrix, view_matrix, p.smooth_volume_faces_, sha,
+						[&](){ md.draw(rendering::VOLUMES_FACES, p.vertex_position_); });
 
 	/*			if (param_vol->attributes_initialized())
 				{		
@@ -905,7 +904,7 @@ public:
 					if (ImGui::Checkbox("shadowable", &p.receive_shadows_))
 						need_update = true;
 
-					if (ImGui::SliderFloat("Explode", &p.data_.explode_, 0.01f, 1.0f))
+					if (ImGui::SliderFloat("Explode", &p.data_.explode_, 0.1f,1.0f))
 						need_update = true;
 
 					auto bb = mesh_provider_->meshes_bb();

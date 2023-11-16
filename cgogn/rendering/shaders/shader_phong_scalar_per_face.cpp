@@ -112,8 +112,6 @@ ShaderPhongScalarPerFace::ShaderPhongScalarPerFace()
 				 "ambiant_color", "specular_color", "specular_coef", "double_side",
 				 shader_function::ColorMap::uniform_names[0], shader_function::ColorMap::uniform_names[1],
 				 shader_function::ColorMap::uniform_names[2], shader_function::ColorMap::uniform_names[3]);
-
-	nb_attributes_ = 3;
 }
 
 void ShaderParamPhongScalarPerFace::set_uniforms()

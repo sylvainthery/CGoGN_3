@@ -79,8 +79,6 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 	load(vertex_shader_source, fragment_shader_source);
 	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "explode", "plane_clip",
 				 "plane_clip2");
-
-	nb_attributes_ = 2;
 }
 
 void ShaderParamExplodeVolumesGenerateShadows::set_uniforms()

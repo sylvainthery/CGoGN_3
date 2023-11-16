@@ -87,7 +87,6 @@ ShaderFlatColorPerFace::ShaderFlatColorPerFace()
 	get_uniforms("vertex_ind", "face_ind", "vertex_position", "face_color", "ambiant_color", "light_position",
 				 "double_side");
 
-	nb_attributes_ = 2;
 }
 
 void ShaderParamFlatColorPerFace::set_uniforms()

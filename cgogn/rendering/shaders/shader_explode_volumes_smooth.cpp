@@ -109,9 +109,6 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 
 	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_clipping",
 				 "color", "light_position", "explode", "plane_clip", "plane_clip2");
-
-
-	nb_attributes_ = 2;
 }
 
 void ShaderParamExplodeVolumesSmooth::set_uniforms()

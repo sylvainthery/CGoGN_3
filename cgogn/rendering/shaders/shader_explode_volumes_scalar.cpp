@@ -68,7 +68,7 @@ ShaderExplodeVolumesScalar::ShaderExplodeVolumesScalar()
 			float d2 = dot(plane_clip2, vec4(clip_center, 1.0));
 			if (d <= 0.0 && d2 <= 0.0)
 			{
-				vec3 explode_position = mix(center, position_in, explode);
+				vec3 explode_position = (explode>0.98) ? position_in : mix(center, position_in, explode);
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				position = position4.xyz;
 				gl_Position = projection_matrix * position4;
@@ -109,8 +109,6 @@ ShaderExplodeVolumesScalar::ShaderExplodeVolumesScalar()
 					 "light_position", "explode", "plane_clip", "plane_clip2",
 					 shader_function::ColorMap::uniform_names[0], shader_function::ColorMap::uniform_names[1],
 					 shader_function::ColorMap::uniform_names[2], shader_function::ColorMap::uniform_names[3]);
-
-	nb_attributes_ = 3;
 }
 
 void ShaderParamExplodeVolumesScalar::set_uniforms()
@@ -179,7 +177,7 @@ ShaderExplodeVolumesScalarSmooth::ShaderExplodeVolumesScalarSmooth()
 				int iii =  10 * gl_InstanceID + 3*gl_VertexID;
 				int ind_v = int(texelFetch(vertex_ind,iii).r);
 				vec3 position_in = texelFetch(vertex_position, ind_v).rgb;
-				vec3 explode_position = mix(center, position_in, explode);
+				vec3 explode_position = (explode>0.98) ? position_in : mix(center, position_in, explode);
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				position = position4.xyz;
 				gl_Position = projection_matrix * position4;
@@ -222,8 +220,6 @@ ShaderExplodeVolumesScalarSmooth::ShaderExplodeVolumesScalarSmooth()
 				 "plane_clip", "plane_clip2", shader_function::ColorMap::uniform_names[0],
 				 shader_function::ColorMap::uniform_names[1], shader_function::ColorMap::uniform_names[2],
 				 shader_function::ColorMap::uniform_names[3]);
-
-	nb_attributes_ = 3;
 }
 
 void ShaderParamExplodeVolumesScalarSmooth::set_uniforms()

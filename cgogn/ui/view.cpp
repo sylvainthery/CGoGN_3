@@ -193,6 +193,8 @@ void View::draw()
 
 	//	float64 sr = camera().scene_radius();
 		float64 sr = (bb.second - bb.first).norm() / 2.0; 
+		shadow_.bias_k_ = float32(sr) / 100000.0f;
+
 		if (shadow_.is_started())
 		{
 		//	GLVec3d center = camera().pivot_point();
@@ -275,11 +277,11 @@ void View::draw()
 
 
 
-void View::draw_shadowmap(const cgogn::rendering::GLMat4d& proj, const cgogn::rendering::GLMat4d& view)
-{
-	for (ViewModule* m : linked_view_modules_)
-		m->draw_shadowmap(this, proj.cast<float>(), view.cast<float>());
-}
+//void View::draw_shadowmap(const cgogn::rendering::GLMat4d& proj, const cgogn::rendering::GLMat4d& view)
+//{
+//	for (ViewModule* m : linked_view_modules_)
+//		m->draw_shadowmap(this, proj.cast<float>(), view.cast<float>());
+//}
 
 
 void View::link_module(ViewModule* m)

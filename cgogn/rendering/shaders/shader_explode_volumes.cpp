@@ -61,7 +61,7 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			{
 				int ind_v = int(texelFetch(vertex_ind, 4 * gl_InstanceID + gl_VertexID).r);
 				vec3 position_in = texelFetch(vertex_position, ind_v).rgb;
-				vec3 explode_position = mix(center, position_in, explode);
+				vec3 explode_position = (explode>0.98) ? position_in : mix(center, position_in, explode);
 				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
 				position = position4.xyz;
 				gl_Position = projection_matrix * position4;
@@ -99,7 +99,6 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
 	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color",
 					 "light_position", "explode", "plane_clip", "plane_clip2");
-	nb_attributes_ = 2; // ???
 }
 
 void ShaderParamExplodeVolumes::set_uniforms()

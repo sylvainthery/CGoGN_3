@@ -78,9 +78,9 @@ std::string insert_shadow_code(const std::string& frag_src, const std::string& s
 #define SHADOWS_UNIFORMS_STRINGS "with_shadow","shadow_matrix","TUshadow","bias_k","TUpoisson","nb_samples"
 
 #define SHADOWS_PARAMETERS(ptr) ptr->shadow_matrix_,\
-ptr->fbo_shadows_->getDepthTexture()->bind(0),\
+ptr->fbo_shadows_->getDepthTexture()->bind(14),\
 ptr->bias_k_,\
-ptr->tex_poisson_->bind(1),\
+ptr->tex_poisson_->bind(15),\
 ptr->nb_samples_
 
 
