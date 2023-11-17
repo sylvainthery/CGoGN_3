@@ -50,7 +50,7 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 			vec4 pt =  model_view_matrix*transfo*vec4((2.0 * p - 1.0), 0.0, 1.0);
 			position = pt.xyz;
 			vec4 q = projection_matrix * pt; 
-			gl_Position = vec4(q.x, q.y, 0.5*q.w, q.w);
+			gl_Position = q; // vec4(q.x, q.y, 0.5*q.w, q.w);
 			// to avoid Z clipping (we do not use depth buffer here)
 		}
 	)";
@@ -83,7 +83,7 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 				return 1.0;
 
 			vec4 sh_coord = shadow_matrix*vec4(position,1); 
-			float sc = 7.0/textureSize(TUshadow,0).x;	
+			float sc = 5.0/textureSize(TUshadow,0).x;	
 			float shad = texture(TUshadow, vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w));
 			for (int i=1;i<nb_samples;i++)
 			{
@@ -99,7 +99,7 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.1*max(0.0,N.z) + 0.7 * dnl * compute_shadow( dnl);
+			float lambert = 0.2 + 0.8 * dnl * compute_shadow( dnl);
 			frag_out = vec4(vec3(lambert * texture(TUcolor,tc).r), 1.0);
 		}
 

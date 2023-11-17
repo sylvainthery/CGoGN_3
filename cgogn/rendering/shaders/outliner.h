@@ -154,8 +154,8 @@ public:
 
 	~Outliner();
 
-	void draw(VBO* position, MeshRender* renderer, const rendering::GLMat4& projection_matrix,
-			  const rendering::GLMat4& view_matrix, const GLColor& color);
+	void draw(VBO* position, MeshRender* renderer, const rendering::GLMat4d& projection_matrix,
+			  const rendering::GLMat4d& view_matrix, const GLColor& color);
 };
 
 } // namespace rendering

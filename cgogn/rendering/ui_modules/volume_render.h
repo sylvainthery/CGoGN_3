@@ -496,7 +496,7 @@ protected:
 	}
 
 public:
-	void draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view) override
+	void draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view) override
 	{
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
@@ -528,10 +528,12 @@ public:
 		for (auto& [m, p] : parameters_[view])
 		{
 			MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
-			int32 indss = (p.smooth_volume_faces_ ? 2 : 0) + ((view->get_shadow().is_started() && p.receive_shadows_) ? 1 : 0);
+			//int32 indss = (p.smooth_volume_faces_ ? 2 : 0) + ((view->get_shadow().is_started() && p.receive_shadows_) ? 1 : 0);
+			int32 indss = (p.smooth_volume_faces_ ? 2 : 0);
 
-			const rendering::GLMat4& proj_matrix = view->projection_matrix();
-			const rendering::GLMat4& view_matrix = view->modelview_matrix();
+
+			const rendering::GLMat4d& proj_matrix = view->projection_matrix_d();
+			const rendering::GLMat4d& view_matrix = view->modelview_matrix_d();
 
 			if (p.render_volumes_)
 			{

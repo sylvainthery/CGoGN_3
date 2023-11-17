@@ -37,7 +37,7 @@ namespace cgogn
 namespace rendering
 {
 
-const float32 FrameManipulator::ring_half_width = 0.08f;
+const float64 FrameManipulator::ring_half_width = 0.08f;
 
 FrameManipulator::FrameManipulator()
 	: highlighted_(NONE), scale_rendering_(1.0f), trans_(0.0f, 0.0f, 0.0f), scale_(1.0f, 1.0f, 1.0f)
@@ -52,22 +52,24 @@ FrameManipulator::FrameManipulator()
 	set_length_axes();
 }
 
-void FrameManipulator::set_size(float32 radius)
+void FrameManipulator::set_size(float64 radius)
 {
 	if (scale_rendering_ >= 0.0f)
 		scale_rendering_ = radius;
 }
 
-float32 FrameManipulator::get_size()
+float64 FrameManipulator::get_size()
 {
 	return scale_rendering_;
 }
 
-void FrameManipulator::draw(bool frame, bool zplane, const GLMat4& proj, const GLMat4& view)
+void FrameManipulator::draw(bool frame, bool zplane, const GLMat4d& proj, const GLMat4d& view)
 {
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 	fmd_->set_axis_selected(highlighted_ - Xt);
 	fmd_->set_ring_selected(highlighted_ - Xr);
-	GLMat4 fr = transfo_render_frame();
+	GLMat4d fr = transfo_render_frame();
 
 	if (frame)
 	{
@@ -90,24 +92,24 @@ void FrameManipulator::highlight(uint32 axis)
 		highlighted_ = axis;
 }
 
-uint32 FrameManipulator::pick_frame(const GLVec4& PP, const GLVec4& QQ)
+uint32 FrameManipulator::pick_frame(const GLVec4d& PP, const GLVec4d& QQ)
 {
 	// ray inverse transfo
-	GLMat4 invtr = transfo_render_frame().inverse();
-	GLVec4 tP = invtr * PP;
-	GLVec4 tQ = invtr * QQ;
+	GLMat4d invtr = transfo_render_frame().inverse();
+	GLVec4d tP = invtr * PP;
+	GLVec4d tQ = invtr * QQ;
 
-	Vec3 P(tP[0] / tP[3], tP[1] / tP[3], tP[2] / tP[3]);
-	Vec3 Q(tQ[0] / tQ[3], tQ[1] / tQ[3], tQ[2] / tQ[3]);
-	Vec3 V = Q - P;
+	GLVec3d P(tP[0] / tP[3], tP[1] / tP[3], tP[2] / tP[3]);
+	GLVec3d Q(tQ[0] / tQ[3], tQ[1] / tQ[3], tQ[2] / tQ[3]);
+	GLVec3d V = Q - P;
 
 	// origin of frame
-	Vec3 origin(0.0, 0.0, 0.0);
+	GLVec3d origin(0.0, 0.0, 0.0);
 
 	// intersection possible between line and frame (10% margin)?
-	float32 dist2 = float32(cgogn::geometry::squared_distance_line_point(P, Q, origin));
+	float64 dist2 = float64(cgogn::geometry::squared_distance_line_point(P, Q, origin));
 
-	float32 distMax = std::max(length_axes_[0], std::max(length_axes_[1], length_axes_[2]));
+	float64 distMax = std::max(length_axes_[0], std::max(length_axes_[1], length_axes_[2]));
 	distMax *= 3.6f;
 	distMax = std::max(distMax, 1.0f + ring_half_width);
 
@@ -249,29 +251,29 @@ uint32 FrameManipulator::pick_frame(const GLVec4& PP, const GLVec4& QQ)
 	return NONE;
 }
 
-void FrameManipulator::rotate(uint32 axis, float32 angle)
+void FrameManipulator::rotate(uint32 axis, float64 angle)
 {
 	// create axis
-	GLVec3 ax(0, 0, 0);
+	GLVec3d ax(0, 0, 0);
 	ax[axis - Xr] = 1.0f;
 
-	Eigen::Transform<float, 3, Eigen::Affine> tr(Eigen::AngleAxisf(angle, ax));
+	Eigen::Transform<float64, 3, Eigen::Affine> tr(Eigen::AngleAxis(angle, ax));
 	rotations_ = rotations_ * tr.matrix();
 }
 
-void FrameManipulator::translate(uint32 axis, float32 x)
+void FrameManipulator::translate(uint32 axis, float64 x)
 {
 	trans_ += x * scale_rendering_ * rotations_.block<3, 1>(0, axis - Xt);
 }
 
 void FrameManipulator::set_length_axes()
 {
-	float32 avgScale = 0.75f / (scale_[0] + scale_[1] + scale_[2]);
+	float64 avgScale = 0.75f / (scale_[0] + scale_[1] + scale_[2]);
 
 	length_axes_ = avgScale * scale_;
 }
 
-void FrameManipulator::scale(uint32 axis, float32 sc)
+void FrameManipulator::scale(uint32 axis, float64 sc)
 {
 	if (axis == CENTER)
 	{
@@ -285,38 +287,38 @@ void FrameManipulator::scale(uint32 axis, float32 sc)
 	set_length_axes();
 }
 
-GLMat4 FrameManipulator::transfo_render_frame()
+GLMat4d FrameManipulator::transfo_render_frame()
 {
-	GLMat4 tr = GLMat4::Identity();
+	GLMat4d tr = GLMat4d::Identity();
 	tr.block<3, 1>(0, 3) = trans_;
 
 	tr *= rotations_;
 
-	float32 avgScale = (scale_[0] + scale_[1] + scale_[2]) / 3.0f * scale_rendering_;
-	Eigen::Transform<float, 3, Eigen::Affine> sc(Eigen::Scaling(avgScale));
+	float64 avgScale = (scale_[0] + scale_[1] + scale_[2]) / 3.0 * scale_rendering_;
+	Eigen::Transform<float64, 3, Eigen::Affine> sc(Eigen::Scaling(avgScale));
 	tr *= sc.matrix();
 	return tr;
 }
 
-GLMat4 FrameManipulator::transfo()
+GLMat4d FrameManipulator::transfo()
 {
-	GLMat4 tr = GLMat4::Identity();
+	GLMat4d tr = GLMat4d::Identity();
 	tr.block<3, 1>(0, 3) = trans_;
 	tr *= rotations_;
-	Eigen::Transform<float, 3, Eigen::Affine> sc(Eigen::Scaling(scale_));
+	Eigen::Transform<float64, 3, Eigen::Affine> sc(Eigen::Scaling(scale_));
 	tr *= sc.matrix();
 	return tr;
 }
 
-void FrameManipulator::set_scale(const GLVec3& S)
+void FrameManipulator::set_scale(const GLVec3d& S)
 {
 	scale_ = S;
 	set_length_axes();
 }
 
-bool FrameManipulator::set_orientation(const GLVec3& X, const GLVec3& Y)
+bool FrameManipulator::set_orientation(const GLVec3d& X, const GLVec3d& Y)
 {
-	GLVec3 Z = X.cross(Y);
+	GLVec3d Z = X.cross(Y);
 
 	if ((X.norm() != 1.0f) || (Y.norm() != 1.0f) || (Z.norm() != 1.0f))
 		return false;
@@ -328,7 +330,7 @@ bool FrameManipulator::set_orientation(const GLVec3& X, const GLVec3& Y)
 	return true;
 }
 
-void FrameManipulator::set_transformation(const GLMat4&)
+void FrameManipulator::set_transformation(const GLMat4d&)
 {
 	// TODO E.S.: parameter is not used. It seems wrong.
 	set_position(rotations_.block<3, 1>(0, 3).eval());
@@ -340,7 +342,7 @@ void FrameManipulator::set_transformation(const GLMat4&)
 	//	col = rotations_.column(2);
 	//	QVector3D Rz(	col[0], col[1], col[2]);
 
-	//	set_scale(QVector3D(float32(Rx.length()), float32(Ry.length()), float32(Rz.length())));
+	//	set_scale(QVector3D(float64(Rx.length()), float64(Ry.length()), float64(Rz.length())));
 
 	//	col[3] = 0.0f;
 	//	col[0] = Rx[0];
@@ -478,7 +480,7 @@ bool FrameManipulator::locked_picking(uint32 axis)
 	return locked_picking_axis_[axis];
 }
 
-GLVec3 FrameManipulator::get_axis(uint32 ax)
+GLVec3d FrameManipulator::get_axis(uint32 ax)
 {
 	uint32 i = (ax - Xt) % 3;
 	return rotations_.block<3, 1>(0, i);
@@ -486,62 +488,62 @@ GLVec3 FrameManipulator::get_axis(uint32 ax)
 
 void FrameManipulator::store_projection(uint32 ax)
 {
-	GLMat4 mat = proj_mat_ * view_mat_;
-	GLVec4 tr(trans_.x(), trans_.y(), trans_.z(), 1);
-	GLVec4 Or4 = (mat * tr);
-	GLVec3 Or = Or4.head<3>() / Or4[3];
-	projected_origin_ = Or * 0.5f + GLVec3(0.5f, 0.5f, 0.5f);
-	projected_origin_[0] = projected_origin_[0] * float32(viewport_[2]) + float32(viewport_[0]);
-	projected_origin_[1] = projected_origin_[1] * float32(viewport_[3]) + float32(viewport_[1]);
+	GLMat4d mat = proj_mat_ * view_mat_;
+	GLVec4d tr(trans_.x(), trans_.y(), trans_.z(), 1);
+	GLVec4d Or4 = (mat * tr);
+	GLVec3d Or = Or4.head<3>() / Or4[3];
+	projected_origin_ = Or * 0.5f + GLVec3d(0.5f, 0.5f, 0.5f);
+	projected_origin_[0] = projected_origin_[0] * float64(viewport_[2]) + float64(viewport_[0]);
+	projected_origin_[1] = projected_origin_[1] * float64(viewport_[3]) + float64(viewport_[1]);
 
 	if (ax > CENTER)
 	{
-		GLVec3 A = get_axis(ax);
+		GLVec3d A = get_axis(ax);
 		if ((ax >= Xr) && (ax <= Zr))
 		{
 			// compute screen orientation
-			GLVec3 V = (view_mat_.block<3, 3>(0, 0) * A);
+			GLVec3d V = (view_mat_.block<3, 3>(0, 0) * A);
 			axis_orientation_ = V[2] > 0;
 		}
 
 		A = A + trans_;
-		GLVec4 A4(A.x(), A.y(), A.z(), 1);
+		GLVec4d A4(A.x(), A.y(), A.z(), 1);
 		A4 = (mat * A4);
 		projected_selected_axis_ = A4.head<3>() / A4[3];
-		projected_selected_axis_ = projected_selected_axis_ * 0.5f + GLVec3(0.5f, 0.5f, 0.5f);
-		projected_selected_axis_[0] = projected_selected_axis_[0] * float32(viewport_[2]) + float32(viewport_[0]);
-		projected_selected_axis_[1] = projected_selected_axis_[1] * float32(viewport_[3]) + float32(viewport_[1]);
+		projected_selected_axis_ = projected_selected_axis_ * 0.5f + GLVec3d(0.5f, 0.5f, 0.5f);
+		projected_selected_axis_[0] = projected_selected_axis_[0] * float64(viewport_[2]) + float64(viewport_[0]);
+		projected_selected_axis_[1] = projected_selected_axis_[1] * float64(viewport_[3]) + float64(viewport_[1]);
 		projected_selected_axis_ -= projected_origin_;
 	}
 }
 
-float32 FrameManipulator::angle_from_mouse(int x, int y, int dx, int dy)
+float64 FrameManipulator::angle_from_mouse(int x, int y, int dx, int dy)
 {
-	Vec3 Vo(float32(x) - projected_origin_[0], float32(viewport_[3] - y) - projected_origin_[1], 0.0f);
+	Vec3 Vo(float64(x) - projected_origin_[0], float64(viewport_[3] - y) - projected_origin_[1], 0.0f);
 
-	Vec3 dV(float32(dx), float32(dy), 0.0f);
+	Vec3 dV(float64(dx), float64(dy), 0.0f);
 
 	Vo.normalize();
 	dV.normalize();
 	Vec3 W = Vo.cross(dV);
-	return float32(axis_orientation_ ? W[2] : -W[2]) / 100.0f;
+	return float64(axis_orientation_ ? W[2] : -W[2]) / 100.0f;
 }
 
-float32 FrameManipulator::distance_from_mouse(int dx, int dy)
+float64 FrameManipulator::distance_from_mouse(int dx, int dy)
 {
-	Vec3 dV(float32(dx), float32(dy), 0.0f);
+	Vec3 dV(float64(dx), float64(dy), 0.0f);
 	Vec3 ax(projected_selected_axis_[0], projected_selected_axis_[1], projected_selected_axis_[2]);
-	float32 tr = float32(dV.dot(ax));
+	float64 tr = float64(dV.dot(ax));
 
 	if (tr > 0)
-		tr = float32(dV.norm() / 100.0f);
+		tr = float64(dV.norm() / 100.0f);
 	else
-		tr = float32(dV.norm() / -100.0f);
+		tr = float64(dV.norm() / -100.0f);
 
 	return tr;
 }
 
-float32 FrameManipulator::scale_from_mouse(int dx, int dy)
+float64 FrameManipulator::scale_from_mouse(int dx, int dy)
 {
 	if (abs(dx) > abs(dy))
 	{
@@ -560,11 +562,11 @@ float32 FrameManipulator::scale_from_mouse(int dx, int dy)
 void FrameManipulator::translate_in_screen(int dx, int dy)
 {
 	// unproject origin shifted
-	GLMat4 inv_mat = (proj_mat_ * view_mat_).inverse();
-	GLVec4 P(projected_origin_[0] + float32(dx), projected_origin_[1] + float32(dy), projected_origin_[2], 1.0f);
-	P[0] = (P[0] - float32(viewport_[0])) / float32(viewport_[2]);
-	P[1] = (P[1] - float32(viewport_[1])) / float32(viewport_[3]);
-	P = P * 2.0f - GLVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	GLMat4d inv_mat = (proj_mat_ * view_mat_).inverse();
+	GLVec4d P(projected_origin_[0] + float64(dx), projected_origin_[1] + float64(dy), projected_origin_[2], 1.0f);
+	P[0] = (P[0] - float64(viewport_[0])) / float64(viewport_[2]);
+	P[1] = (P[1] - float64(viewport_[1])) / float64(viewport_[3]);
+	P = P * 2.0f - GLVec4d(1.0f, 1.0f, 1.0f, 1.0f);
 
 	P = inv_mat * P;
 	P /= P[3];
@@ -578,16 +580,16 @@ void FrameManipulator::translate_in_screen(int dx, int dy)
 
 void FrameManipulator::rotate_in_screen(int dx, int dy)
 {
-	GLMat4 inv_mat = (proj_mat_ * view_mat_).inverse();
-	GLVec4 P(float32(dx), float32(-dy), 0.0f, 1.0f);
+	GLMat4d inv_mat = (proj_mat_ * view_mat_).inverse();
+	GLVec4d P(float64(dx), float64(-dy), 0.0f, 1.0f);
 	P = inv_mat * P;
 	P /= P[3];
 
-	GLVec3 axis_rot(P[1], P[0], P[2]);
+	GLVec3d axis_rot(P[1], P[0], P[2]);
 	axis_rot.normalize();
 
-	float32 angle = std::sqrt(float32(dx * dx + dy * dy)) / 200.0f;
-	Eigen::Transform<float, 3, Eigen::Affine> tr(Eigen::AngleAxisf(angle, axis_rot));
+	float64 angle = std::sqrt(float64(dx * dx + dy * dy)) / 200.0f;
+	Eigen::Transform<float64, 3, Eigen::Affine> tr(Eigen::AngleAxis(angle, axis_rot));
 	rotations_ = tr * rotations_;
 }
 

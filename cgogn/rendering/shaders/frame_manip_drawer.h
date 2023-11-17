@@ -124,11 +124,11 @@ public:
 
 	~FrameManipDrawer();
 
-	void draw_transla(const GLMat4& projection, const GLMat4& view, const GLMat4& frame);
-	void draw_rota(const GLMat4& projection, const GLMat4& view, const GLMat4& frame);
-	void draw_grid(const GLMat4& projection, const GLMat4& view, const GLMat4& frame, float32 scale = 5);
+	void draw_transla(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame);
+	void draw_rota(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame);
+	void draw_grid(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame, float32 scale = 5);
 
-	inline void draw(const GLMat4& projection, const GLMat4& view, const GLMat4& frame)
+	inline void draw(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame)
 	{
 		draw_transla(projection, view, frame);
 		draw_rota(projection, view, frame);

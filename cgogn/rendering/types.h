@@ -44,16 +44,20 @@ using GLVec2 = Eigen::Vector2f;
 using GLVec3 = Eigen::Vector3f;
 using GLVec4 = Eigen::Vector4f;
 
+using GLVec2d = Eigen::Vector2d;
+using GLVec3d = Eigen::Vector3d;
+using GLVec4d = Eigen::Vector4d;
+
 template <typename T1, typename T2>
-inline GLVec2 construct_GLVec4(T1 x, T2 y)
+inline GLVec2 construct_GLVec2(T1 x, T2 y)
 {
 	return GLVec2(float32(x), float32(y));
 }
 
 template <typename T1, typename T2, typename T3>
-inline GLVec4 construct_GLVec4(T1 x, T2 y, T3 z)
+inline GLVec3 construct_GLVec3(T1 x, T2 y, T3 z)
 {
-	return GLVec4(float32(x), float32(y), float32(z));
+	return GLVec3(float32(x), float32(y), float32(z));
 }
 
 template <typename T1, typename T2, typename T3, typename T4>
@@ -62,15 +66,30 @@ inline GLVec4 construct_GLVec4(T1 x, T2 y, T3 z, T4 w)
 	return GLVec4(float32(x), float32(y), float32(z), float32(w));
 }
 
+
+template <typename T1, typename T2>
+inline GLVec2d construct_GLVec2d(T1 x, T2 y)
+{
+	return GLVec2d(float64(x), float64(y));
+}
+
+template <typename T1, typename T2, typename T3>
+inline GLVec3d construct_GLVec3d(T1 x, T2 y, T3 z)
+{
+	return GLVec3d(float64(x), float64(y), float64(z));
+}
+
+template <typename T1, typename T2, typename T3, typename T4>
+inline GLVec4d construct_GLVec4d(T1 x, T2 y, T3 z, T4 w)
+{
+	return GLVec4d(float64(x), float64(y), float64(z), float64(w));
+}
+
+
 inline GLVec4 homogenous(const GLVec3& v)
 {
 	return GLVec4{v.x(), v.y(), v.z(), 1.0f};
 }
-
-
-using GLVec2d = Eigen::Vector2d;
-using GLVec3d = Eigen::Vector3d;
-using GLVec4d = Eigen::Vector4d;
 
 inline GLVec4d homogenous(const GLVec3d& v)
 {

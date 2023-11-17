@@ -268,21 +268,21 @@ FrameManipDrawer::~FrameManipDrawer()
 {
 }
 
-void FrameManipDrawer::draw_transla(const GLMat4& projection, const GLMat4& view, const GLMat4& frame)
+void FrameManipDrawer::draw_transla(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame)
 {
 	param_axis_->bind(projection, view * frame);
 	glDrawArraysInstanced(GL_LINES, 0, 2, 3);
 	param_axis_->release();
 }
 
-void FrameManipDrawer::draw_rota(const GLMat4& projection, const GLMat4& view, const GLMat4& frame)
+void FrameManipDrawer::draw_rota(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame)
 {
 	param_rings_->bind(projection, view * frame);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 3);
 	param_rings_->release();
 }
 
-void FrameManipDrawer::draw_grid(const GLMat4& projection, const GLMat4& view, const GLMat4& frame, float32 scale)
+void FrameManipDrawer::draw_grid(const GLMat4d& projection, const GLMat4d& view, const GLMat4d& frame, float32 scale)
 {
 	param_grid_->sc_ = scale;
 	param_grid_->nb_ = GLint(5 * scale);

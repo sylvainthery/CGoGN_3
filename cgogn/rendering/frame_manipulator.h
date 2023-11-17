@@ -62,7 +62,7 @@ using geometry::Scalar;
  *   Vec3 axis_z;
  *   frame_manip_->get_position(position);
  *   frame_manip_->get_axis(cgogn::rendering::FrameManipulator::Zt,axis_z);
- *   float32 d = -(position.dot(axis_z));
+ *   float64 d = -(position.dot(axis_z));
  */
 class CGOGN_RENDERING_EXPORT FrameManipulator
 {
@@ -99,7 +99,7 @@ protected:
 	 */
 	static const uint32 nb_segments = 64;
 
-	static const float32 ring_half_width;
+	static const float64 ring_half_width;
 
 	/**
 	 * locking table
@@ -127,16 +127,16 @@ protected:
 	 */
 	uint32 highlighted_;
 	bool axis_orientation_;
-	GLMat4 rotations_;
-	float32 scale_rendering_;
-	GLVec3 trans_;
-	GLVec3 scale_;
-	GLVec3 length_axes_;
-	GLVec3 projected_selected_axis_;
-	GLVec3 projected_origin_;
+	GLMat4d rotations_;
+	float64 scale_rendering_;
+	GLVec3d trans_;
+	GLVec3d scale_;
+	GLVec3d length_axes_;
+	GLVec3d projected_selected_axis_;
+	GLVec3d projected_origin_;
 
-	GLMat4 proj_mat_;
-	GLMat4 view_mat_;
+	GLMat4d proj_mat_;
+	GLMat4d view_mat_;
 	GLint viewport_[4];
 
 	// last mouse position
@@ -148,13 +148,13 @@ protected:
 		return (!locked_axis_[a]) && (!locked_picking_axis_[a]);
 	}
 
-	GLMat4 transfo_render_frame();
+	GLMat4d transfo_render_frame();
 	void set_length_axes();
-	uint32 pick_frame(const GLVec4& PP, const GLVec4& QQ);
+	uint32 pick_frame(const GLVec4d& PP, const GLVec4d& QQ);
 	void store_projection(uint32 ax);
-	float32 angle_from_mouse(int x, int y, int dx, int dy);
-	float32 distance_from_mouse(int dx, int dy);
-	float32 scale_from_mouse(int dx, int dy);
+	float64 angle_from_mouse(int x, int y, int dx, int dy);
+	float64 distance_from_mouse(int dx, int dy);
+	float64 scale_from_mouse(int dx, int dy);
 	void translate_in_screen(int dx, int dy);
 	void rotate_in_screen(int dx, int dy);
 
@@ -164,12 +164,12 @@ public:
 	/**
 	 * set size of frame (for rendering)
 	 */
-	void set_size(float32 radius);
+	void set_size(float64 radius);
 
 	/**
 	 * get the size of frame
 	 */
-	float32 get_size();
+	float64 get_size();
 
 	/**
 	 * @brief draw the frame and the Z plane
@@ -178,7 +178,7 @@ public:
 	 * @param proj projection matrix
 	 * @param view model-view matrix
 	 */
-	void draw(bool frame, bool zplane, const GLMat4& proj, const GLMat4& view);
+	void draw(bool frame, bool zplane, const GLMat4d& proj, const GLMat4d& view);
 
 	/**
 	 * @brief try picking the frame
@@ -248,26 +248,26 @@ public:
 	/**
 	 * rotate the frame around one of its axis
 	 */
-	void rotate(uint32 axis, float32 angle);
+	void rotate(uint32 axis, float64 angle);
 
 	/**
 	 * translate the frame around one of its axis
 	 * @param axis
 	 * @param x ratio of frame radius
 	 */
-	void translate(uint32 axis, float32 x);
+	void translate(uint32 axis, float64 x);
 
 	/**
 	 * scale the frame in direction of one axis
 	 * @param axis (Xs/Ys/Zs/CENTER)
 	 * @param sc scale factor to apply on
 	 */
-	void scale(uint32 axis, float32 sc);
+	void scale(uint32 axis, float64 sc);
 
 	/**
 	 * get the matrix transformation
 	 */
-	GLMat4 transfo();
+	GLMat4d transfo();
 
 	/**
 	 * set the position of frame
@@ -276,7 +276,7 @@ public:
 	template <typename VEC3>
 	void set_position(const VEC3& P);
 
-	inline GLVec3 get_position()
+	inline GLVec3d get_position()
 	{
 		return trans_;
 	}
@@ -290,7 +290,7 @@ public:
 	 * @param ax (Xr,Yr,Zr)
 	 * @return the axis
 	 */
-	GLVec3 get_axis(uint32 ax);
+	GLVec3d get_axis(uint32 ax);
 
 	// get axis in a non-QVector3 vector
 	template <typename VEC3>
@@ -300,7 +300,7 @@ public:
 	 * set the scale of frame
 	 * @param P the vector of scale factors
 	 */
-	void set_scale(const GLVec3& S);
+	void set_scale(const GLVec3d& S);
 
 	/**
 	 * set the orientation of frame (Z is deduced)
@@ -308,12 +308,12 @@ public:
 	 * @param Y the vector Y of frame
 	 * @return return false if parameters are not unit orthogonal vectors
 	 */
-	bool set_orientation(const GLVec3& X, const GLVec3& Y);
+	bool set_orientation(const GLVec3d& X, const GLVec3d& Y);
 
 	/**
 	 * set transformation matrix
 	 */
-	void set_transformation(const GLMat4& transfo);
+	void set_transformation(const GLMat4d& transfo);
 
 	inline static bool rotation_axis(uint32 axis)
 	{
@@ -339,8 +339,8 @@ void FrameManipulator::pick(int x, int y, const VEC& PP, const VEC& QQ)
 	beg_X_ = x;
 	beg_Y_ = y;
 
-	GLVec4 P = construct_GLVec4(PP[0], PP[1], PP[2], 1.0);
-	GLVec4 Q = construct_GLVec4(QQ[0], QQ[1], QQ[2], 1.0);
+	GLVec4d P = construct_GLVec4d(PP[0], PP[1], PP[2], 1.0);
+	GLVec4d Q = construct_GLVec4d(QQ[0], QQ[1], QQ[2], 1.0);
 	highlighted_ = pick_frame(P, Q);
 
 	if (highlighted_ != NONE)
@@ -366,7 +366,7 @@ void FrameManipulator::get_position(VEC3& pos)
 template <typename VEC3>
 void FrameManipulator::get_axis(uint32 ax, VEC3& axis)
 {
-	GLVec3 A = get_axis(ax);
+	GLVec3d A = get_axis(ax);
 	axis[0] = A[0];
 	axis[1] = A[1];
 	axis[2] = A[2];

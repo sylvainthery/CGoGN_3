@@ -79,18 +79,17 @@ void ShadowsPlane::init(ShadowData* ptr)
 	param_plane_->sha_data_ = ptr;
 }
 
-void ShadowsPlane::drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, const GLMat4& projm, const GLMat4& mvm, const GLVec3& light_position)
+void ShadowsPlane::drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, const GLMat4d& projm, const GLMat4d& mvm, const GLVec3& light_position)
 {
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-
 	auto bb_sz = (bb.second - bb.first);
 	auto bb_center = (bb.second + bb.first) / 2;
 	
 	Eigen::Transform<float64, 3, Eigen::Affine> trf =
 		Eigen::Translation3d(Eigen::Vector3d(bb_center.x(), bb_center.y(),
 											 bb.first.z() - shift * bb_sz.z())) *
-		Eigen::Scaling((1+shift)*bb_sz);
+		//Eigen::Scaling((1+shift)*bb_sz);
+		Eigen::Scaling((0.707) * bb_sz);
+
 	
 	param_plane_->transfo_ = trf.matrix().cast<float>();
 	param_plane_->scale_xy_ = 20.0f;

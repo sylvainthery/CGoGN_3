@@ -106,7 +106,7 @@ void ViewModule::draw(View*)
 {
 }
 
-void ViewModule::draw_shadowmap(View* view, const GLMat4& mat_proj, const GLMat4& mat_view)
+void ViewModule::draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view)
 {
 }
 

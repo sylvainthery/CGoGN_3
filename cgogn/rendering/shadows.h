@@ -33,7 +33,7 @@
 
 
 namespace cgogn
-{
+{ 
 
 namespace rendering
 {

@@ -47,7 +47,7 @@ struct ShadowsPlane
 
 	ShadowsPlane();
 	void init(cgogn::rendering::ShadowData* sha_dat_ptr);
-	void drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, const GLMat4& projm, const GLMat4& mvm,
+	void drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, const GLMat4d& projm, const GLMat4d& mvm,
 			   const GLVec3& light_position);
 };
 

@@ -38,12 +38,12 @@ class ShaderParamShape : public ShaderParam
 {
 public:
 	inline virtual void set_subdiv(int32 nb){};
-	inline virtual void draw(const GLMat4& projection, const GLMat4& view) = 0;
+	inline virtual void draw(const GLMat4d& projection, const GLMat4d& view) = 0;
 
 	GLColor color_;
 	float roughness_;
 	float shininess_;
-	GLVec3 light_position_;
+	GLVec3d light_position_;
 
 	ShaderParamShape(ShaderProgram* prg);
 
@@ -78,7 +78,7 @@ public:
 
 	~ShaderParamCylinder() override;
 
-	void draw(const GLMat4& projection, const GLMat4& view) override;
+	void draw(const GLMat4d& projection, const GLMat4d& view) override;
 };
 
 
@@ -96,7 +96,7 @@ public:
 
 	~ShaderParamSphere() override;
 
-	void draw(const GLMat4& projection, const GLMat4& view) override;
+	void draw(const GLMat4d& projection, const GLMat4d& view) override;
 };
 
 
@@ -114,7 +114,7 @@ public:
 
 	~ShaderParamCone() override;
 
-	void draw(const GLMat4& projection, const GLMat4& view) override;
+	void draw(const GLMat4d& projection, const GLMat4d& view) override;
 };
 
 
@@ -131,7 +131,7 @@ public:
 
 	~ShaderParamCube() override;
 
-	void draw(const GLMat4& projection, const GLMat4& view) override;
+	void draw(const GLMat4d& projection, const GLMat4d& view) override;
 };
 
 
@@ -158,7 +158,7 @@ protected:
 
 	ShapeDrawer();
 
-	GLMat4 points_2_transfo(const GLVec3& p1, const GLVec3& p2, float32 radius);
+	GLMat4d points_2_transfo(const GLVec3d& p1, const GLVec3d& p2, float64 radius);
 
 public:
 
@@ -207,9 +207,9 @@ public:
 	* @brief update the light position for all shapes
 	* @param lp
 	*/
-	void update_light_position(const GLVec3& lp);
+	void update_light_position(const GLVec3d& lp);
 
-	/**
+	/*
 	 * @brief update the subdivion for all smooth shapes
 	 * @param nb
 	 */
@@ -222,7 +222,7 @@ public:
 	* @param projection matrix from View
 	* @param model_view matrix from View multiplied by local transfo
 	*/
-	void draw(SHAPE s, const GLMat4& projection, const GLMat4& model_view);
+	void draw(SHAPE s, const GLMat4d& projection, const GLMat4d& model_view);
 
 	/**
 	* @brief draw a sphere at position p of radius size
@@ -231,7 +231,7 @@ public:
 	* @param p position
 	* @param radius
 	*/
-	void drawSphere(const GLMat4& projection, const GLMat4& view, const GLVec3& p, float32 radius);
+	void drawSphere(const GLMat4d& projection, const GLMat4d& view, const GLVec3d& p, float64 radius);
 
 	/**
 	* @brief draw a cylinder with given radius from point p1 to point p2
@@ -241,7 +241,7 @@ public:
 	* @param p2 end point
 	* @param radius
 	*/
-	void drawCylinder(const GLMat4& projection, const GLMat4& view, const GLVec3& p1, const GLVec3& p2, float32 radius);
+	void drawCylinder(const GLMat4d& projection, const GLMat4d& view, const GLVec3d& p1, const GLVec3d& p2, float64 radius);
 
 	/**
 	* @brief draw a cone with given radius from point p1 to point p2
@@ -251,7 +251,7 @@ public:
 	* @param p2 end point
 	* @param radius
 	*/
-	void drawCone(const GLMat4& projection, const GLMat4& view, const GLVec3& p1, const GLVec3& p2, float32 radius);
+	void drawCone(const GLMat4d& projection, const GLMat4d& view, const GLVec3d& p1, const GLVec3d& p2, float64 radius);
 };
 
 } // namespace rendering

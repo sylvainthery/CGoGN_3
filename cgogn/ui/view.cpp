@@ -45,8 +45,10 @@ View::View(Inputs* inputs, const std::string& name)
 	fbo_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_}, true, nullptr);
 
 	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
-	param_full_screen_texture_->unit_ = 0;
 	param_full_screen_texture_->texture_ = fbo_->texture(0);
+
+	param_full_screen_hbao_ = cgogn::rendering::ShaderFullScreenHBAO::generate_param();
+	param_full_screen_hbao_->tex_d_ = fbo_->getDepthTexture();
 
 	light_.link(camera_);
 	sha_plane_.init(&shadow_);
@@ -187,12 +189,13 @@ void View::draw()
 		return;
 	spin();
 
+	auto bb = compute_bb();
+	//	float64 sr = camera().scene_radius();
+	float64 sr = (bb.second - bb.first).norm() / 2.0;
+	param_full_screen_hbao_->radius_ = float32(sr / 50.0);
+	//std::cout << (bb.second - bb.first).transpose() << std::endl;
 	if (need_redraw_) //AND NEED SHADOW UPDATE
 	{
-		auto bb = compute_bb();
-
-	//	float64 sr = camera().scene_radius();
-		float64 sr = (bb.second - bb.first).norm() / 2.0; 
 		shadow_.bias_k_ = float32(sr) / 100000.0f;
 
 		if (shadow_.is_started())
@@ -238,7 +241,7 @@ void View::draw()
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_DEPTH_BUFFER_BIT);
 			for (ViewModule* m : linked_view_modules_)
-				m->draw_shadowmap(this, light_projection_matrix.cast<float>(), light_view_matrix.cast<float>());
+				m->draw_shadowmap(this, light_projection_matrix, light_view_matrix);
 			shadow_.fbo_shadows_->release();
 		}
 	}
@@ -255,14 +258,14 @@ void View::draw()
 			GLenum idbuf = GL_COLOR_ATTACHMENT0;
 			glDrawBuffers(1, &idbuf);
 
-			if (shadow_.is_started())
-			{
-				glEnable(GL_CULL_FACE);
-				glCullFace(GL_BACK);
-				auto bb = compute_bb();
-				sha_plane_.drawZ(bb, 0.1f, camera_.projection_matrix(), camera_.modelview_matrix(),
-								 light_.getEyeCoord());
-			}
+			//if (shadow_.is_started())
+			//{
+			//	glEnable(GL_CULL_FACE);
+			//	glCullFace(GL_BACK);
+			//	auto bb = compute_bb();
+			//	sha_plane_.drawZ(bb, -0.01f, camera_.projection_matrix_d(), camera_.modelview_matrix_d(),
+			//					 light_.getEyeCoord());
+			//}
 
 			for (ViewModule* m : linked_view_modules_)
 				m->draw(this);
@@ -271,8 +274,20 @@ void View::draw()
 			need_redraw_ = false;
 		}
 	}
+	if (shadow_.is_started())
+	{
+		const GLMat4d& mproj = this->projection_matrix_d();
+		float64 znear = mproj(2, 3) / (mproj(2, 2) - 1.0);
+		float64 zfar = mproj(2, 3) / (mproj(2, 2) + 1.0);
 
-	param_full_screen_texture_->draw();
+		param_full_screen_hbao_->projv_ = ::cgogn::rendering::GLVec2(mproj(0, 0), mproj(1, 1));
+		param_full_screen_hbao_->fn_ =
+			::cgogn::rendering::GLVec3(float32(-2.0 * zfar * znear), float32(zfar + znear), float32(zfar - znear));
+	
+		param_full_screen_hbao_->draw(this);
+	}
+	else
+		param_full_screen_texture_->draw();
 }
 
 

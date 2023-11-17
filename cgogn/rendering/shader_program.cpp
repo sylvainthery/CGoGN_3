@@ -298,7 +298,7 @@ ShaderParam::ShaderParam(ShaderProgram* prg, bool opt_clip)
 	vao_ = std::make_unique<VAO>();
 }
 
-void ShaderParam::bind(const GLMat4& proj, const GLMat4& mv)
+void ShaderParam::bind(const GLMat4d& proj, const GLMat4d& mv)
 {
 	shader_->bind();
 	shader_->set_matrices(proj, mv);

@@ -326,7 +326,7 @@ void ShapeDrawer::update_material(const GLColor& col, float32 roughness, float32
 	};
 }
 
-void ShapeDrawer::update_light_position(const GLVec3& lp)
+void ShapeDrawer::update_light_position(const GLVec3d& lp)
 {
 	for (auto& p : param_)
 		p->light_position_ = lp;
@@ -341,73 +341,73 @@ void ShapeDrawer::update_subdivision(int32 nb)
 }
 
 
-void ShapeDrawer::draw(SHAPE s, const GLMat4& projection, const GLMat4& view)
+void ShapeDrawer::draw(SHAPE s, const GLMat4d& projection, const GLMat4d& view)
 {
 
 	param_[s]->draw(projection, view);
 }
 
-void ShaderParamCylinder::draw(const GLMat4& projection, const GLMat4& view)
+void ShaderParamCylinder::draw(const GLMat4d& projection, const GLMat4d& view)
 {
 	this->bind(projection, view);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 2*nb_+2, 3);
 	this->release();
 }
 
-void ShaderParamSphere::draw(const GLMat4& projection, const GLMat4& view)
+void ShaderParamSphere::draw(const GLMat4d& projection, const GLMat4d& view)
 {
 	this->bind(projection, view);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 2*nb_+2, nb_);
 	this->release();
 }
 
-void ShaderParamCone::draw(const GLMat4& projection, const GLMat4& view)
+void ShaderParamCone::draw(const GLMat4d& projection, const GLMat4d& view)
 {
 	this->bind(projection, view);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 2 * nb_+2, 2);
 	this->release();
 }
 
-void ShaderParamCube::draw(const GLMat4& projection, const GLMat4& view)
+void ShaderParamCube::draw(const GLMat4d& projection, const GLMat4d& view)
 {
 	this->bind(projection, view);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	this->release();
 }
 
-void ShapeDrawer::drawSphere(const GLMat4& projection, const GLMat4& view, const GLVec3& p, float32 radius)
+void ShapeDrawer::drawSphere(const GLMat4d& projection, const GLMat4d& view, const GLVec3d& p, float64 radius)
 {
-	draw(SPHERE, projection, view * (Eigen::Translation3f(p) * Eigen::Scaling(radius)).matrix());
+	draw(SPHERE, projection, view * (Eigen::Translation3d(p) * Eigen::Scaling(radius)).matrix());
 }
 
-GLMat4 ShapeDrawer::points_2_transfo(const GLVec3& p1, const GLVec3& p2, float32 radius)
+GLMat4d ShapeDrawer::points_2_transfo(const GLVec3d& p1, const GLVec3d& p2, float64 radius)
 {
-	GLVec3 dir = p2 - p1;
-	float l = dir.norm();
+	GLVec3d dir = p2 - p1;
+	float64 l = dir.norm();
 	dir /= l;
-	GLVec3 axis = GLVec3(-dir.y(), dir.x(), 0.0);
-	GLVec3(0, 0, 1).cross(dir);
-	float la = axis.norm();
-	Eigen::Affine3f tr = Eigen::Affine3f(Eigen::Translation3f((p1 + p2) / 2));
+	GLVec3d axis = GLVec3d(-dir.y(), dir.x(), 0.0);
+	GLVec3d(0, 0, 1).cross(dir);
+	float64 la = axis.norm();
+	Eigen::Affine3d tr = Eigen::Affine3d(Eigen::Translation3d((p1 + p2) / 2));
 	if (la != 0.0f)
 	{
 		axis /= la;
-		float alpha = std::asin(la);
+		float64 alpha = std::asin(la);
 		if (dir.z() < 0)
 			alpha = M_PI - alpha;
-		tr *= Eigen::AngleAxisf(alpha, axis);
+		tr *= Eigen::AngleAxis(alpha, axis);
 	}
 	tr *= Eigen::Scaling(radius, radius, l / 2);
 	return tr.matrix();
 }
 
-void ShapeDrawer::drawCylinder(const GLMat4& projection, const GLMat4& view, const GLVec3& p1, const GLVec3& p2, float32 radius)
+void ShapeDrawer::drawCylinder(const GLMat4d& projection, const GLMat4d& view, const GLVec3d& p1, const GLVec3d& p2, float64 radius)
 {
 	draw(CYLINDER, projection, view * points_2_transfo(p1,p2,radius));
 }
 
 
-void ShapeDrawer::drawCone(const GLMat4& projection, const GLMat4& view, const GLVec3& p1, const GLVec3& p2, float32 radius)
+void ShapeDrawer::drawCone(const GLMat4d& projection, const GLMat4d& view, const GLVec3d& p1, const GLVec3d& p2, float64 radius)
 {
 	draw(CONE, projection, view * points_2_transfo(p1,p2,radius));
 }

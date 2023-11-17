@@ -36,6 +36,7 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 		#version 330
 		uniform mat4 projection_matrix;
 		uniform mat4 model_view_matrix;
+		uniform mat4 mvp_matrix;
 
 		uniform usamplerBuffer vertex_ind;
 		uniform samplerBuffer vertex_position;
@@ -61,10 +62,9 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			{
 				int ind_v = int(texelFetch(vertex_ind, 4 * gl_InstanceID + gl_VertexID).r);
 				vec3 position_in = texelFetch(vertex_position, ind_v).rgb;
-				vec3 explode_position = (explode>0.98) ? position_in : mix(center, position_in, explode);
-				vec4 position4 = model_view_matrix * vec4(explode_position, 1);
-				position = position4.xyz;
-				gl_Position = projection_matrix * position4;
+				vec4 explode_position = vec4((explode>0.98) ? position_in : mix(center, position_in, explode),1);
+				position = (model_view_matrix * explode_position).xyz;
+				gl_Position = mvp_matrix * explode_position;
 			}
 			else
 			{
@@ -103,8 +103,6 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 
 void ShaderParamExplodeVolumes::set_uniforms()
 {
-	//shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
-	//						data_->plane_clip_, data_->plane_clip2_);
 	sha_set_uniforms_values(shader_,sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 							data_->plane_clip_, data_->plane_clip2_);
 }

@@ -40,6 +40,7 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/shader_program.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/shadows.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shadows.cpp"
+
 		"${CMAKE_CURRENT_LIST_DIR}/shadows_plane.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shadows_plane.cpp"
 
@@ -50,6 +51,7 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/volume_render_defer.h"
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/topo_render.h"
+
 
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.h"
 #		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_hbao.cpp"
@@ -116,6 +118,8 @@ set(src_list
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_fullscreen_texture.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_fullscreen_texture.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_full_screen_shadow.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_full_screen_shadow.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.cpp"

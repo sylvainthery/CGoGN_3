@@ -59,7 +59,7 @@ public:
 	{
 	}
 
-	inline void draw(const GLMat4& proj, const GLMat4& view )
+	inline void draw(const GLMat4d& proj, const GLMat4d& view )
 	{
 		bind(proj,view);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

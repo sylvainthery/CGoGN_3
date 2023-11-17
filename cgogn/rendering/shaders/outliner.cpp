@@ -255,8 +255,8 @@ Outliner::~Outliner()
 	delete fbo_blur2_;
 }
 
-void Outliner::draw(VBO* position, MeshRender* renderer, const rendering::GLMat4& projection_matrix,
-					const rendering::GLMat4& view_matrix, const GLColor& color)
+void Outliner::draw(VBO* position, MeshRender* renderer, const rendering::GLMat4d& projection_matrix,
+					const rendering::GLMat4d& view_matrix, const GLColor& color)
 {
 	GLint prev_viewport[4];
 	glGetIntegerv(GL_VIEWPORT, prev_viewport);

@@ -592,7 +592,7 @@ protected:
 	}
 
 public:
-	void draw_shadowmap(View* view, const GLMat4& mproj, const GLMat4& mview) override
+	void draw_shadowmap(View* view, const GLMat4d& mproj, const GLMat4d& mview) override
 	{
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);

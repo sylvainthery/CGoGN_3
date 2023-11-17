@@ -28,6 +28,7 @@
 
 #include <cgogn/core/utils/numerics.h>
 #include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
+#include <cgogn/rendering/shaders/shader_full_screen_shadow.h>
 
 #include <cgogn/ui/gl_viewer.h>
 #include <cgogn/ui/module.h>
@@ -183,6 +184,8 @@ protected:
 	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
 	std::unique_ptr<rendering::FBO> fbo_;
 	std::shared_ptr<rendering::Texture2D> tex_;
+
+	std::unique_ptr<rendering::ShaderFullScreenHBAO::Param> param_full_screen_hbao_;
 
 	cgogn::ui::LightData light_;
 	cgogn::rendering::ShadowData shadow_;

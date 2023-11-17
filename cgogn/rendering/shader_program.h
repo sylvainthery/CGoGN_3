@@ -537,7 +537,7 @@ public:
 	 * @param proj projection matrix
 	 * @param mv modelview matrix
 	 */
-	void bind(const GLMat4& proj, const GLMat4& mv);
+	void bind(const GLMat4d& proj, const GLMat4d& mv);
 
 	void bind();
 
