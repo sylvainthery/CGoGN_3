@@ -118,8 +118,9 @@ set(src_list
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_fullscreen_texture.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_fullscreen_texture.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_full_screen_shadow.h"
-		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_full_screen_shadow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_ao_shadows_post.h"
+		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_ao_shadows_post.cpp"
+
 
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.h"
 		"${CMAKE_CURRENT_LIST_DIR}/shaders/shader_plane_env.cpp"

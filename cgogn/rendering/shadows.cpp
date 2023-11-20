@@ -35,7 +35,7 @@ namespace rendering
 std::unique_ptr<Texture2D> ShadowData::tex_poisson_ = nullptr;
 
 
-ShadowData::ShadowData() : fbo_shadows_(nullptr), nb_samples_(4), bias_k_(0.0f)
+ShadowData::ShadowData() : fbo_shadows_(nullptr), nb_samples_(4), bias_k_(0.0f,0.0f)
 {
 	std::vector<float> pois = {-0.94201624f, -0.39906216f, 0.94558609f,	 -0.76890725f, -0.094184101, -0.92938870f,
 							   0.34495938f,	 0.29387760f,  -0.91588581f, 0.45771432f,  -0.81544232f, -0.87912464f,
@@ -53,7 +53,7 @@ ShadowData::ShadowData() : fbo_shadows_(nullptr), nb_samples_(4), bias_k_(0.0f)
 	}
 }
 
-void ShadowData::start(double bias_k)
+void ShadowData::start()
 {
 	fbo_shadows_ = std::make_shared<cgogn::rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{},
 														   true, nullptr);
@@ -66,7 +66,6 @@ void ShadowData::start(double bias_k)
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_sz);
 	int sz = std::min(max_tex_sz, 8192);
 	fbo_shadows_->resize(sz, sz);
-	bias_k_ = float(bias_k);
 }
 
 

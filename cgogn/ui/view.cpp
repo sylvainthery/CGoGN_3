@@ -25,6 +25,7 @@
 
 #include <cgogn/rendering/gl_image.h>
 
+using cgogn::rendering::GLVec2;
 using cgogn::rendering::GLVec3d;
 using cgogn::rendering::GLVec4d;
 using cgogn::rendering::GLMat4d;
@@ -37,21 +38,40 @@ namespace ui
 
 View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
-	  param_full_screen_texture_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false)
+	  param_full_screen_texture_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false),
+	  shift_zplane_(0.05), hbao_radius_ratio_(0.01f), bias_k_div(GLVec2(17.f,29.0f))
 {
 	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
 
 	fbo_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_}, true, nullptr);
 
-	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
-	param_full_screen_texture_->texture_ = fbo_->texture(0);
+	tex_hbao_ = std::make_shared<cgogn::rendering::Texture2D>();
+	tex_hbao_->allocate(1, 1, GL_R32F, GL_RED);
+	fbo_hbao_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_hbao_},
+												   false, nullptr);
+
+	tex_hbao2_ = std::make_shared<cgogn::rendering::Texture2D>();
+	tex_hbao2_->allocate(1, 1, GL_R32F, GL_RED);
+	fbo_hbao2_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_hbao2_},
+												   false, nullptr);
 
 	param_full_screen_hbao_ = cgogn::rendering::ShaderFullScreenHBAO::generate_param();
 	param_full_screen_hbao_->tex_d_ = fbo_->getDepthTexture();
+	param_full_screen_hbao_->shadataptr_ = &shadow_;
+	
+	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
+	param_full_screen_texture_->texture_ = fbo_->texture(0);
+
+	param_full_screen_apply_ = cgogn::rendering::ShaderFullScreenApplyHBAO::generate_param();
+	param_full_screen_apply_->tex_ambiant_ = fbo_hbao_->texture(0);
+	param_full_screen_apply_->tex_diffuse_ = fbo_->texture(0);
+
+	param_blur_ao_ = cgogn::rendering::ShaderFSBlurAO::generate_param();
 
 	light_.link(camera_);
 	sha_plane_.init(&shadow_);
+
 }
 
 View::~View()
@@ -79,6 +99,8 @@ void View::resize_event(int32 window_width, int32 window_height, int32 frame_buf
 	GLViewer::resize_event(int32(ratio_width_ * frame_buffer_width), int32(ratio_height_ * frame_buffer_height));
 
 	fbo_->resize(viewport_width_, viewport_height_);
+	fbo_hbao_->resize(viewport_width_, viewport_height_);
+	fbo_hbao2_->resize(viewport_width_, viewport_height_);
 }
 
 void View::close_event()
@@ -160,48 +182,23 @@ void View::key_release_event(int32 key_code)
 }
 
 
-std::pair<GLVec3d, GLVec3d> View::compute_bb()
-{
-	GLVec3d bb_min, bb_max;
-	for (uint32 i = 0; i < 3; ++i)
-	{
-		bb_min[i] = std::numeric_limits<float64>::max();
-		bb_max[i] = std::numeric_limits<float64>::lowest();
-	}
-
-	for (const auto& pm : linked_provider_modules_)
-	{
-		const auto& pmbb = pm->meshes_bb();
-		for (uint32 i = 0; i < 3; ++i)
-		{
-			if (pmbb.first[i] < bb_min[i])
-				bb_min[i] = pmbb.first[i];
-			if (pmbb.second[i] > bb_max[i])
-				bb_max[i] = pmbb.second[i];
-		}
-	}
-	return std::make_pair(bb_min, bb_max);
-}
-
 void View::draw()
-{
+{			  
 	if (closing_)
 		return;
 	spin();
 
-	auto bb = compute_bb();
-	//	float64 sr = camera().scene_radius();
-	float64 sr = (bb.second - bb.first).norm() / 2.0;
-	param_full_screen_hbao_->radius_ = float32(sr / 50.0);
-	//std::cout << (bb.second - bb.first).transpose() << std::endl;
+	float64 sr = (bb_.second - bb_.first).norm()/2.0;
+
 	if (need_redraw_) //AND NEED SHADOW UPDATE
 	{
-		shadow_.bias_k_ = float32(sr) / 100000.0f;
+		shadow_.bias_k_[0] = float32(sr) / std::pow(2.0f, bias_k_div[0]);
+		shadow_.bias_k_[1] = float32(sr) / std::pow(2.0f, bias_k_div[1]);
 
 		if (shadow_.is_started())
 		{
 		//	GLVec3d center = camera().pivot_point();
-			GLVec3d center = (bb.first + bb.second) / 2.0;
+			GLVec3d center = (bb_.first + bb_.second) / 2.0;
 			GLVec3 wlpf = light_.getWorldCoord();
 			GLVec3d wlp = wlpf.cast<double>();
 
@@ -240,6 +237,9 @@ void View::draw()
 			shadow_.fbo_shadows_->bind();
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
+	
 			for (ViewModule* m : linked_view_modules_)
 				m->draw_shadowmap(this, light_projection_matrix, light_view_matrix);
 			shadow_.fbo_shadows_->release();
@@ -262,41 +262,59 @@ void View::draw()
 			//{
 			//	glEnable(GL_CULL_FACE);
 			//	glCullFace(GL_BACK);
-			//	auto bb = compute_bb();
-			//	sha_plane_.drawZ(bb, -0.01f, camera_.projection_matrix_d(), camera_.modelview_matrix_d(),
-			//					 light_.getEyeCoord());
+			//	sha_plane_.drawZ(bb_, shift_zplane_, camera_.projection_matrix_d(), camera_.modelview_matrix_d(),light_.getEyeCoord());
 			//}
 
 			for (ViewModule* m : linked_view_modules_)
 				m->draw(this);
-			glDisable(GL_DEPTH_TEST);
+
 			fbo_->release();
+
+
 			need_redraw_ = false;
 		}
 	}
+ 
+
 	if (shadow_.is_started())
 	{
-		const GLMat4d& mproj = this->projection_matrix_d();
-		float64 znear = mproj(2, 3) / (mproj(2, 2) - 1.0);
-		float64 zfar = mproj(2, 3) / (mproj(2, 2) + 1.0);
-
-		param_full_screen_hbao_->projv_ = ::cgogn::rendering::GLVec2(mproj(0, 0), mproj(1, 1));
-		param_full_screen_hbao_->fn_ =
-			::cgogn::rendering::GLVec3(float32(-2.0 * zfar * znear), float32(zfar + znear), float32(zfar - znear));
-	
+		//float Zp = bb_.first.z();
+		//auto& inv_mv = camera_.modelview_matrix_d().inverse();
+		//GLVec3d A = cgogn::rendering::homoTransform(inv_mv, GLVec3d(0, 0, 0));
+		//GLVec3d B = cgogn::rendering::homoTransform(inv_mv, GLVec3d(0, 0, -1));
+		//float d = Zp - A.z() / (B - A).normalized();
+		
+		fbo_hbao_->bind();
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
+		param_full_screen_hbao_->radius_ = float32(sr) * hbao_radius_ratio_;
+		param_full_screen_hbao_->light_position_ = light_.getEyeCoord();
+		param_full_screen_hbao_->inv_mat_ = (camera_.projection_matrix_d()).inverse().cast<float>();
+		param_full_screen_hbao_->plane_p_ = 0.5f*bb_.first.cast<float>() + 0.5f*bb_.second.cast<float>();
+		//		param_full_screen_hbao_->plane_normal_ = camera_.modelview_matrix().block<3, 1>(0, 2).normalized();
+		param_full_screen_hbao_->plane_n_ = camera_.modelview_matrix().block<3, 3>(0, 0) * GLVec3(0, 0, 1);
 		param_full_screen_hbao_->draw(this);
+		fbo_hbao_->release();
+
+		for (int i = 0; i < 3; ++i)
+		{
+			fbo_hbao2_->bind();
+			param_blur_ao_->tex_ = fbo_hbao_->getTexture(0);
+			param_blur_ao_->blurH();
+			fbo_hbao2_->release();
+
+			fbo_hbao_->bind();
+			param_blur_ao_->tex_ = fbo_hbao2_->getTexture(0);
+			param_blur_ao_->blurV();
+			fbo_hbao_->release();
+		}
+		param_full_screen_apply_->draw();
 	}
-	else
-		param_full_screen_texture_->draw();
+ //
+	//param_full_screen_apply_->draw();
+
 }
-
-
-
-//void View::draw_shadowmap(const cgogn::rendering::GLMat4d& proj, const cgogn::rendering::GLMat4d& view)
-//{
-//	for (ViewModule* m : linked_view_modules_)
-//		m->draw_shadowmap(this, proj.cast<float>(), view.cast<float>());
-//}
 
 
 void View::link_module(ViewModule* m)
@@ -320,7 +338,8 @@ void View::link_module(ProviderModule* m)
 
 void View::update_scene_bb()
 {
-	geometry::Vec3 min, max;
+	GLVec3d& min = bb_.first; 
+	GLVec3d& max = bb_.second; 
 	for (uint32 i = 0; i < 3; ++i)
 	{
 		min[i] = std::numeric_limits<float64>::max();

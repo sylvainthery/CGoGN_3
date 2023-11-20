@@ -45,7 +45,7 @@ struct ShadowData
 	std::shared_ptr<cgogn::rendering::FBO> fbo_shadows_;
 	GLMat4d shadow_matrix_;
 	int nb_samples_;
-	float32 bias_k_;
+	GLVec2 bias_k_;
 
 	ShadowData();
 
@@ -54,7 +54,7 @@ struct ShadowData
 		return fbo_shadows_ != nullptr;
 	}
 
-	void start(double bias_k);
+	void start();
 
 	inline void stop()
 	{

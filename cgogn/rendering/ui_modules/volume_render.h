@@ -103,6 +103,8 @@ class VolumeRender : public ViewModule
 			  vertex_scale_factor_(1.0), auto_update_volume_scalar_min_max_(true), clipping_plane_(false),
 			  clip_only_volumes_(true), show_frame_manipulator_(false), manipulating_frame_(false)
 		{
+			transfo_ = rendering::Transfo3d::Identity();
+			transfo_scene_ = rendering::Transfo3d::Identity();
 
 			data_.color_ = {0.4f, 0.8f, 1.0f, 1.0f};
 			data_.color_line_ = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -148,6 +150,15 @@ class VolumeRender : public ViewModule
 
 		}
 
+		inline std::pair<GLVec3d, GLVec3d> compute_initial_transfo(const std::pair<GLVec3d, GLVec3d>& bb)
+		{
+			auto bb_width = bb.second - ;
+			auto center = bb.second + bb.first / 2;
+			float64 width = std::max(bb_width.x(), std::max(bb_width.y(), bb_width.z()));
+			transfo_ = Eigen::Translation3d(GLVec3d(-center)) * Eigen::Scale(2.0 / width);
+			return {transfo_.apply(bb.first), transfo_.apply(bb.second)};
+		}
+
 		CGOGN_NOT_COPYABLE_NOR_MOVABLE(Parameters);
 
 		std::shared_ptr<Attribute<Vec3>> vertex_position_;
@@ -178,6 +189,8 @@ class VolumeRender : public ViewModule
 
 		std::vector < std::unique_ptr<rendering::ShaderParam>> params_volumes_;
 
+		
+
 		bool render_vertices_;
 		bool render_edges_;
 		bool render_volumes_;
@@ -199,6 +212,8 @@ class VolumeRender : public ViewModule
 		rendering::FrameManipulator frame_manipulator_;
 		bool show_frame_manipulator_;
 		bool manipulating_frame_;
+		rendering::Transfo3d transfo_;
+		rendering::Transfo3d transfo_scene_;
 	};
 
 public:
@@ -217,10 +232,13 @@ public:
 private:
 	void init_mesh(MESH* m)
 	{
+		MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
+
 		for (View* v : linked_views_)
 		{
 			Parameters& p = parameters_[v][m];
 			cgogn::rendering::ShadowData* shadata = &(v->get_shadow());
+			
 			p.init_shaders(shadata);
 
 			p.volume_center_ = add_attribute<Vec3, Volume>(*m, "__volume_center");
@@ -499,14 +517,18 @@ public:
 	void draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view) override
 	{
 		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		glCullFace(GL_FRONT);
 
 		for (auto& [m, p] : parameters_[view])
 		{
 			if (p.render_volumes_& p.cast_shadow_)
 			{
-				p.param_volume_generate_shadows_->bind(mat_proj,mat_view);
-				mesh_provider_->mesh_data(*m).draw(rendering::VOLUMES_FACES, p.vertex_position_);
+				auto& md = mesh_provider_->mesh_data(*m);
+				GLMat4d trf_mesh = p.transfo_.matrix();
+				GLMat4d trf_scene = p.transfo_.matrix();
+				p.param_volume_generate_shadows_->bind(mat_proj, mat_view * trf_scene * trf_mesh);
+
+				md.draw(rendering::VOLUMES_FACES, p.vertex_position_);
 				p.param_volume_generate_shadows_->release();
 			}
 		}
@@ -535,6 +557,13 @@ public:
 			const rendering::GLMat4d& proj_matrix = view->projection_matrix_d();
 			const rendering::GLMat4d& view_matrix = view->modelview_matrix_d();
 
+//			const auto& md = mesh_provider_->mesh_data(*m);
+			GLMat4d trf_mesh = p.transfo_.matrix();
+			GLMat4d trf_scene = p.transfo_scene_.matrix();
+
+			GLMat4d model_view_matrix = view_matrix * trf_scene * trf_mesh;
+
+
 			if (p.render_volumes_)
 			{
 				p.data_.light_position_ = view->get_light().getEyeCoord();
@@ -562,7 +591,7 @@ public:
 				rendering::ShaderParam* param_vol = p.params_volumes_[index_shader].get();
 				if (param_vol->attributes_initialized())
 				{		
-					param_vol->bind(proj_matrix, view_matrix);
+					param_vol->bind(proj_matrix, model_view_matrix);
 					if (p.smooth_volume_faces_)
 						md.draw(rendering::VOLUMES_SMOOTH_FACES, p.vertex_position_);
 					else
@@ -573,7 +602,7 @@ public:
 
 				if (p.render_volume_lines_ && p.param_volume_line_->attributes_initialized())
 				{
-					p.param_volume_line_->bind(proj_matrix, view_matrix);
+					p.param_volume_line_->bind(proj_matrix, model_view_matrix);
 					md.draw(rendering::VOLUMES_EDGES);
 					p.param_volume_line_->release();
 				}
@@ -581,7 +610,7 @@ public:
 
 			if (p.render_edges_ && p.param_bold_line_->attributes_initialized())
 			{
-				p.param_bold_line_->bind(proj_matrix, view_matrix);
+				p.param_bold_line_->bind(proj_matrix, model_view_matrix);
 				md.draw(rendering::LINES);
 				p.param_bold_line_->release();
 			}
@@ -589,13 +618,13 @@ public:
 			if (p.render_vertices_ && p.param_point_sprite_->attributes_initialized())
 			{
 				p.param_point_sprite_->point_size_ = p.vertex_base_size_ * p.vertex_scale_factor_;
-				p.param_point_sprite_->bind(proj_matrix, view_matrix);
+				p.param_point_sprite_->bind(proj_matrix, model_view_matrix);
 				md.draw(rendering::POINTS);
 				p.param_point_sprite_->release();
 			}
 
 			if (p.show_frame_manipulator_)
-				p.frame_manipulator_.draw(true, true, proj_matrix, view_matrix);
+				p.frame_manipulator_.draw(true, true, proj_matrix, model_view_matrix);
 
 			float64 remain = md.outlined_until_ - App::frame_time_;
 			if (remain > 0 && p.vertex_position_vbo_)
@@ -604,7 +633,7 @@ public:
 				color *= float(remain * 2);
 				if (!md.is_primitive_uptodate(rendering::TRIANGLES))
 					md.init_primitives(rendering::TRIANGLES);
-				outline_engine_->draw(p.vertex_position_vbo_, md.mesh_render(), proj_matrix, view_matrix, color);
+				outline_engine_->draw(p.vertex_position_vbo_, md.mesh_render(), proj_matrix, model_view_matrix, color);
 			}
 		}
 	}
@@ -700,6 +729,37 @@ public:
 		{
 			ImGui::LabelText("fps", "%5f", float(app_.fps()));
 			ImGui::Separator();
+			if (ImGui::SliderFloat("Zplane", &selected_view_->shift_zplane_, -0.1f, 0.5f))
+				need_update = true;	
+							if (ImGui::SliderFloat("HBAO Radius", &selected_view_->HBAO_radius_ratio(), 0.0f, 0.3f))
+				need_update = true;
+
+			if (ImGui::SliderFloat("HBAO strengh", selected_view_->hbao_strength_ptr(), 0.0f, 8.0f))
+				need_update = true;	
+
+			if (ImGui::SliderFloat("HBAO bias cst", &selected_view_->bias_k_div[0], 8.0f, 31.0f))
+				need_update = true;	
+			if (ImGui::SliderFloat("HBAO bias slope", &selected_view_->bias_k_div[1], 8.0f, 31.0f))
+				need_update = true;	
+
+
+			cgogn::rendering::ShadowData& sha_data = selected_view_->get_shadow();
+			bool shsta = sha_data.is_started();
+			if (ImGui::Checkbox("Shadows", &shsta))
+			{
+				if (shsta)
+					sha_data.start();
+				else
+					sha_data.stop();
+				need_update = true;
+			}
+			if (shsta)
+			{
+				if (ImGui::SliderInt("samples", &sha_data.nb_samples_, 1, 9))
+					need_update = true;			}
+
+			ImGui::Separator();
+
 
 			LightData& LD = selected_view_->get_light();
 			if (ImGui::Checkbox("Cam Light ?", &LD.light_on_cam_))
@@ -717,42 +777,11 @@ public:
 			else
 			{
 				if (ImGui::SliderFloat("Azimut", &(LD.world_polar_[0]), float(-2.5 * M_PI), float(3.5 * M_PI)) ||
-					ImGui::SliderFloat("Elevation", &(LD.world_polar_[1]), float(0.05 * M_PI), float(0.5 * M_PI)))
+					ImGui::SliderFloat("Elevation", &(LD.world_polar_[1]), float(0.1 * M_PI), float(0.5 * M_PI)))
 				{
 					LD.update();
 					need_update = true;
 				}
-			}
-
-			ImGui::Separator();
-
-			cgogn::rendering::ShadowData& sha_data = selected_view_->get_shadow();
-			bool shsta = sha_data.is_started();
-			if (ImGui::Checkbox("Shadows", &shsta))
-			{
-				if (shsta)
-				{
-					auto bb = selected_view_->compute_bb();
-					auto diag = (bb.second - bb.first).norm();
-					float64 bias_k = diag / std::pow(2.0, diag);
-					sha_data.start(bias_k);
-				}
-				else
-					sha_data.stop();
-				need_update = true;
-			}
-			if (shsta)
-			{
-				auto bb = selected_view_->compute_bb();
-				auto diag = (bb.second - bb.first).norm();
-				//float loc_bias = std::log(float(diag) / sha_data.bias_k_) / std::log(2.0f);
-				//if (ImGui::SliderFloat("Bias", &loc_bias, 8, 27))
-				//{
-				//	sha_data.bias_k_ = float(diag) / std::pow(2.0f, loc_bias);
-				//	need_update = true;
-				//}
-				if (ImGui::SliderInt("samples", &sha_data.nb_samples_, 1, 9))
-					need_update = true;
 			}
 
 			ImGui::Separator();

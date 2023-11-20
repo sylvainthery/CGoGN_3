@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 	v1->link_module(&mp);
 	v1->link_module(&vr);
 
-	Mesh* m = mp.load_volume_from_file(filename2);
+	Mesh* m = mp.load_volume_from_file(filename);
 	if (!m)
 	{
 		std::cout << "File could not be loaded" << std::endl;
@@ -119,17 +119,17 @@ int main(int argc, char** argv)
 	});
 
 
-	//Mesh* m2 = mp.load_volume_from_file(filename);
-	//std::shared_ptr<Attribute<Vec3>> vertex_position4 = cgogn::get_attribute<Vec3, Vertex>(*m2, "position");
-	//shiftVec = (bb.second - bb.first) / 2.0;
+	Mesh* m2 = mp.load_volume_from_file(filename);
+	std::shared_ptr<Attribute<Vec3>> vertex_position4 = cgogn::get_attribute<Vec3, Vertex>(*m2, "position");
+	shiftVec = (bb.second - bb.first) / 2.0;
 
-	//cgogn::foreach_cell(*m2, [&](Vertex v) -> bool {
-	//	cgogn::value<Vec3>(*m2, vertex_position4, v) -= shiftVec;
-	//	return true;
-	//});
+	cgogn::foreach_cell(*m2, [&](Vertex v) -> bool {
+		cgogn::value<Vec3>(*m2, vertex_position4, v) -= shiftVec;
+		return true;
+	});
 
-	//mp.emit_attribute_changed(*m2, vertex_position4.get());
-
+	mp.emit_attribute_changed(*m2, vertex_position4.get());
+  
 
 
 

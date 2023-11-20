@@ -28,7 +28,7 @@
 
 #include <cgogn/core/utils/numerics.h>
 #include <cgogn/rendering/shaders/shader_fullscreen_texture.h>
-#include <cgogn/rendering/shaders/shader_full_screen_shadow.h>
+#include <cgogn/rendering/shaders/shader_ao_shadows_post.h>
 
 #include <cgogn/ui/gl_viewer.h>
 #include <cgogn/ui/module.h>
@@ -127,6 +127,11 @@ public:
 		return x >= x_offset_ && x < x_offset_ + width_ && y >= y_offset_ && y < y_offset_ + height_;
 	}
 
+	inline float& HBAO_radius_ratio()
+	{
+		return hbao_radius_ratio_;
+	}
+
 	void set_view_ratio(float64 px, float64 py, float64 pw, float64 ph);
 
 	void update_scene_bb();
@@ -162,10 +167,11 @@ public:
 		return sha_plane_;
 	}
 
-	std::pair<GLVec3d, GLVec3d> compute_bb();
 
 protected:
 	std::string name_;
+
+	std::pair<GLVec3d, GLVec3d> bb_;
 
 	float64 ratio_x_offset_;
 	float64 ratio_y_offset_;
@@ -182,10 +188,18 @@ protected:
 	int32 viewport_y_offset_;
 
 	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
+	std::unique_ptr<rendering::ShaderFullScreenApplyHBAO::Param> param_full_screen_apply_;
 	std::unique_ptr<rendering::FBO> fbo_;
 	std::shared_ptr<rendering::Texture2D> tex_;
+	std::unique_ptr<rendering::FBO> fbo_hbao_;
+	std::shared_ptr<rendering::Texture2D> tex_hbao_;
+	std::unique_ptr<rendering::FBO> fbo_hbao2_;
+	std::shared_ptr<rendering::Texture2D> tex_hbao2_;
 
 	std::unique_ptr<rendering::ShaderFullScreenHBAO::Param> param_full_screen_hbao_;
+	float hbao_radius_ratio_;
+
+	std::unique_ptr<rendering::ShaderFSBlurAO::Param> param_blur_ao_;
 
 	cgogn::ui::LightData light_;
 	cgogn::rendering::ShadowData shadow_;
@@ -199,6 +213,18 @@ protected:
 
 	bool event_stopped_;
 	bool closing_;
+
+public:
+	GLVec2 bias_k_div;
+	float shift_zplane_;
+	float* ambiant_ratio_ptr()
+	{
+		return &param_full_screen_apply_->ambiant_ratio_;
+	}
+	float* hbao_strength_ptr()
+	{
+		return &param_full_screen_hbao_->ao_strength_;
+	}
 };
 
 } // namespace ui

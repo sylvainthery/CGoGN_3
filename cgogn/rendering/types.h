@@ -113,13 +113,13 @@ inline GLVec3 homoTransform(const GLMat4& m, const GLVec3& p)
 {
 	GLVec4 p4(p.x(), p.y(), p.z(), 1.0);
 	GLVec4 q = m * p4;
-	return GLVec3{q[0], q[1], q[2]};
+	return GLVec3{q[0] / q[3], q[1] / q[3], q[2] / q[3]};
 }
 inline GLVec3d homoTransform(const GLMat4d& m, const GLVec3d& p)
 {
 	GLVec4d p4(p.x(), p.y(), p.z(),1.0);
 	GLVec4d q = m * p4;
-	return GLVec3d{q[0], q[1], q[2]};
+	return GLVec3d{q[0] / q[3], q[1] / q[3], q[2] / q[3]};
 }
 
 static std::map<GLenum, std::string> GL_ERRORS_NAMES = {

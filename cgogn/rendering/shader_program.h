@@ -257,6 +257,19 @@ public:
 		glUniform1i(uniforms_[i], int32(v));
 	}
 
+	inline void set_uniform_value(std::size_t i, const std::array<int32,2>& v)
+	{
+		glUniform2iv(uniforms_[i], 1, v.data());
+	}
+	inline void set_uniform_value(std::size_t i, const std::array<int32, 3>& v)
+	{
+		glUniform3iv(uniforms_[i], 1, v.data());
+	}
+	inline void set_uniform_value(std::size_t i, const std::array<int32, 4>& v)
+	{
+		glUniform4iv(uniforms_[i], 1, v.data());
+	}
+
 	inline void set_uniform_value(std::size_t i, const GLMat4& m)
 	{
 		glUniformMatrix4fv(uniforms_[i], 1, false, m.data());
