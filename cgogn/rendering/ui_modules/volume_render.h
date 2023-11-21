@@ -979,7 +979,6 @@ private:
 	std::vector<std::shared_ptr<boost::synapse::connection>> connections_;
 	std::unordered_map<const MESH*, std::vector<std::shared_ptr<boost::synapse::connection>>> mesh_connections_;
 	MeshProvider<MESH>* mesh_provider_;
-
 	rendering::Outliner* outline_engine_;
 	// std::unique_ptr<rendering::ComputeVolumeCenterEngine> compute_volume_center_engine_;
 };

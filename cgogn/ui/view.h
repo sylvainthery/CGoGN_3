@@ -190,7 +190,9 @@ protected:
 	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
 	std::unique_ptr<rendering::ShaderFullScreenApplyHBAO::Param> param_full_screen_apply_;
 	std::unique_ptr<rendering::FBO> fbo_;
+	std::unique_ptr<rendering::FBO> fbo2_;
 	std::shared_ptr<rendering::Texture2D> tex_;
+	std::shared_ptr<rendering::Texture2D> tex_n_;
 	std::unique_ptr<rendering::FBO> fbo_hbao_;
 	std::shared_ptr<rendering::Texture2D> tex_hbao_;
 	std::unique_ptr<rendering::FBO> fbo_hbao2_;

@@ -50,6 +50,7 @@ class CGOGN_RENDERING_EXPORT ShaderParamFullScreenHBAO : public ShaderParam
 
 public:
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_d_;
+	std::shared_ptr<::cgogn::rendering::Texture2D> tex_n_;
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_shadow_;
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_poisson_;
 	GLVec2 projv_;

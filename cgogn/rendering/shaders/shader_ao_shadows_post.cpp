@@ -60,6 +60,7 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		out float frag_out;
 
 		uniform sampler2D TUdepth;
+		uniform sampler2D TUnormal;
 		uniform vec2 projv;  // [ projection_matrix[0][0],projection_matrix.data[1][1] ];
 		uniform vec3 fn;    // [ -2.0*zfar*znearn, zfar+znear, zfar-znear ];
 		uniform float radius;
@@ -213,9 +214,9 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 			//if (dot(P.xy,P.xy) < 150.0*150.0)
 			if (N.z>0.0)
 			{
-				float z =  dot(N, plane_p - A.xyz) / dot(N,normalize(B.xyz-A.xyz));
+				float z = dot(N, plane_p - A.xyz) / dot(N,normalize(B.xyz-A.xyz));
 				vec3 P = vec3(-stc/projv, 1.0) * z;
-				frag_out = 8.0 + abs(P.x/200.0);//compute_shadow_map(P,N);
+				frag_out = 2.0 + compute_shadow_map(P,N);
 				return;
 			}
 			else
@@ -223,15 +224,16 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		}
 
 		vec3 P = pos_from_depth(tc,depth);
-		vec3 N = N_from_ZB(tc,P);
-		float hbao = max(0.0, 1.0 - compute_hbao(P,N) * ao_strength);
+		vec3 N = texture(TUnormal,tc).rgb;//N_from_ZB(tc,P);
+		float hbao = max(0.0, 0.9999 - compute_hbao(P,N) * ao_strength); // 0.9999 for the fract in final shader path
 		float shadow = compute_shadow_map(P,N);
-		frag_out = hbao*(shadow);
+		frag_out = hbao*(0.2+0.8*shadow);
 	}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("TUdepth", "projv", "fn", "radius", "subs", "nb_dirs", "nb_steps", "time", "ao_strength",
+	get_uniforms("TUdepth", "TUnormal",
+		"projv", "fn", "radius", "subs", "nb_dirs", "nb_steps", "time", "ao_strength",
 				 "light_position", "shadow_matrix", "TUshadow", "bias_k", "TUpoisson", "nb_samples", "invMat",
 				 "plane_p", "plane_n");
 }
@@ -239,10 +241,11 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 
 void ShaderParamFullScreenHBAO::set_uniforms()
 {
-	shader_->set_uniforms_values(tex_d_->bind(0), projv_, fn_, radius_, subs_, nb_dirs_, nb_steps_, time_, ao_strength_,
+	shader_->set_uniforms_values(tex_d_->bind(0), tex_n_->bind(1), projv_, fn_, radius_, subs_, nb_dirs_, nb_steps_,
+								 time_, ao_strength_,
 								 light_position_, shadataptr_->shadow_matrix_,
-								 shadataptr_->fbo_shadows_->getDepthTexture()->bind(1), shadataptr_->bias_k_,
-		shadataptr_->tex_poisson_->bind(2), shadataptr_->nb_samples_, inv_mat_, plane_p_, plane_n_);
+								 shadataptr_->fbo_shadows_->getDepthTexture()->bind(2), shadataptr_->bias_k_,
+		shadataptr_->tex_poisson_->bind(3), shadataptr_->nb_samples_, inv_mat_, plane_p_, plane_n_);
 }
 
 
@@ -254,7 +257,7 @@ void ShaderParamFullScreenHBAO::draw(::cgogn::ui::View* v)
 
 	projv_ = ::cgogn::rendering::GLVec2(mproj(0, 0), mproj(1, 1));
 	fn_ = ::cgogn::rendering::GLVec3(float32(- 2.0 * zfar * znear), float32(zfar + znear), float32(zfar - znear));
-	
+//	std::cout << "PLANE  " << plane_p_.transpose() << "  /  " << plane_n_.transpose() << std::endl;
 	bind();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	release();
@@ -289,10 +292,10 @@ ShaderFullScreenApplyHBAO::ShaderFullScreenApplyHBAO()
 	{
 		vec3 diff = texture(TUdiffuse,tc).rgb;
 		float ao_shadow = texture(TUambiant,tc).r;
-		if (ao_shadow>=8.0)
-			frag_out = vec3(ao_shadow-8.0);
-		else;
-		frag_out = diff * ao_shadow;
+		if (ao_shadow >= 2.0)
+			frag_out = vec3(1,0,1)*(ao_shadow-2.0);
+		else
+			frag_out = diff * ao_shadow;
 	}
 	)";
 

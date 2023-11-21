@@ -77,7 +77,10 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 		#version 330
 
 		in vec3 position;
-		out vec4 frag_out;
+
+		layout(location = 0) out vec4 frag_out;
+		layout(location = 1) out vec3 normal_out;
+
 
 		uniform vec4 color;
 		uniform vec3 light_position;
@@ -93,6 +96,7 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			float dnl = max(0.0, dot(N, L));
 			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
 			frag_out = vec4(lambert * color.rgb, color.a);
+			normal_out = N;
 		}
 	)";
 

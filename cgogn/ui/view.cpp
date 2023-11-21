@@ -43,8 +43,12 @@ View::View(Inputs* inputs, const std::string& name)
 {
 	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
+	tex_n_ = std::make_shared<cgogn::rendering::Texture2D>();
+	tex_n_->allocate(1, 1, GL_RGB16F, GL_RGB);
 
-	fbo_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_}, true, nullptr);
+	fbo1_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_,tex_n_}, true, nullptr);
+	fbo1_ = std::make_unique<cgogn::rendering::FBO>(
+		std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_, tex_n_}, true, nullptr);
 
 	tex_hbao_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_hbao_->allocate(1, 1, GL_R32F, GL_RED);
@@ -58,6 +62,7 @@ View::View(Inputs* inputs, const std::string& name)
 
 	param_full_screen_hbao_ = cgogn::rendering::ShaderFullScreenHBAO::generate_param();
 	param_full_screen_hbao_->tex_d_ = fbo_->getDepthTexture();
+	param_full_screen_hbao_->tex_n_ = fbo_->getTexture(1);
 	param_full_screen_hbao_->shadataptr_ = &shadow_;
 	
 	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
@@ -255,8 +260,17 @@ void View::draw()
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			GLenum idbuf = GL_COLOR_ATTACHMENT0;
-			glDrawBuffers(1, &idbuf);
+			if (shadow_.is_started())
+			{
+				GLenum idbuf[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+				glDrawBuffers(2, idbuf);
+			}
+			else
+			{
+				GLenum idbuf = GL_COLOR_ATTACHMENT0;
+				glDrawBuffers(1, &idbuf);
+			}
+
 
 			//if (shadow_.is_started())
 			//{
@@ -278,12 +292,6 @@ void View::draw()
 
 	if (shadow_.is_started())
 	{
-		//float Zp = bb_.first.z();
-		//auto& inv_mv = camera_.modelview_matrix_d().inverse();
-		//GLVec3d A = cgogn::rendering::homoTransform(inv_mv, GLVec3d(0, 0, 0));
-		//GLVec3d B = cgogn::rendering::homoTransform(inv_mv, GLVec3d(0, 0, -1));
-		//float d = Zp - A.z() / (B - A).normalized();
-		
 		fbo_hbao_->bind();
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -291,8 +299,7 @@ void View::draw()
 		param_full_screen_hbao_->radius_ = float32(sr) * hbao_radius_ratio_;
 		param_full_screen_hbao_->light_position_ = light_.getEyeCoord();
 		param_full_screen_hbao_->inv_mat_ = (camera_.projection_matrix_d()).inverse().cast<float>();
-		param_full_screen_hbao_->plane_p_ = 0.5f*bb_.first.cast<float>() + 0.5f*bb_.second.cast<float>();
-		//		param_full_screen_hbao_->plane_normal_ = camera_.modelview_matrix().block<3, 1>(0, 2).normalized();
+		param_full_screen_hbao_->plane_p_ = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), bb_.first).cast<float>();
 		param_full_screen_hbao_->plane_n_ = camera_.modelview_matrix().block<3, 3>(0, 0) * GLVec3(0, 0, 1);
 		param_full_screen_hbao_->draw(this);
 		fbo_hbao_->release();
@@ -309,10 +316,11 @@ void View::draw()
 			param_blur_ao_->blurV();
 			fbo_hbao_->release();
 		}
+
 		param_full_screen_apply_->draw();
 	}
- //
-	//param_full_screen_apply_->draw();
+	else
+	param_full_screen_->draw();
 
 }
 

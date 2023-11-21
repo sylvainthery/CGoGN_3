@@ -492,11 +492,11 @@ int App::launch()
 		glfwMakeContextCurrent(window_);
 
 		frame_time_ = glfwGetTime();
-		if (++frame_counter == 50)
+		if (++frame_counter == 500)
 		{
 			double now = frame_time_;
 			frame_counter = 0;
-			fps_ = 50 / (now - time_last_50_frames_);
+			fps_ = 500.0 / (now - time_last_50_frames_);
 			time_last_50_frames_ = now;
 		}
 
