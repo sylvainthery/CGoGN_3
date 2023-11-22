@@ -52,12 +52,12 @@ View::View(Inputs* inputs, const std::string& name)
 	fbo_ = fbo1_.get();
 
 	tex_hbao_ = std::make_shared<cgogn::rendering::Texture2D>();
-	tex_hbao_->allocate(1, 1, GL_R32F, GL_RED);
+	tex_hbao_->allocate(1, 1, GL_R8, GL_RED);
 	fbo_hbao_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_hbao_},
 												   false, nullptr);
 
 	tex_hbao2_ = std::make_shared<cgogn::rendering::Texture2D>();
-	tex_hbao2_->allocate(1, 1, GL_R32F, GL_RED);
+	tex_hbao2_->allocate(1, 1, GL_R8, GL_RED);
 	fbo_hbao2_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_hbao2_},
 												   false, nullptr);
 
