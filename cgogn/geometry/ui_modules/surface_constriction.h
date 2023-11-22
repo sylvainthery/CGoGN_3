@@ -98,14 +98,14 @@ protected:
 	{
 		if (intr_traced_.size() > 0)
 		{
-			param_intr_->bind(view->projection_matrix(), view->modelview_matrix());
+			param_intr_->bind(view->projection_matrix_d(), view->modelview_matrix_d());
 			glDrawArrays(GL_LINES, 0, intr_vbo_.size());
 			param_intr_->release();
 		}
 
 		if (edges_vbo_.size() > 0)
 		{
-			param_edge_->bind(view->projection_matrix(), view->modelview_matrix());
+			param_edge_->bind(view->projection_matrix_d(), view->modelview_matrix_d());
 			glDrawArrays(GL_LINES, 0, edges_vbo_.size());
 			param_edge_->release();
 		}

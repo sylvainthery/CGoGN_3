@@ -118,6 +118,8 @@ public:
 
 	inline void resize(GLsizei w, GLsizei h)
 	{
+		if ((width_ == w) && (height_ == h))
+			return;
 		bind();
 		glTexImage2D(GL_TEXTURE_2D, 0, internal_, w, h, 0, external_, data_type_, nullptr);
 		width_ = w;

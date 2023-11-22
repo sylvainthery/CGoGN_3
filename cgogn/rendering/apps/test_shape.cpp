@@ -63,23 +63,23 @@ public:
 
 	void draw(ui::View * view) override
 	{
-		const GLMat4& proj_matrix = view->projection_matrix();
-		const GLMat4& view_matrix = view->modelview_matrix();
-		Eigen::Affine3f transfo = Eigen::Translation3f(GLVec3(4, 0, 0)) * Eigen::Scaling(2.0f);
+		const GLMat4d& proj_matrix = view->projection_matrix_d();
+		const GLMat4d& view_matrix = view->modelview_matrix_d();
+		Eigen::Affine3d transfo = Eigen::Translation3d(GLVec3d(4, 0, 0)) * Eigen::Scaling(2.0);
 		shape_->draw(ShapeDrawer::CYLINDER, proj_matrix, view_matrix * transfo.matrix());
-		transfo = Eigen::Translation3f(GLVec3(-4, 0, 0)) * Eigen::Scaling(2.0f);
+		transfo = Eigen::Translation3d(GLVec3d(-4, 0, 0)) * Eigen::Scaling(2.0);
 		shape_->draw(ShapeDrawer::SPHERE, proj_matrix, view_matrix * transfo.matrix());
-		transfo = Eigen::Translation3f(GLVec3(0, -4, 0)) * Eigen::Scaling(2.0f);
+		transfo = Eigen::Translation3d(GLVec3d(0, -4, 0)) * Eigen::Scaling(2.0);
 		shape_->draw(ShapeDrawer::CONE, proj_matrix, view_matrix * transfo.matrix());
-		transfo = Eigen::Translation3f(GLVec3(0, 4, 0)) * Eigen::Scaling(GLVec3(1.5f,0.5f,2));
+		transfo = Eigen::Translation3d(GLVec3d(0, 4, 0)) * Eigen::Scaling(GLVec3d(1.5,0.5,2));
 		shape_->draw(ShapeDrawer::CUBE, proj_matrix, view_matrix * transfo.matrix());
 
-		shape_->drawCylinder(proj_matrix, view_matrix, GLVec3(-3.75f, -4, -4.1f), GLVec3(4.1f, 4.3f, 3.95f), 0.5f);
+		shape_->drawCylinder(proj_matrix, view_matrix, GLVec3d(-3.75, -4, -4.1), GLVec3d(4.1, 4.3, 3.95), 0.5);
 
-		shape_->drawSphere(proj_matrix, view_matrix, GLVec3(-3.75f, -4, -4.1f), 0.4f);
-		shape_->drawSphere(proj_matrix, view_matrix, GLVec3(4.1f, 4.3f, 3.95f), 0.4f);
+		shape_->drawSphere(proj_matrix, view_matrix, GLVec3d(-3.75, -4, -4.1), 0.4);
+		shape_->drawSphere(proj_matrix, view_matrix, GLVec3d(4.1, 4.3, 3.95), 0.4);
 
-		shape_->drawCone(proj_matrix, view_matrix, GLVec3(0,0,2), GLVec3(-2,1,3.5), 0.75f);
+		shape_->drawCone(proj_matrix, view_matrix, GLVec3d(0,0,2), GLVec3d(-2,1,3.5), 0.75);
 		std::cout << "DRAW" << std::endl;
 	}
 

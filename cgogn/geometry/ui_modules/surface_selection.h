@@ -778,8 +778,8 @@ protected:
 	{
 		for (auto& [m, p] : parameters_)
 		{
-			const rendering::GLMat4& proj_matrix = view->projection_matrix();
-			const rendering::GLMat4& view_matrix = view->modelview_matrix();
+			const rendering::GLMat4d& proj_matrix = view->projection_matrix_d();
+			const rendering::GLMat4d& view_matrix = view->modelview_matrix_d();
 
 			// draw selected cells
 

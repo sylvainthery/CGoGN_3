@@ -105,6 +105,9 @@ protected:
 	virtual void key_release_event(View* view, int32 key_code);
 
 	virtual void draw(View* view);
+
+	virtual void draw_no_shading(View* view);
+
 	//virtual void draw_shadowmap(View* view, const GLt4d& mat_proj, const GLMat4d& mat_view);
 	
 	virtual void draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view);

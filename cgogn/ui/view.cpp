@@ -38,7 +38,7 @@ namespace ui
 
 View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
-	  param_full_screen_texture_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false),
+	  param_final_simple_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false),
 	  shift_zplane_(0.05), hbao_radius_ratio_(0.01f), bias_k_div(GLVec2(17.f,29.0f))
 {
 	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
@@ -46,9 +46,10 @@ View::View(Inputs* inputs, const std::string& name)
 	tex_n_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_n_->allocate(1, 1, GL_RGB16F, GL_RGB);
 
-	fbo1_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_,tex_n_}, true, nullptr);
-	fbo1_ = std::make_unique<cgogn::rendering::FBO>(
-		std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_, tex_n_}, true, nullptr);
+	fbo1_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_}, true, nullptr);
+	fbo2_ = std::make_unique<cgogn::rendering::FBO>(
+		std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_, tex_n_}, true, fbo1_.get());
+	fbo_ = fbo1_.get();
 
 	tex_hbao_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_hbao_->allocate(1, 1, GL_R32F, GL_RED);
@@ -61,16 +62,16 @@ View::View(Inputs* inputs, const std::string& name)
 												   false, nullptr);
 
 	param_full_screen_hbao_ = cgogn::rendering::ShaderFullScreenHBAO::generate_param();
-	param_full_screen_hbao_->tex_d_ = fbo_->getDepthTexture();
-	param_full_screen_hbao_->tex_n_ = fbo_->getTexture(1);
+	param_full_screen_hbao_->tex_d_ = fbo2_->getDepthTexture();
+	param_full_screen_hbao_->tex_n_ = fbo2_->getTexture(1);
 	param_full_screen_hbao_->shadataptr_ = &shadow_;
 	
-	param_full_screen_texture_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
-	param_full_screen_texture_->texture_ = fbo_->texture(0);
+	param_final_simple_ = cgogn::rendering::ShaderFullScreenTexture::generate_param();
+	param_final_simple_->texture_ = tex_;
 
 	param_full_screen_apply_ = cgogn::rendering::ShaderFullScreenApplyHBAO::generate_param();
 	param_full_screen_apply_->tex_ambiant_ = fbo_hbao_->texture(0);
-	param_full_screen_apply_->tex_diffuse_ = fbo_->texture(0);
+	param_full_screen_apply_->tex_diffuse_ = tex_;
 
 	param_blur_ao_ = cgogn::rendering::ShaderFSBlurAO::generate_param();
 
@@ -103,7 +104,8 @@ void View::resize_event(int32 window_width, int32 window_height, int32 frame_buf
 
 	GLViewer::resize_event(int32(ratio_width_ * frame_buffer_width), int32(ratio_height_ * frame_buffer_height));
 
-	fbo_->resize(viewport_width_, viewport_height_);
+	fbo1_->resize(viewport_width_, viewport_height_);
+	fbo2_->resize(viewport_width_, viewport_height_);
 	fbo_hbao_->resize(viewport_width_, viewport_height_);
 	fbo_hbao2_->resize(viewport_width_, viewport_height_);
 }
@@ -202,7 +204,6 @@ void View::draw()
 
 		if (shadow_.is_started())
 		{
-		//	GLVec3d center = camera().pivot_point();
 			GLVec3d center = (bb_.first + bb_.second) / 2.0;
 			GLVec3 wlpf = light_.getWorldCoord();
 			GLVec3d wlp = wlpf.cast<double>();
@@ -282,6 +283,9 @@ void View::draw()
 			for (ViewModule* m : linked_view_modules_)
 				m->draw(this);
 
+			for (ViewModule* m : linked_view_modules_)
+				m->draw_no_shading(this);
+
 			fbo_->release();
 
 
@@ -320,7 +324,7 @@ void View::draw()
 		param_full_screen_apply_->draw();
 	}
 	else
-	param_full_screen_->draw();
+		param_final_simple_->draw();
 
 }
 

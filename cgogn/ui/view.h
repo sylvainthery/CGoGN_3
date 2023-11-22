@@ -187,10 +187,11 @@ protected:
 	int32 viewport_x_offset_;
 	int32 viewport_y_offset_;
 
-	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_full_screen_texture_;
+	std::unique_ptr<rendering::ShaderFullScreenTexture::Param> param_final_simple_;
 	std::unique_ptr<rendering::ShaderFullScreenApplyHBAO::Param> param_full_screen_apply_;
-	std::unique_ptr<rendering::FBO> fbo_;
+	std::unique_ptr<rendering::FBO> fbo1_;
 	std::unique_ptr<rendering::FBO> fbo2_;
+	rendering::FBO* fbo_;
 	std::shared_ptr<rendering::Texture2D> tex_;
 	std::shared_ptr<rendering::Texture2D> tex_n_;
 	std::unique_ptr<rendering::FBO> fbo_hbao_;
@@ -219,15 +220,29 @@ protected:
 public:
 	GLVec2 bias_k_div;
 	float shift_zplane_;
-	float* ambiant_ratio_ptr()
+	inline float* ambiant_ratio_ptr()
 	{
 		return &param_full_screen_apply_->ambiant_ratio_;
 	}
-	float* hbao_strength_ptr()
+	inline float* hbao_strength_ptr()
 	{
 		return &param_full_screen_hbao_->ao_strength_;
 	}
+
+	inline void start_shadow()
+	{
+		shadow_.start();
+		fbo_ = fbo2_.get();
+	}
+
+	inline void stop_shadow()
+	{
+		shadow_.stop();
+		fbo_ = fbo1_.get();
+	}
+
 };
+
 
 } // namespace ui
 

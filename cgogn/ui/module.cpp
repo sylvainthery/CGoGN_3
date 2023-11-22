@@ -106,6 +106,10 @@ void ViewModule::draw(View*)
 {
 }
 
+void ViewModule::draw_no_shading(View*)
+{
+}
+
 void ViewModule::draw_shadowmap(View* view, const GLMat4d& mat_proj, const GLMat4d& mat_view)
 {
 }

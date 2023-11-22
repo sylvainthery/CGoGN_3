@@ -208,8 +208,8 @@ protected:
 		{
 			MeshData<MESH>& md = mesh_provider_->mesh_data(*m);
 
-			const rendering::GLMat4& proj_matrix = view->projection_matrix();
-			const rendering::GLMat4& view_matrix = view->modelview_matrix();
+			const rendering::GLMat4d& proj_matrix = view->projection_matrix_d();
+			const rendering::GLMat4d& view_matrix = view->modelview_matrix_d();
 
 			if (p.param_vector_per_vertex_->attributes_initialized())
 			{

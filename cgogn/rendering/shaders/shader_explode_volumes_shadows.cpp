@@ -83,7 +83,7 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 
 void ShaderParamExplodeVolumesGenerateShadows::set_uniforms()
 {
-	shader_->set_uniforms_values(10, 11, 12, 13,std::max(0.0f,data_->explode_-0.01f),
+	shader_->set_uniforms_values(10, 11, 12, 13,std::max(0.0f,data_->explode_+0.001f),
 								 data_->plane_clip_, data_->plane_clip2_);
 }
 

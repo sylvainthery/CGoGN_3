@@ -82,7 +82,7 @@ public:
 	{
 	}
 	
-	void ShaderParamFullScreenHBAO::draw(::cgogn::ui::View* v);
+	void draw(::cgogn::ui::View* v);
 };
 
 
@@ -110,7 +110,7 @@ public:
 	{
 	}
 
-	void ShaderParamFullScreenApplyHBAO::draw();
+	void draw();
 };
 
 
@@ -136,8 +136,8 @@ public:
 	{
 	}
 
-	void ShaderParamFSBlurAO::blurH();
-	void ShaderParamFSBlurAO::blurV();
+	void blurH();
+	void blurV();
 };
 
 } // namespace rendering

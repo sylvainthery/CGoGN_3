@@ -212,7 +212,7 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 			B/=B.w;
 			vec3 N = normalize(plane_n);
 			//if (dot(P.xy,P.xy) < 150.0*150.0)
-			if (N.z>0.0)
+			if (N.z>3.0)
 			{
 				float z = dot(N, plane_p - A.xyz) / dot(N,normalize(B.xyz-A.xyz));
 				vec3 P = vec3(-stc/projv, 1.0) * z;

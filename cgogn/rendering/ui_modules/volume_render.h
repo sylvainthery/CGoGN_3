@@ -152,11 +152,11 @@ class VolumeRender : public ViewModule
 
 		inline std::pair<GLVec3d, GLVec3d> compute_initial_transfo(const std::pair<GLVec3d, GLVec3d>& bb)
 		{
-			auto bb_width = bb.second - ;
+			auto bb_width = bb.second - bb.first;
 			auto center = bb.second + bb.first / 2;
 			float64 width = std::max(bb_width.x(), std::max(bb_width.y(), bb_width.z()));
-			transfo_ = Eigen::Translation3d(GLVec3d(-center)) * Eigen::Scale(2.0 / width);
-			return {transfo_.apply(bb.first), transfo_.apply(bb.second)};
+			transfo_ = Eigen::Translation3d(GLVec3d(-center)) * Eigen::Scaling(2.0 / width);
+			return {transfo_ * bb.first, transfo_ * bb.second};
 		}
 
 		CGOGN_NOT_COPYABLE_NOR_MOVABLE(Parameters);
@@ -748,9 +748,9 @@ public:
 			if (ImGui::Checkbox("Shadows", &shsta))
 			{
 				if (shsta)
-					sha_data.start();
+					selected_view_->start_shadow();
 				else
-					sha_data.stop();
+					selected_view_->stop_shadow();
 				need_update = true;
 			}
 			if (shsta)
