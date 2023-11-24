@@ -75,8 +75,7 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		uniform sampler2DShadow TUshadow;
 		uniform sampler2D TUpoisson;
 		uniform int nb_samples;
-		uniform float plane_p;
-		uniform vec3 plane_n;
+		uniform vec4 plane;
 		uniform mat4 invMat;
 
 		#define TWO_PI  6.28318531
@@ -186,7 +185,9 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 			vec3 L = normalize(light_position - P);
 			float dnl = max(0.0, dot(N, L));
 
-			float bias_shd = bias_k.x + 0.0000000001* bias_k.y*tan(acos(dnl)); 
+//			float bias_shd = bias_k.x + 0.0000000001* bias_k.y*tan(acos(dnl)); 
+			float bias_shd = max(bias_k.y * (1.0 - dot(N,L)), bias_k.x);  
+
 			vec4 sh_coord = shadow_matrix*vec4(P,1);
 			float sc = 3.0/textureSize(TUshadow,0).x;
 			vec3 shc =	vec3(sh_coord.xy, sh_coord.z  - bias_shd);
@@ -206,17 +207,15 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		if (depth>=1.0)
 		{
 			vec2 stc = 2.0*tc -1.0;
-			vec4 A = invMat*vec4(stc,0.0,1.0);
-			vec4 B = invMat*vec4(stc,0.9,1.0);
-			A/=A.w;
-			B/=B.w;
-			vec3 N = normalize(plane_n);
-			//if (dot(P.xy,P.xy) < 150.0*150.0)
-			if (N.z>3.0)
+//Z = Np.Pp / Np.(-U/MP00 ,-V/MP11, 1 )
+//X = -U/MP00 * Z
+//Y = -V/MP11 * Z
+			float q = dot(plane.xyz,vec3(stc/projv,1));
+			if (abs(q)<0.01)
 			{
-				float z = dot(N, plane_p - A.xyz) / dot(N,normalize(B.xyz-A.xyz));
+				float z = plane.w/q;
 				vec3 P = vec3(-stc/projv, 1.0) * z;
-				frag_out = 2.0 + compute_shadow_map(P,N);
+				frag_out = 2.0 + compute_shadow_map(P,plane.xyz);
 				return;
 			}
 			else
@@ -227,15 +226,14 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		vec3 N = texture(TUnormal,tc).rgb;//N_from_ZB(tc,P);
 		float hbao = max(0.0, 0.9999 - compute_hbao(P,N) * ao_strength); // 0.9999 for the fract in final shader path
 		float shadow = compute_shadow_map(P,N);
-		frag_out = hbao*(0.2+0.8*shadow);
+		frag_out = hbao*(0.3+0.7*shadow);
 	}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
 	get_uniforms("TUdepth", "TUnormal",
 		"projv", "fn", "radius", "subs", "nb_dirs", "nb_steps", "time", "ao_strength",
-				 "light_position", "shadow_matrix", "TUshadow", "bias_k", "TUpoisson", "nb_samples", "invMat",
-				 "plane_p", "plane_n");
+				 "light_position", "shadow_matrix", "TUshadow", "bias_k", "TUpoisson", "nb_samples", "plane");
 }
 
 
@@ -245,7 +243,7 @@ void ShaderParamFullScreenHBAO::set_uniforms()
 								 time_, ao_strength_,
 								 light_position_, shadataptr_->shadow_matrix_,
 								 shadataptr_->fbo_shadows_->getDepthTexture()->bind(2), shadataptr_->bias_k_,
-		shadataptr_->tex_poisson_->bind(3), shadataptr_->nb_samples_, inv_mat_, plane_p_, plane_n_);
+		shadataptr_->tex_poisson_->bind(3), shadataptr_->nb_samples_, plane_);
 }
 
 
@@ -286,7 +284,6 @@ ShaderFullScreenApplyHBAO::ShaderFullScreenApplyHBAO()
 
 		uniform sampler2D TUambiant;
 		uniform sampler2D TUdiffuse;
-//		uniform float shadow_strength;
 
 	void main()
 	{

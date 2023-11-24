@@ -60,6 +60,9 @@ public:
 	~App();
 
 	void set_window_size(int32 w, int32 h);
+
+	void set_window_size_ratio_screen(float32 w, float32 h);
+
 	void set_window_title(const std::string& name);
 
 	static inline float64 fps()
@@ -127,6 +130,9 @@ public:
 private:
 	void close_event();
 	void adapt_views_geometry();
+
+	int32 monitor_width_;
+	int32 monitor_height_;
 
 	GLFWwindow* window_;
 	ImGuiContext* context_;

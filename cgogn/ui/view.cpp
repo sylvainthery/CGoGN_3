@@ -39,7 +39,7 @@ namespace ui
 View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
 	  param_final_simple_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false),
-	  shift_zplane_(0.05), hbao_radius_ratio_(0.01f), bias_k_div(GLVec2(17.f,29.0f))
+	  shift_zplane_(0.05f), hbao_radius_ratio_(0.01f), bias_k_div(GLVec2(17.f,19.0f))
 {
 	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
@@ -302,9 +302,15 @@ void View::draw()
 		glDisable(GL_DEPTH_TEST);
 		param_full_screen_hbao_->radius_ = float32(sr) * hbao_radius_ratio_;
 		param_full_screen_hbao_->light_position_ = light_.getEyeCoord();
-		param_full_screen_hbao_->inv_mat_ = (camera_.projection_matrix_d()).inverse().cast<float>();
-		param_full_screen_hbao_->plane_p_ = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), bb_.first).cast<float>();
-		param_full_screen_hbao_->plane_n_ = camera_.modelview_matrix().block<3, 3>(0, 0) * GLVec3(0, 0, 1);
+		//param_full_screen_hbao_->inv_mat_ = (camera_.projection_matrix_d()).inverse().cast<float>();
+		//param_full_screen_hbao_->plane_p_ = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), bb_.first).cast<float>();
+		//param_full_screen_hbao_->plane_n_ = camera_.modelview_matrix().block<3, 3>(0, 0) * GLVec3(0, 0, 1);
+		GLVec3d Np = (camera_.modelview_matrix_d().block<3, 3>(0, 0) * GLVec3d(0, 0, 1)).normalized();
+		GLVec3d Pp = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), bb_.first);
+		GLVec4d Plane{Np.x(), Np.y(), Np.z(), Np.dot(Pp)};
+		param_full_screen_hbao_->plane_ = GLVec4d{Np.x(), Np.y(), Np.z(), Np.dot(Pp)}.cast<float>();
+
+
 		param_full_screen_hbao_->draw(this);
 		fbo_hbao_->release();
 

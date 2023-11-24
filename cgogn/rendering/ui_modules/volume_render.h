@@ -715,6 +715,7 @@ public:
 
 	void left_panel() override
 	{
+
 		bool need_update = false;
 
 		if (app_.nb_views() > 1)
@@ -727,6 +728,8 @@ public:
 
 		if (selected_view_)
 		{
+			ImGui::SetWindowSize( ImVec2(selected_view_->viewport_width() * 0.25f, 0));
+
 			ImGui::LabelText("fps", "%5f", float(app_.fps()));
 			ImGui::Separator();
 			if (ImGui::SliderFloat("Zplane", &selected_view_->shift_zplane_, -0.1f, 0.5f))
@@ -737,9 +740,9 @@ public:
 			if (ImGui::SliderFloat("HBAO strengh", selected_view_->hbao_strength_ptr(), 0.0f, 8.0f))
 				need_update = true;	
 
-			if (ImGui::SliderFloat("HBAO bias cst", &selected_view_->bias_k_div[0], 8.0f, 31.0f))
+			if (ImGui::SliderFloat("HBAO bias min", &selected_view_->bias_k_div[0], 8.0f, 31.0f))
 				need_update = true;	
-			if (ImGui::SliderFloat("HBAO bias slope", &selected_view_->bias_k_div[1], 8.0f, 31.0f))
+			if (ImGui::SliderFloat("HBAO bias max", &selected_view_->bias_k_div[1], 8.0f, 31.0f))
 				need_update = true;	
 
 

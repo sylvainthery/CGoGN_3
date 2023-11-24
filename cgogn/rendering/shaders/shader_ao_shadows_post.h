@@ -68,8 +68,7 @@ public:
 	float bias_k_;
 	int nb_samples_;
 	GLMat4 inv_mat_;
-	GLVec3 plane_p_;
-	GLVec3 plane_n_;
+	GLVec4 plane_;
 	
 	using ShaderType = ShaderFullScreenHBAO;
 

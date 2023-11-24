@@ -199,6 +199,21 @@ App::App()
 	std::cout << glGetString(GL_RENDERER) << std::endl;
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
+	GLFWmonitor** monitors;
+	int monitors_count= 0;
+	monitors = glfwGetMonitors(&monitors_count);
+	
+
+	float xscale, yscale;
+	glfwGetMonitorWorkarea(monitors[0], nullptr, nullptr, &monitor_width_, &monitor_height_);
+	glfwGetMonitorContentScale(monitors[0], &xscale, &yscale);
+	std::cout << "Main Monitor " << monitor_width_ << " x " << monitor_height_ << "   scale :" << xscale << " , "
+			  << yscale << std::endl;
+	
+	interface_scaling_ = (xscale + yscale) / 2;
+	ImGui::GetIO().FontGlobalScale = interface_scaling_;
+
+
 	glfwSetWindowSizeCallback(window_, [](GLFWwindow* wi, int width, int height) {
 		App* that = static_cast<App*>(glfwGetWindowUserPointer(wi));
 
@@ -409,6 +424,14 @@ void App::set_window_size(int32 w, int32 h)
 	glfwSetWindowSize(window_, w, h);
 }
 
+void App::set_window_size_ratio_screen(float32 wr, float32 hr)
+{
+	int32 w = int32(wr * monitor_width_);
+	int32 h = int32(hr * monitor_height_);
+	std::cout << "set size " << w << " x " << h <<  std::endl;
+	glfwSetWindowSize(window_, w, h);
+}
+
 void App::set_window_title(const std::string& name)
 {
 	window_name_ = name;
@@ -533,8 +556,7 @@ int App::launch()
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+						ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
 			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |
 							ImGuiWindowFlags_NoMove;
 			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
@@ -654,7 +676,7 @@ int App::launch()
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-			// Update and Render additional Platform Windows
+			// Update and Render additional Platform Windowsx
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(window_);

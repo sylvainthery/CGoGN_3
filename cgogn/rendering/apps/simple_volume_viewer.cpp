@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
 	cgogn::ui::App app;
 	app.set_window_title("Simple volume viewer");
-	app.set_window_size(1000, 800);
+	app.set_window_size_ratio_screen(0.75f, 0.85f);
 
 	cgogn::ui::MeshProvider<Mesh> mp(app);
 	cgogn::ui::VolumeRender<Mesh> vr(app);
