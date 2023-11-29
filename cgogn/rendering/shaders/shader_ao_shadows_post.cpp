@@ -72,17 +72,19 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		uniform vec3 light_position;
 		uniform mat4 shadow_matrix;
 		uniform vec2 bias_k;
-		uniform sampler2DShadow TUshadow;
+		uniform vec2 bias_adapt;
+//		uniform sampler2DShadow TUshadow;
+		uniform sampler2D TUshadow;
 		uniform sampler2D TUpoisson;
 		uniform int nb_samples;
 		uniform vec4 plane;
-		uniform mat4 invMat;
+
 
 		#define TWO_PI  6.28318531
 		#define PI      3.141592654
 
-		// sin(PI/48)
-		#define ANGLE_BIAS 0.13	
+		// sin(10°)
+		#define ANGLE_BIAS 0.1736
 
 		float rand1Dp(vec2 coord) //generating noise/pattern texture for dithering
 		{
@@ -119,30 +121,29 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 			return normalize(cross(min_len_vect(P, Pr, Pl), min_len_vect(P, Pb, Pt)));
 		}
 
+
+	mat2 createRot(float theta)
+	{
+		float cosTheta = cos(theta);
+		float sinTheta = sin(theta);
+		return mat2(cosTheta, -sinTheta, sinTheta, cosTheta);
+	}
+
 		
 	float compute_hbao(vec3 P, vec3 N)
 	{
-		float projectedRad = - radius/2.0 * projv.x / P.z;
-		float screenRadius = projectedRad * textureSize(TUdepth,0).x;
-		if (screenRadius < 3.0)
-		{
+		vec2 projectedRad = - radius/2.0 * projv / P.z;
+		vec2 screenRadius = textureSize(TUdepth,0) * projectedRad;
+		if (dot(screenRadius,screenRadius) < 25)
 			return 0.0;
-		}
 
-		float theta = TWO_PI / float(nb_dirs);
-		float cosTheta = cos(theta);
-		float sinTheta = sin(theta);
-		mat2 deltaRotationMatrix = mat2(cosTheta, -sinTheta, sinTheta, cosTheta);
-
-		float angl1 = rand1Dp(tc)*TWO_PI;
-		float cosThetaR = cos(angl1);
-		float sinThetaR = sin(angl1);
-		mat2 MR = mat2(cosThetaR, -sinThetaR, sinThetaR, cosThetaR);
-		vec2 deltaUV = MR * vec2(screenRadius/float(nb_steps), 0.0);
+		mat2 deltaRotationMatrix = createRot(TWO_PI / float(nb_dirs));
+		mat2 MR = createRot( rand1Dp(tc)*TWO_PI);
+		vec2 deltaUV = MR * vec2(screenRadius.x/float(nb_steps), 0.0);
 
 		float occlusion = 0.0;
 
-		vec2 inv_d_wh = vec2(1)/textureSize(TUdepth,0); //  ?? /sub ?
+		vec2 inv_d_wh = vec2(subs)/textureSize(TUdepth,0); //  
 
 		for(int i = 0; i < nb_dirs; i++)
 		{
@@ -176,74 +177,91 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 
 		float random(vec3 seed,int i)
 		{
-			float dp = dot(vec4(seed,3.721*float(i)), vec4(12.9898,78.233,45.164,17.371));
+			float dp = dot(vec4(seed,3.721*float(i)), vec4(12.9898,78.233,45.164,17.371)*time);
 			return fract(sin(dp) * 43758.5453);
+		}
+
+		float shadowTexTest(vec3 scoo, float dnl)
+		{
+			float d = texture(TUshadow, scoo.xy).r;
+			float bias = (bias_adapt.x + bias_adapt.y * d) * bias_k.x * (2.0-dnl);
+			return ((d > (scoo.z-bias))?1.0:0.0);
 		}
 
 		float compute_shadow_map(vec3 P, vec3 N)
 		{
 			vec3 L = normalize(light_position - P);
-			float dnl = max(0.0, dot(N, L));
-
-//			float bias_shd = bias_k.x + 0.0000000001* bias_k.y*tan(acos(dnl)); 
-			float bias_shd = max(bias_k.y * (1.0 - dot(N,L)), bias_k.x);  
-
+			float dnl = dot(N,L);
 			vec4 sh_coord = shadow_matrix*vec4(P,1);
-			float sc = 3.0/textureSize(TUshadow,0).x;
-			vec3 shc =	vec3(sh_coord.xy, sh_coord.z  - bias_shd);
-			float shad = texture(TUshadow, shc);
+			sh_coord.xyz /= sh_coord.w;
+			
+			sh_coord.z = clamp(sh_coord.z,0.001,0.999);
+
+			float sc = 1.5/textureSize(TUshadow,0).x;
+
+			float shad = shadowTexTest(sh_coord.xyz, dnl);
+
 			for (int i=1;i<nb_samples;i++)
 			{
 				int index = int(15.99*random(gl_FragCoord.xyz,i));
-				vec3 shc =	vec3(sh_coord.xy + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z - bias_shd);
-				shad += texture(TUshadow, shc);
+				vec3 shc =	vec3(sh_coord.xy + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc,sh_coord.z - 0.001 * random(gl_FragCoord.xyz,i+64));
+				shad += shadowTexTest(shc,dnl); 
 			}
 			return shad/float(nb_samples);
 		}
 
-	void main()
-	{
-		float depth = texture(TUdepth,tc).r;
-		if (depth>=1.0)
+		void main()
 		{
-			vec2 stc = 2.0*tc -1.0;
-//Z = Np.Pp / Np.(-U/MP00 ,-V/MP11, 1 )
-//X = -U/MP00 * Z
-//Y = -V/MP11 * Z
-			float q = dot(plane.xyz,vec3(stc/projv,1));
-			if (abs(q)<0.01)
+			float depth = texture(TUdepth,tc).r;
+			if (depth>=1.0)
 			{
-				float z = plane.w/q;
-				vec3 P = vec3(-stc/projv, 1.0) * z;
-				frag_out = 2.0 + compute_shadow_map(P,plane.xyz);
-				return;
+				vec2 stc = 2.0*tc -1.0;
+				float q = dot(plane.xyz,vec3(-stc/projv,1));
+				if (abs(q)>0.0001)
+				{
+					float z = plane.w/q;
+					vec3 P = vec3(-stc/projv, 1.0) * z;
+					frag_out = compute_shadow_map(P,plane.xyz);
+				}
+				else
+					frag_out = 1.0;
 			}
 			else
-				discard;
+			{
+				vec3 P = pos_from_depth(tc,depth);
+				vec3 N = texture(TUnormal,tc).rgb;
+				float hbao = max(0.0, 0.9999 - compute_hbao(P,N) * ao_strength); // 0.9999 for the fract in final shader path
+				float shadow = compute_shadow_map(P,N);
+				frag_out = hbao*(0.25+0.75*shadow);
+			}
 		}
-
-		vec3 P = pos_from_depth(tc,depth);
-		vec3 N = texture(TUnormal,tc).rgb;//N_from_ZB(tc,P);
-		float hbao = max(0.0, 0.9999 - compute_hbao(P,N) * ao_strength); // 0.9999 for the fract in final shader path
-		float shadow = compute_shadow_map(P,N);
-		frag_out = hbao*(0.3+0.7*shadow);
-	}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("TUdepth", "TUnormal",
-		"projv", "fn", "radius", "subs", "nb_dirs", "nb_steps", "time", "ao_strength",
-				 "light_position", "shadow_matrix", "TUshadow", "bias_k", "TUpoisson", "nb_samples", "plane");
+	get_uniforms("TUdepth", "TUnormal",	"projv", "fn", "radius", "subs", "nb_dirs", "nb_steps", "time", "ao_strength",
+		//		 "light_position", 
+		"shadow_matrix", "TUshadow", "bias_k", "bias_adapt","TUpoisson", "nb_samples",
+				 "plane");
+
+
+}
+
+ShaderParamFullScreenHBAO::ShaderParamFullScreenHBAO(ShaderType* sh):
+	ShaderParam(sh), tex_d_(nullptr), radius_(0.0f),
+	subs_(1.0f), nb_dirs_(7), nb_steps_(9), time_(1.0f), 
+	ao_strength_(1.0f), light_position_(10, 100, 1000)
+{
 }
 
 
 void ShaderParamFullScreenHBAO::set_uniforms()
-{
+{	
 	shader_->set_uniforms_values(tex_d_->bind(0), tex_n_->bind(1), projv_, fn_, radius_, subs_, nb_dirs_, nb_steps_,
 								 time_, ao_strength_,
-								 light_position_, shadataptr_->shadow_matrix_,
+								 shadataptr_->shadow_matrix_,
 								 shadataptr_->fbo_shadows_->getDepthTexture()->bind(2), shadataptr_->bias_k_,
-		shadataptr_->tex_poisson_->bind(3), shadataptr_->nb_samples_, plane_);
+								 shadataptr_->bias_adapt_, shadataptr_->tex_poisson_->bind(3),
+								 shadataptr_->nb_samples_, plane_);
 }
 
 
@@ -255,15 +273,19 @@ void ShaderParamFullScreenHBAO::draw(::cgogn::ui::View* v)
 
 	projv_ = ::cgogn::rendering::GLVec2(mproj(0, 0), mproj(1, 1));
 	fn_ = ::cgogn::rendering::GLVec3(float32(- 2.0 * zfar * znear), float32(zfar + znear), float32(zfar - znear));
-//	std::cout << "PLANE  " << plane_p_.transpose() << "  /  " << plane_n_.transpose() << std::endl;
+
 	bind();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	release();
 }
 
 
-
 ShaderFullScreenApplyHBAO* ShaderFullScreenApplyHBAO::instance_ = nullptr;
+
+ShaderParamFullScreenApplyHBAO::ShaderParamFullScreenApplyHBAO(ShaderType* sh)
+	: ShaderParam(sh), ambiant_ratio_(0.5), tex_ambiant_(nullptr), tex_diffuse_(nullptr)
+{
+}
 
 ShaderFullScreenApplyHBAO::ShaderFullScreenApplyHBAO()
 {
@@ -284,20 +306,18 @@ ShaderFullScreenApplyHBAO::ShaderFullScreenApplyHBAO()
 
 		uniform sampler2D TUambiant;
 		uniform sampler2D TUdiffuse;
+		uniform sampler2D TUplane;
 
-	void main()
-	{
-		vec3 diff = texture(TUdiffuse,tc).rgb;
-		float ao_shadow = texture(TUambiant,tc).r;
-		if (ao_shadow >= 2.0)
-			frag_out = vec3(1,0,1)*(ao_shadow-2.0);
-		else
+		void main()
+		{
+			vec3 diff = texture(TUdiffuse,tc).rgb;
+			float ao_shadow = texture(TUambiant,tc).r;
 			frag_out = diff * ao_shadow;
-	}
+		}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("TUambiant", "TUdiffuse");//"shadow_strength");
+	get_uniforms("TUambiant", "TUdiffuse"); //"shadow_strength");
 }
 
 void ShaderParamFullScreenApplyHBAO::set_uniforms()

@@ -82,7 +82,9 @@ ShaderExplodeVolumesColor::ShaderExplodeVolumesColor()
 		in vec3 position;
 		flat in vec3 color;
 
-		out vec4 frag_out;
+		layout(location = 0) out vec4 frag_out;
+		layout(location = 1) out vec3 normal_out;
+
 
 //Shadows_code_here
 
@@ -92,20 +94,20 @@ ShaderExplodeVolumesColor::ShaderExplodeVolumesColor()
 			vec3 L = normalize(light_position - position);
 
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			float lambert = 0.25 + 0.75 * dnl;
 			frag_out = vec4(lambert * color.rgb, 1.0);
+			normal_out = N;
 		}
 	)";
 
-	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-
-	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_color", "volume_clipping", "light_position", "explode", "plane_clip", "plane_clip2");
+	load(vertex_shader_source, fragment_shader_source);
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_color", "volume_clipping", "light_position", "explode", "plane_clip", "plane_clip2");
 }
 
 
 void ShaderParamExplodeVolumesColor::set_uniforms()
 {
-	sha_set_uniforms_values(shader_, sha_data_, 10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
+	shader_->set_uniforms_values( 10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
 									  data_->plane_clip2_);
 }
 
@@ -190,28 +192,28 @@ ShaderExplodeVolumesColorSmooth::ShaderExplodeVolumesColorSmooth()
 		in vec3 normal;
 		flat in vec3 color;
 
-		out vec4 frag_out;
-
-//Shadows_code_here
+		layout(location = 0) out vec4 frag_out;
+		layout(location = 1) out vec3 normal_out;
 
 		void main()
 		{
 			vec3 N = normalize(normal);
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			float lambert = 0.25 + 0.75 * dnl;
 			frag_out = vec4(lambert * color, 1.0);
+			normal_out = N;
 		}
 	)";
 
-	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_color", "volume_clipping", "light_position", "explode",
+	load(vertex_shader_source, fragment_shader_source);
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_color", "volume_clipping", "light_position", "explode",
 				 "plane_clip", "plane_clip2");
 }
 
 void ShaderParamExplodeVolumesColorSmooth::set_uniforms()
 {
-	sha_set_uniforms_values(shader_, sha_data_, 10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
+	shader_->set_uniforms_values(10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
 								 data_->plane_clip2_);
 }
 

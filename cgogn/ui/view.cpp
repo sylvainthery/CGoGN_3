@@ -22,7 +22,7 @@
  *******************************************************************************/
 
 #include <cgogn/ui/view.h>
-
+#include <GLFW/glfw3.h>
 #include <cgogn/rendering/gl_image.h>
 
 using cgogn::rendering::GLVec2;
@@ -39,12 +39,12 @@ namespace ui
 View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
 	  param_final_simple_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false),
-	  shift_zplane_(0.05f), hbao_radius_ratio_(0.01f), bias_k_div(GLVec2(17.f,19.0f))
+	  nb_ao_blurs_(3),prec_ao_(7), shift_zplane_(0.05f), hbao_radius_ratio_(0.01f), bias_k_div_(GLVec2(8.0f, 8.0f))
 {
 	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
 	tex_n_ = std::make_shared<cgogn::rendering::Texture2D>();
-	tex_n_->allocate(1, 1, GL_RGB16F, GL_RGB);
+	tex_n_->allocate(1, 1, GL_RGB8, GL_RGB);
 
 	fbo1_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_}, true, nullptr);
 	fbo2_ = std::make_unique<cgogn::rendering::FBO>(
@@ -52,12 +52,12 @@ View::View(Inputs* inputs, const std::string& name)
 	fbo_ = fbo1_.get();
 
 	tex_hbao_ = std::make_shared<cgogn::rendering::Texture2D>();
-	tex_hbao_->allocate(1, 1, GL_R8, GL_RED);
+	tex_hbao_->allocate(1, 1, GL_R16F, GL_RED);
 	fbo_hbao_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_hbao_},
 												   false, nullptr);
 
 	tex_hbao2_ = std::make_shared<cgogn::rendering::Texture2D>();
-	tex_hbao2_->allocate(1, 1, GL_R8, GL_RED);
+	tex_hbao2_->allocate(1, 1, GL_R16F, GL_RED);
 	fbo_hbao2_ = std::make_unique<cgogn::rendering::FBO>(std::vector<std::shared_ptr<cgogn::rendering::Texture2D>>{tex_hbao2_},
 												   false, nullptr);
 
@@ -199,8 +199,7 @@ void View::draw()
 
 	if (need_redraw_) //AND NEED SHADOW UPDATE
 	{
-		shadow_.bias_k_[0] = float32(sr) / std::pow(2.0f, bias_k_div[0]);
-		shadow_.bias_k_[1] = float32(sr) / std::pow(2.0f, bias_k_div[1]);
+		shadow_.bias_k_[0] = float32(sr) / std::pow(2.0f,bias_k_div_[0]);
 
 		if (shadow_.is_started())
 		{
@@ -211,7 +210,9 @@ void View::draw()
 
 			auto orthographic = [&](float64 zcenter) {
 				float64 znear = zcenter - sr;
-				float64 zfar = zcenter + 4.0 * sr;
+				float64 zfar = zcenter + sr;
+				shadow_.bias_adapt_ = rendering::GLVec2{float32(1.0 / (znear * (zfar - znear))),
+																		 float32((zfar - znear) / (zfar * znear))};
 				float64 ihw = 1.0 / sr;
 				float64 r_inv = 1.0 / (znear - zfar);
 				GLMat4d m;
@@ -249,6 +250,7 @@ void View::draw()
 			for (ViewModule* m : linked_view_modules_)
 				m->draw_shadowmap(this, light_projection_matrix, light_view_matrix);
 			shadow_.fbo_shadows_->release();
+			glCullFace(GL_BACK);
 		}
 	}
 
@@ -272,13 +274,14 @@ void View::draw()
 				glDrawBuffers(1, &idbuf);
 			}
 
-
-			//if (shadow_.is_started())
-			//{
-			//	glEnable(GL_CULL_FACE);
-			//	glCullFace(GL_BACK);
-			//	sha_plane_.drawZ(bb_, shift_zplane_, camera_.projection_matrix_d(), camera_.modelview_matrix_d(),light_.getEyeCoord());
-			//}
+			if (shadow_.is_started())
+			{
+				glEnable(GL_BLEND);
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				sha_plane_.drawZ(bb_, shift_zplane_, camera_.projection_matrix_d(), camera_.modelview_matrix_d(),
+								 light_.getEyeCoord());
+				glDisable(GL_BLEND);
+			}
 
 			for (ViewModule* m : linked_view_modules_)
 				m->draw(this);
@@ -288,50 +291,58 @@ void View::draw()
 
 			fbo_->release();
 
+			if (shadow_.is_started())
+			{
+				fbo_hbao_->bind();
+				glClearColor(0, 0, 0, 0);
+				glClear(GL_COLOR_BUFFER_BIT);
+				glDisable(GL_DEPTH_TEST);
 
+				shadow_.fbo_shadows_->getDepthTexture()->bind();
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+				shadow_.fbo_shadows_->getDepthTexture()->release();
+
+				param_full_screen_hbao_->radius_ = float32(sr) * hbao_radius_ratio_;
+				param_full_screen_hbao_->light_position_ = light_.getEyeCoord();
+
+				GLVec3d Np = camera_.modelview_matrix_d().block<3, 1>(0, 2).normalized();
+				GLVec3d Pw{(bb_.first.x() + bb_.second.x()) / 2, (bb_.first.y() + bb_.second.y()) / 2,
+						   bb_.first.z() - shift_zplane_ * (bb_.second.z() - bb_.first.z())};
+				GLVec3d Pp = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), Pw);
+
+				param_full_screen_hbao_->plane_ = GLVec4d{Np.x(), Np.y(), Np.z(), Np.dot(Pp)}.cast<float>();
+				param_full_screen_hbao_->time_ = glfwGetTime();
+				param_full_screen_hbao_->nb_dirs_ = prec_ao_;
+				param_full_screen_hbao_->nb_steps_ = prec_ao_;
+
+				param_full_screen_hbao_->draw(this);
+				fbo_hbao_->release();
+
+				shadow_.fbo_shadows_->getDepthTexture()->bind();
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+				shadow_.fbo_shadows_->getDepthTexture()->release();
+
+				for (int i = 0; i < nb_ao_blurs_; ++i)
+				{
+					fbo_hbao2_->bind();
+					param_blur_ao_->tex_ = fbo_hbao_->getTexture(0);
+					param_blur_ao_->blurH();
+					fbo_hbao2_->release();
+
+					fbo_hbao_->bind();
+					param_blur_ao_->tex_ = fbo_hbao2_->getTexture(0);
+					param_blur_ao_->blurV();
+					fbo_hbao_->release();
+				}
+			}
 			need_redraw_ = false;
 		}
 	}
  
-
 	if (shadow_.is_started())
-	{
-		fbo_hbao_->bind();
-		glClearColor(0, 0, 0, 0);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glDisable(GL_DEPTH_TEST);
-		param_full_screen_hbao_->radius_ = float32(sr) * hbao_radius_ratio_;
-		param_full_screen_hbao_->light_position_ = light_.getEyeCoord();
-		//param_full_screen_hbao_->inv_mat_ = (camera_.projection_matrix_d()).inverse().cast<float>();
-		//param_full_screen_hbao_->plane_p_ = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), bb_.first).cast<float>();
-		//param_full_screen_hbao_->plane_n_ = camera_.modelview_matrix().block<3, 3>(0, 0) * GLVec3(0, 0, 1);
-		GLVec3d Np = (camera_.modelview_matrix_d().block<3, 3>(0, 0) * GLVec3d(0, 0, 1)).normalized();
-		GLVec3d Pp = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), bb_.first);
-		GLVec4d Plane{Np.x(), Np.y(), Np.z(), Np.dot(Pp)};
-		param_full_screen_hbao_->plane_ = GLVec4d{Np.x(), Np.y(), Np.z(), Np.dot(Pp)}.cast<float>();
-
-
-		param_full_screen_hbao_->draw(this);
-		fbo_hbao_->release();
-
-		for (int i = 0; i < 3; ++i)
-		{
-			fbo_hbao2_->bind();
-			param_blur_ao_->tex_ = fbo_hbao_->getTexture(0);
-			param_blur_ao_->blurH();
-			fbo_hbao2_->release();
-
-			fbo_hbao_->bind();
-			param_blur_ao_->tex_ = fbo_hbao2_->getTexture(0);
-			param_blur_ao_->blurV();
-			fbo_hbao_->release();
-		}
-
 		param_full_screen_apply_->draw();
-	}
 	else
 		param_final_simple_->draw();
-
 }
 
 
@@ -376,8 +387,10 @@ void View::update_scene_bb()
 	}
 	geometry::Scalar radius = (max - min).norm() / 2.0;
 	geometry::Vec3 center = (max + min) / 2.0;
+	std::cout << "UPDATESCENE " << center.transpose() << "  " << radius << std::endl;
 	set_scene_radius(radius);
 	set_scene_center(center);
+	show_entire_scene();
 	request_update();
 }
 

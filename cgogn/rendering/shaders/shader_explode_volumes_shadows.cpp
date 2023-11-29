@@ -22,6 +22,7 @@
  *******************************************************************************/
 
 #include <cgogn/rendering/shaders/shader_explode_volumes_shadows.h>
+#include <cgogn/rendering/shadows_plane.h>
 
 namespace cgogn
 {
@@ -42,6 +43,7 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 		uniform samplerBuffer vertex_position;
 		uniform samplerBuffer volume_center;
 		uniform samplerBuffer volume_clipping;
+		uniform samplerBuffer plane;
 
 		uniform float explode;
 		uniform vec4 plane_clip;
@@ -83,7 +85,7 @@ ShaderExplodeVolumesGenerateShadows::ShaderExplodeVolumesGenerateShadows()
 
 void ShaderParamExplodeVolumesGenerateShadows::set_uniforms()
 {
-	shader_->set_uniforms_values(10, 11, 12, 13,std::max(0.0f,data_->explode_),
+	shader_->set_uniforms_values(10, 11, 12, 13,std::max(0.0f,data_->explode_ - 0.025f),
 								 data_->plane_clip_, data_->plane_clip2_);
 }
 

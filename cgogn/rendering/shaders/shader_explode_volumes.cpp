@@ -85,8 +85,6 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 		uniform vec4 color;
 		uniform vec3 light_position;
 
-//Shadows_code_here
-
 
 		void main()
 		{
@@ -94,20 +92,20 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			vec3 L = normalize(light_position - position);
 
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			float lambert = 0.25 + 0.75 * dnl;
 			frag_out = vec4(lambert * color.rgb, color.a);
 			normal_out = N;
 		}
 	)";
 
-	load(vertex_shader_source, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color",
+	load(vertex_shader_source,fragment_shader_source);
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping", "color",
 					 "light_position", "explode", "plane_clip", "plane_clip2");
 }
 
 void ShaderParamExplodeVolumes::set_uniforms()
 {
-	sha_set_uniforms_values(shader_,sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 							data_->plane_clip_, data_->plane_clip2_);
 }
 

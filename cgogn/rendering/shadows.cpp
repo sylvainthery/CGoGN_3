@@ -58,13 +58,13 @@ void ShadowData::start()
 	fbo_shadows_ = std::make_shared<cgogn::rendering::FBO>(std::vector<std::shared_ptr<rendering::Texture2D>>{},
 														   true, nullptr);
 	fbo_shadows_->getDepthTexture()->bind();
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	fbo_shadows_->getDepthTexture()->release();
 	int max_tex_sz;
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_tex_sz);
-	int sz = std::min(max_tex_sz, 8192);
+	int sz = std::min(max_tex_sz, 4096);
 	fbo_shadows_->resize(sz, sz);
 }
 

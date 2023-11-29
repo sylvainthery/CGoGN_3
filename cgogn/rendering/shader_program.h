@@ -212,16 +212,9 @@ public:
 		get_uniforms(pn...);
 	}
 
-	//template <typename T1, typename... Ts>
-	//void sha_get_uniforms(T1 p1, Ts... pn)
-	//{
-	//	get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
-	//}
-
 	void print_uniforms()
 	{
-
-		std::cout << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
+		std::cout << "XXX UNIFORMS XXXXXXXXXXXXXXXXXXXXXXXXXX" << std::endl;
 		for (const auto& uni : uniforms_)
 			std::cout << uni << " / ";
 		std::cout << std::endl;

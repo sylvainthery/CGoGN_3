@@ -84,9 +84,8 @@ ShaderExplodeVolumesScalar::ShaderExplodeVolumesScalar()
 		in vec3 position;
 		flat in vec3 color;
 
-		out vec4 frag_out;
-
-//Shadows_code_here
+		layout(location = 0) out vec4 frag_out;
+		layout(location = 1) out vec3 normal_out;
 
 		void main()
 		{
@@ -94,17 +93,17 @@ ShaderExplodeVolumesScalar::ShaderExplodeVolumesScalar()
 			vec3 L = normalize(light_position - position);
 
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			float lambert = 0.2 + 0.8 * dnl;
 			frag_out = vec4(lambert * color.rgb, 1.0);
-
+			normal_out = N;
 		}
 	)";
 
 	std::string v_src(vertex_shader_source);
 	v_src.insert(v_src.find("//_insert_colormap_function_here"), shader_function::ColorMap::source);
 
-	load(v_src, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_scalar", "volume_clipping",
+	load(v_src, fragment_shader_source);
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_scalar", "volume_clipping",
 					 "light_position", "explode", "plane_clip", "plane_clip2",
 					 shader_function::ColorMap::uniform_names[0], shader_function::ColorMap::uniform_names[1],
 					 shader_function::ColorMap::uniform_names[2], shader_function::ColorMap::uniform_names[3]);
@@ -112,7 +111,7 @@ ShaderExplodeVolumesScalar::ShaderExplodeVolumesScalar()
 
 void ShaderParamExplodeVolumesScalar::set_uniforms()
 {
-	sha_set_uniforms_values(shader_, sha_data_,10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
+	shader_->set_uniforms_values(10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
 									 data_->plane_clip2_, data_->color_map_.color_map_, data_->color_map_.expansion_,
 									 data_->color_map_.min_value_, data_->color_map_.max_value_);
 }
@@ -199,24 +198,26 @@ ShaderExplodeVolumesScalarSmooth::ShaderExplodeVolumesScalarSmooth()
 		in vec3 normal;
 		flat in vec3 color;
 
-		out vec4 frag_out;
+		layout(location = 0) out vec4 frag_out;
+		layout(location = 1) out vec3 normal_out;
 
-//Shadows_code_here
+
 
 		void main()
 		{
 			vec3 N = normalize(normal);
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			float lambert = 0.2 + 0.8 * dnl;
 			frag_out = vec4(lambert * color, 1.0);
+			normal_out = N;
 		}
 	)";
 
 	std::string v_src(vertex_shader_source);
 	v_src.insert(v_src.find("//_insert_colormap_function_here"), shader_function::ColorMap::source);
-	load(v_src, insert_shadow_code(fragment_shader_source, "//Shadows_code_here"));
-	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_scalar", "volume_clipping","light_position", "explode",
+	load(v_src, fragment_shader_source);
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_scalar", "volume_clipping","light_position", "explode",
 				 "plane_clip", "plane_clip2", shader_function::ColorMap::uniform_names[0],
 				 shader_function::ColorMap::uniform_names[1], shader_function::ColorMap::uniform_names[2],
 				 shader_function::ColorMap::uniform_names[3]);
@@ -224,7 +225,7 @@ ShaderExplodeVolumesScalarSmooth::ShaderExplodeVolumesScalarSmooth()
 
 void ShaderParamExplodeVolumesScalarSmooth::set_uniforms()
 {
-	sha_set_uniforms_values(shader_, sha_data_, 10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
+	shader_->set_uniforms_values( 10, 11, 12, 13, 14, data_->light_position_, data_->explode_, data_->plane_clip_,
 								 data_->plane_clip2_, data_->color_map_.color_map_, data_->color_map_.expansion_,
 								 data_->color_map_.min_value_, data_->color_map_.max_value_);
 }

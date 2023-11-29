@@ -119,16 +119,17 @@ int main(int argc, char** argv)
 	});
 
 
-	Mesh* m2 = mp.load_volume_from_file(filename);
-	std::shared_ptr<Attribute<Vec3>> vertex_position4 = cgogn::get_attribute<Vec3, Vertex>(*m2, "position");
+	Mesh* me2 = mp.load_volume_from_file(filename);
+	std::shared_ptr<Attribute<Vec3>> vertex_position4 = cgogn::get_attribute<Vec3, Vertex>(*me2, "position");
 	shiftVec = (bb.second - bb.first) / 2.0;
+	shiftVec.z() *= 1.3;
 
-	cgogn::foreach_cell(*m2, [&](Vertex v) -> bool {
-		cgogn::value<Vec3>(*m2, vertex_position4, v) -= shiftVec;
+	cgogn::foreach_cell(*me2, [&](Vertex v) -> bool {
+		cgogn::value<Vec3>(*me2, vertex_position4, v) -= shiftVec;
 		return true;
 	});
 
-	mp.emit_attribute_changed(*m2, vertex_position4.get());
+	mp.emit_attribute_changed(*me2, vertex_position4.get());
   
 
 

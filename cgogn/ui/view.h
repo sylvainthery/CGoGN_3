@@ -200,7 +200,6 @@ protected:
 	std::shared_ptr<rendering::Texture2D> tex_hbao2_;
 
 	std::unique_ptr<rendering::ShaderFullScreenHBAO::Param> param_full_screen_hbao_;
-	float hbao_radius_ratio_;
 
 	std::unique_ptr<rendering::ShaderFSBlurAO::Param> param_blur_ao_;
 
@@ -218,7 +217,11 @@ protected:
 	bool closing_;
 
 public:
-	GLVec2 bias_k_div;
+	float32 hbao_radius_ratio_;
+	int32 nb_ao_blurs_;
+	int32 prec_ao_;
+
+	GLVec2 bias_k_div_;
 	float shift_zplane_;
 	inline float* ambiant_ratio_ptr()
 	{

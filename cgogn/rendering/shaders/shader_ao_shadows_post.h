@@ -52,7 +52,9 @@ public:
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_d_;
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_n_;
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_shadow_;
+	//GLOBAL ?
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_poisson_;
+
 	GLVec2 projv_;
 	GLVec3 fn_;
 	float radius_;
@@ -61,21 +63,15 @@ public:
 	int nb_steps_;
 	float time_;
 	float ao_strength_;
-	ShadowData* shadataptr_;
 	GLVec3 light_position_;
-	
-	GLMat4 shadow_matrix_;
-	float bias_k_;
-	int nb_samples_;
-	GLMat4 inv_mat_;
+	ShadowData* shadataptr_;
 	GLVec4 plane_;
+	GLVec3 plane_p_;
 	
 	using ShaderType = ShaderFullScreenHBAO;
 
-	inline ShaderParamFullScreenHBAO(ShaderType* sh)
-		: ShaderParam(sh), tex_d_(nullptr), radius_(0.0f), subs_(1.0f), nb_dirs_(7), nb_steps_(7), time_(1.0f),
-		  ao_strength_(1.0f),light_position_(10, 100,1000)
-		 {}
+	ShaderParamFullScreenHBAO(ShaderType* sh);
+	
 
 	inline ~ShaderParamFullScreenHBAO() override
 	{
@@ -100,10 +96,7 @@ public:
 
 	using ShaderType = ShaderFullScreenApplyHBAO;
 
-	inline ShaderParamFullScreenApplyHBAO(ShaderType* sh)
-		: ShaderParam(sh), ambiant_ratio_(0.5), tex_ambiant_(nullptr), tex_diffuse_(nullptr)
-	{
-	}
+	ShaderParamFullScreenApplyHBAO(ShaderType* sh);
 
 	inline ~ShaderParamFullScreenApplyHBAO() override
 	{

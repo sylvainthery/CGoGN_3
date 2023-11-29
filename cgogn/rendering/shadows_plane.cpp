@@ -83,6 +83,7 @@ void ShadowsPlane::drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, c
 {
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	auto bb_sz = (bb.second - bb.first);
 	auto bb_center = (bb.second + bb.first) / 2;
@@ -90,12 +91,12 @@ void ShadowsPlane::drawZ(const std::pair<GLVec3d, GLVec3d>& bb, float64 shift, c
 	Eigen::Transform<float64, 3, Eigen::Affine> trf =
 		Eigen::Translation3d(Eigen::Vector3d(bb_center.x(), bb_center.y(),
 											 bb.first.z() - shift * bb_sz.z())) *
-											 Eigen::Scaling(3*bb_sz);
+											 Eigen::Scaling(20*bb_sz);
 
 
 	
 	param_plane_->transfo_ = trf.matrix().cast<float>();
-	param_plane_->scale_xy_ = 20.0f;
+	param_plane_->scale_xy_ = 100.0f;
 	param_plane_->light_position_ = light_position;
 	param_plane_->draw(projm, mvm);
 

@@ -46,6 +46,7 @@ struct ShadowData
 	GLMat4d shadow_matrix_;
 	int nb_samples_;
 	GLVec2 bias_k_;
+	GLVec2 bias_adapt_;
 
 	ShadowData();
 
@@ -62,42 +63,31 @@ struct ShadowData
 	}
 };
 
-//struct ShadowPlane
-//{
-//	static std::unique_ptr<cgogn::rendering::Texture2D> tex_plane_;
-//	std::unique_ptr < cgogn::rendering::ShaderParamPlaneShadow> param_plane_;
+//std::string insert_shadow_code(const std::string& frag_src, const std::string& shadow_comment);
 //
-//	ShadowPlane();
-//	void init(cgogn::rendering::ShadowData* sha_dat_ptr);
-//	void draw();
-//};
+//#define SHADOWS_UNIFORMS_STRINGS "with_shadow","shadow_matrix","TUshadow","bias_k","TUpoisson","nb_samples"
+//
+//#define SHADOWS_PARAMETERS(ptr) ptr->shadow_matrix_,\
+//ptr->fbo_shadows_->getDepthTexture()->bind(14),\
+//ptr->bias_k_,\
+//ptr->tex_poisson_->bind(15),\
+//ptr->nb_samples_
+//
+//
+//template <typename T1, typename... Ts>
+//void sha_get_uniforms(cgogn::rendering::ShaderProgram* prg, T1 p1, Ts... pn)
+//{
+//	prg->get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
+//}
 
-
-std::string insert_shadow_code(const std::string& frag_src, const std::string& shadow_comment);
-
-#define SHADOWS_UNIFORMS_STRINGS "with_shadow","shadow_matrix","TUshadow","bias_k","TUpoisson","nb_samples"
-
-#define SHADOWS_PARAMETERS(ptr) ptr->shadow_matrix_,\
-ptr->fbo_shadows_->getDepthTexture()->bind(14),\
-ptr->bias_k_,\
-ptr->tex_poisson_->bind(15),\
-ptr->nb_samples_
-
-
-template <typename T1, typename... Ts>
-void sha_get_uniforms(cgogn::rendering::ShaderProgram* prg, T1 p1, Ts... pn)
-{
-	prg->get_uniforms(p1, pn..., SHADOWS_UNIFORMS_STRINGS);
-}
-
-template <typename T, typename... Ts>
- inline void sha_set_uniforms_values(cgogn::rendering::ShaderProgram* prg, ShadowData* sha_ptr, T v, Ts... vs)
-{
-	if (sha_ptr != nullptr)
-		prg->set_uniforms_values(v, vs..., true, SHADOWS_PARAMETERS(sha_ptr));
-	else
-		prg->set_uniforms_values(v, vs..., false);
-}
+//template <typename T, typename... Ts>
+// inline void sha_set_uniforms_values(cgogn::rendering::ShaderProgram* prg, ShadowData* sha_ptr, T v, Ts... vs)
+//{
+//	if (sha_ptr != nullptr)
+//		prg->set_uniforms_values(v, vs..., true, SHADOWS_PARAMETERS(sha_ptr));
+//	else
+//		prg->set_uniforms_values(v, vs..., false);
+//}
 
 } // namespace rendering
 

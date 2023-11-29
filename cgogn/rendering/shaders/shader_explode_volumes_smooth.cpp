@@ -82,38 +82,38 @@ ShaderExplodeVolumesSmooth::ShaderExplodeVolumesSmooth()
 		}
 	)";
 
+
 	const char* fragment_shader_source = R"(
-		#version 330
+	#version 330
 
-		in vec3 position;
-		in vec3 normal;
-		out vec4 frag_out;
+	in vec3 position;
+	in vec3 normal;
 
-		uniform vec4 color;
-		uniform vec3 light_position;
+	layout(location = 0) out vec4 frag_out;
+	layout(location = 1) out vec3 normal_out;
 
-//Shadows_code_here
+	uniform vec4 color;
+	uniform vec3 light_position;
 
 	void main()
 		{
 			vec3 N = normalize(normal);
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow(position, dnl);
+			float lambert = 0.25 + 0.75 * dnl;
 			frag_out = vec4(lambert * color.rgb, color.a);
+			normal_out = N;
 		}
 	)";
 
-
-	load(vertex_shader_source, insert_shadow_code(fragment_shader_source,"//Shadows_code_here"));
-
-	sha_get_uniforms(this, "vertex_ind", "vertex_position", "volume_center", "volume_clipping",
+	load(vertex_shader_source, fragment_shader_source);
+	get_uniforms("vertex_ind", "vertex_position", "volume_center", "volume_clipping",
 				 "color", "light_position", "explode", "plane_clip", "plane_clip2");
 }
 
 void ShaderParamExplodeVolumesSmooth::set_uniforms()
 {
-	sha_set_uniforms_values(shader_, sha_data_,10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
+	shader_->set_uniforms_values(10, 11, 12, 13, data_->color_, data_->light_position_, data_->explode_,
 									 data_->plane_clip_, data_->plane_clip2_);
 
 }

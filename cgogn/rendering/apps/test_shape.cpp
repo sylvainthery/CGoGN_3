@@ -52,7 +52,7 @@ public:
 	void init() override
 	{
 		app_.current_view()->set_scene_radius(5);
-		app_.current_view()->set_scene_center(GLVec3(0,0,0));
+		app_.current_view()->set_scene_center(GLVec3d(0,0,0));
 		shape_ = ShapeDrawer::instance();
 		shape_->update_subdivision(24);
 		shape_->color(ShapeDrawer::CYLINDER) = GLColor(1,0,0,1);

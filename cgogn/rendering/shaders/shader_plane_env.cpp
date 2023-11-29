@@ -41,13 +41,15 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 		uniform float scale_xy;
 
 		out vec3 position;
-		out vec2 tc;
+		out vec2 ctc;
+		out vec2 stc;
 
 		void main()
 		{
 			vec2 p = vec2(gl_VertexID % 2, gl_VertexID / 2); 
-			tc = p*scale_xy;
-			vec4 pt =  model_view_matrix*transfo*vec4((2.0 * p - 1.0), 0.0, 1.0);
+			stc = p*scale_xy;
+			ctc = 2.0 * p - 1.0;
+			vec4 pt =  model_view_matrix*transfo*vec4(ctc, 0.0, 1.0);
 			position = pt.xyz;
 			vec4 q = projection_matrix * pt; 
 			gl_Position = vec4(q.x, q.y, 0.5*q.w, q.w);
@@ -61,69 +63,73 @@ ShaderPlaneShadow::ShaderPlaneShadow()
 		uniform vec3 light_position;
 	
 		in vec3 position;
-		in vec2 tc;
+		in vec2 stc;
+		in vec2 ctc;
 
 		out vec4 frag_out;
 
-		uniform bool with_shadow;
-		uniform sampler2DShadow TUshadow;
-		uniform sampler2D TUpoisson;
-		uniform mat4 shadow_matrix;
-		uniform int nb_samples;
+		//uniform bool with_shadow;
+		//uniform sampler2DShadow TUshadow;
+		//uniform sampler2D TUpoisson;
+		//uniform mat4 shadow_matrix;
+		//uniform int nb_samples;
 
-		float random(vec3 seed)
-		{
-			float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
-			return fract(sin(dot_product) * 43758.5453);
-		}
+		//float random(vec3 seed)
+		//{
+		//	float dot_product = dot(seed, vec3(12.9898,78.233,45.164));
+		//	return fract(sin(dot_product) * 43758.5453);
+		//}
 
-		float compute_shadow(float dnl)
-		{
-			if (!with_shadow)
-				return 1.0;
+		//float compute_shadow(float dnl)
+		//{
+		//	if (!with_shadow)
+		//		return 1.0;
 
-			vec4 sh_coord = shadow_matrix*vec4(position,1); 
-			vec3 shcxyz = sh_coord.xyz/sh_coord.w;
-			/*if (any(greaterThan(abs(shcxyz-0.5),vec3(0.5))))*/
-			float sc = 5.0/textureSize(TUshadow,0).x;	
-			float shad = texture(TUshadow, vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w));
-			if (abs(shcxyz.z-0.5)>0.48)
-				return max(shad,abs(2.0*shcxyz.z-1.0));
-			for (int i=1;i<nb_samples;i++)
-			{
-				int index = int(15.99*random(gl_FragCoord.xyz));
-				vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w);
-				shad += texture(TUshadow, shc);
-			}
-			return shad/float(nb_samples);
-		}
+		//	vec4 sh_coord = shadow_matrix*vec4(position,1); 
+		//	vec3 shcxyz = sh_coord.xyz/sh_coord.w;
+		//	/*if (any(greaterThan(abs(shcxyz-0.5),vec3(0.5))))*/
+		//	float sc = 5.0/textureSize(TUshadow,0).x;	
+		//	float shad = texture(TUshadow, vec3(sh_coord.xy/sh_coord.w, sh_coord.z /sh_coord.w));
+		//	if (abs(shcxyz.z-0.5)>0.48)
+		//		return max(shad,abs(2.0*shcxyz.z-1.0));
+		//	for (int i=1;i<nb_samples;i++)
+		//	{
+		//		int index = int(15.99*random(gl_FragCoord.xyz));
+		//		vec3 shc =	vec3(sh_coord.xy/sh_coord.w + texelFetch(TUpoisson,ivec2(index,0),0).xy*sc, sh_coord.z /sh_coord.w);
+		//		shad += texture(TUshadow, shc);
+		//	}
+		//	return shad/float(nb_samples);
+		//}
 
 		void main()
 		{
 			vec3 N = normalize(cross(dFdx(position), dFdy(position)));
 			vec3 L = normalize(light_position - position);
 			float dnl = max(0.0, dot(N, L));
-			float lambert = 0.2 + 0.8 * dnl * compute_shadow( dnl);
-			frag_out = vec4(vec3(lambert * texture(TUcolor,tc).r), 1.0);
+			float border = 1.0 - smoothstep(0.5,1.0,dot(ctc,ctc));
+			float lambert = 0.2 + 0.8 * dnl;
+			frag_out = vec4(vec3(lambert * texture(TUcolor,stc).r), border);
 		}
 
 	)";
 
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("transfo", "scale_xy", "TUcolor", "light_position", "with_shadow",
-				 "shadow_matrix", "TUshadow", "TUpoisson", "nb_samples");
+	get_uniforms("transfo", "scale_xy", "TUcolor", "light_position");
+		/*, "with_shadow",
+				 "shadow_matrix", "TUshadow", "TUpoisson", "nb_samples");*/
 }
 
 void ShaderParamPlaneShadow::set_uniforms()
 {
 
-	if ((sha_data_ != nullptr) && (sha_data_->is_started()))
-		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(0), light_position_,
+//	if ((sha_data_ != nullptr) && (sha_data_->is_started()))
+	shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(0), light_position_);
+		/*,
 								 true, sha_data_->shadow_matrix_, sha_data_->fbo_shadows_->getDepthTexture()->bind(1),
-									 sha_data_->tex_poisson_->bind(2), sha_data_->nb_samples_);
-	else
-		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(0), light_position_, false);
+									 sha_data_->tex_poisson_->bind(2), sha_data_->nb_samples_);*/
+//	else
+//		shader_->set_uniforms_values(transfo_, scale_xy_, tex_col_->bind(0), light_position_, false);
 
 }
 

@@ -24,7 +24,6 @@
 #ifndef CGOGN_RENDERING_SHADOWS_PLANE_H_
 #define CGOGN_RENDERING_SHADOWS_PLANE_H_
 
-//#include <memory>
 #include <cgogn/rendering/types.h>
 #include <cgogn/rendering/fbo.h>
 #include <cgogn/rendering/shaders/shader_plane_env.h>
