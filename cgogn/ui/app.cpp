@@ -210,7 +210,7 @@ App::App()
 	std::cout << "Main Monitor " << monitor_width_ << " x " << monitor_height_ << "   scale :" << xscale << " , "
 			  << yscale << std::endl;
 	
-	interface_scaling_ = (xscale + yscale) / 2;
+	interface_scaling_ = (std::min(xscale,yscale) - 1.0f)/2.0f + 1.0f;
 	ImGui::GetIO().FontGlobalScale = interface_scaling_;
 
 
