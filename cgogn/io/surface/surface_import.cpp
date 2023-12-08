@@ -40,8 +40,8 @@ namespace cgogn
 namespace io
 {
 
-template <typename MESH, typename SURFDATA>
-auto import_surface_data_map_tmpl(MESH& m, SURFDATA& surface_data, bool reconstruct_phi2)
+template <typename MESH, typename VEC>
+auto import_surface_data_map_tmpl(MESH& m, SurfaceImportDataTGen<VEC>& surface_data, bool reconstruct_phi2)
 	-> std::enable_if_t<std::is_convertible_v<MESH&, MapBase&>>
 {
 	using ParentMESH = typename MESH::Parent;

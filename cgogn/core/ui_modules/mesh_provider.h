@@ -352,7 +352,8 @@ public:
 	}
 
 
-	std::array<MESH*, 3> load_surface_from_OBJ_file(const std::string& filename, bool normalized = true)
+	auto load_surface_from_OBJ_file(const std::string& filename, bool normalized = true) -> 
+		std::enable_if_t<std::is_same_t<MESH, MeshObjTriplet>, MeshObjTriplet>
 	{
 		if constexpr (mesh_traits<MESH>::dimension == 2 && std::is_default_constructible_v<MESH>)
 		{
