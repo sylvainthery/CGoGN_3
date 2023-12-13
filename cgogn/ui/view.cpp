@@ -39,7 +39,7 @@ namespace ui
 View::View(Inputs* inputs, const std::string& name)
 	: GLViewer(inputs), name_(name), ratio_x_offset_(0), ratio_y_offset_(0), ratio_width_(1), ratio_height_(1),
 	  param_final_simple_(nullptr), fbo_(nullptr), tex_(nullptr), event_stopped_(false), closing_(false),
-	  nb_ao_blurs_(3),prec_ao_(7), shift_zplane_(0.05f), hbao_radius_ratio_(0.01f), bias_k_div_(GLVec2(8.0f, 8.0f))
+	  nb_ao_blurs_(2), shift_zplane_(0.05f), hbao_radius_ratio_(0.01f), bias_k_div_(GLVec2(8.0f, 8.0f))
 {
 	tex_ = std::make_shared<cgogn::rendering::Texture2D>();
 	tex_->allocate(1, 1, GL_RGBA8, GL_RGBA);
@@ -300,6 +300,7 @@ void View::draw()
 
 				shadow_.fbo_shadows_->getDepthTexture()->bind();
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+				glGenerateMipmap(GL_TEXTURE_2D);
 				shadow_.fbo_shadows_->getDepthTexture()->release();
 
 				param_full_screen_hbao_->radius_ = float32(sr) * hbao_radius_ratio_;
@@ -311,16 +312,13 @@ void View::draw()
 				GLVec3d Pp = cgogn::rendering::homoTransform(camera_.modelview_matrix_d(), Pw);
 
 				param_full_screen_hbao_->plane_ = GLVec4d{Np.x(), Np.y(), Np.z(), Np.dot(Pp)}.cast<float>();
-				param_full_screen_hbao_->time_ = glfwGetTime();
-				param_full_screen_hbao_->nb_dirs_ = prec_ao_;
-				param_full_screen_hbao_->nb_steps_ = prec_ao_;
 
 				param_full_screen_hbao_->draw(this);
 				fbo_hbao_->release();
 
-				shadow_.fbo_shadows_->getDepthTexture()->bind();
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-				shadow_.fbo_shadows_->getDepthTexture()->release();
+//				shadow_.fbo_shadows_->getDepthTexture()->bind();
+//				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+//				shadow_.fbo_shadows_->getDepthTexture()->release();
 
 				for (int i = 0; i < nb_ao_blurs_; ++i)
 				{

@@ -219,15 +219,11 @@ protected:
 public:
 	float32 hbao_radius_ratio_;
 	int32 nb_ao_blurs_;
-	int32 prec_ao_;
 
 	GLVec2 bias_k_div_;
 	float shift_zplane_;
-	inline float* ambiant_ratio_ptr()
-	{
-		return &param_full_screen_apply_->ambiant_ratio_;
-	}
-	inline float* hbao_strength_ptr()
+
+	inline float* ao_strength_ptr()
 	{
 		return &param_full_screen_hbao_->ao_strength_;
 	}

@@ -10,9 +10,8 @@
  * This library is distributed in the hope that it will be useful, but WITHOUT  *
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        *
  * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License  *
- * for more details.            
+ * for more details.															*/
 
- */
 #ifndef CGOGN_RENDERING_SHADERS_FULL_SCREEN_SHADOW_H_
 #define CGOGN_RENDERING_SHADERS_FULL_SCREEN_SHADOW_H_
 
@@ -30,7 +29,6 @@ class View;
 
 using ::cgogn::rendering::GLVec2;
 using ::cgogn::rendering::GLVec3;
-using ::cgogn::rendering::GLVec4;
 using ::cgogn::rendering::GLMat4;
 
 
@@ -58,10 +56,6 @@ public:
 	GLVec2 projv_;
 	GLVec3 fn_;
 	float radius_;
-	float subs_;
-	int nb_dirs_;
-	int nb_steps_;
-	float time_;
 	float ao_strength_;
 	GLVec3 light_position_;
 	ShadowData* shadataptr_;
@@ -88,8 +82,6 @@ class CGOGN_RENDERING_EXPORT ShaderParamFullScreenApplyHBAO : public ShaderParam
 	void set_uniforms() override;
 
 public:
-	float ambiant_ratio_;
-	float hb_ka;
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_ambiant_;
 	std::shared_ptr<::cgogn::rendering::Texture2D> tex_diffuse_;
 	//std::shared_ptr<::cgogn::rendering::Texture2D> tex_spec_; // TODO

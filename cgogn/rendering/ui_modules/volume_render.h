@@ -724,22 +724,19 @@ public:
 			ImGui::Separator();
 			if (ImGui::SliderFloat("Zplane", &selected_view_->shift_zplane_, -0.2f, 0.9f))
 				need_update = true;
+			ImGui::Separator();
 			if (ImGui::SliderFloat("HBAO Radius", &selected_view_->HBAO_radius_ratio(), 0.0f, 0.3f))
 				need_update = true;
 
-			if (ImGui::SliderInt("HBAO blur", &selected_view_->nb_ao_blurs_, 1, 20))
-				need_update = true;
-
-			if (ImGui::SliderInt("HBAO prec", &selected_view_->prec_ao_, 3, 15))
-				need_update = true;
-
-			if (ImGui::SliderFloat("HBAO strengh", selected_view_->hbao_strength_ptr(), 0.0f, 8.0f))
-				need_update = true;
-
-			if (ImGui::SliderFloat("ShadowMap bias mult", &selected_view_->bias_k_div_[0], 1.0f, 15.0f))
-				need_update = true;
-			// if (ImGui::SliderFloat("ShadowMap bias max", &selected_view_->bias_k_div[1], 8.0f, 31.0f))
+			//if (ImGui::SliderInt("HBAO blur", &selected_view_->nb_ao_blurs_, 1, 20))
 			//	need_update = true;
+
+			if (ImGui::SliderFloat("Shadow strength", selected_view_->ao_strength_ptr(), 0.f, 5.0f))
+				need_update = true;
+
+			//if (ImGui::SliderFloat("ShadowMap bias mult", &selected_view_->bias_k_div_[0], 1.0f, 15.0f))
+			//	need_update = true;
+
 
 			auto& sha_data = selected_view_->get_shadow();
 			bool shsta = sha_data.is_started();

@@ -94,7 +94,7 @@ ShaderExplodeVolumes::ShaderExplodeVolumes()
 			float dnl = max(0.0, dot(N, L));
 			float lambert = 0.25 + 0.75 * dnl;
 			frag_out = vec4(lambert * color.rgb, color.a);
-			normal_out = N;
+			normal_out = N*0.5+0.5;
 		}
 	)";
 

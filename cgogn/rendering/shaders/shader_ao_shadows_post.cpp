@@ -47,7 +47,7 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		
 		void main()
 		{
-			tc = 2.0* vec2(gl_VertexID % 2, gl_VertexID / 2);
+			tc = vec2(gl_VertexID % 2, gl_VertexID / 2);
 			vec2 stc = 2.0 * tc - 1.0;
 			gl_Position = vec4(stc, 0.0, 1.0);
 		}
@@ -64,16 +64,15 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 		uniform vec2 projv;  // [ projection_matrix[0][0],projection_matrix.data[1][1] ];
 		uniform vec3 fn;    // [ -2.0*zfar*znearn, zfar+znear, zfar-znear ];
 		uniform float radius;
-		uniform float subs;
-		uniform int nb_dirs;
-		uniform int nb_steps;
-		uniform float time;
+		#define  nb_dirs 7
+		#define nb_steps 7
+		#define amb_ratio 0.3
+
 		uniform float ao_strength;
 		uniform vec3 light_position;
 		uniform mat4 shadow_matrix;
 		uniform vec2 bias_k;
 		uniform vec2 bias_adapt;
-//		uniform sampler2DShadow TUshadow;
 		uniform sampler2D TUshadow;
 		uniform sampler2D TUpoisson;
 		uniform int nb_samples;
@@ -82,13 +81,16 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 
 		#define TWO_PI  6.28318531
 		#define PI      3.141592654
+		#define PIOV2      3.141592654
 
-		// sin(10°)
-		#define ANGLE_BIAS 0.1736
 
-		float rand1Dp(vec2 coord) //generating noise/pattern texture for dithering
+		//  ~sin(5°)
+		#define ANGLE_BIAS 0.87155
+
+		float rand1Dp(vec2 coord, int i) //generating noise/pattern texture for dithering
 		{
-			return fract(sin(dot(coord ,vec2(12.9898,78.233))*time) * 43758.5453);
+			float dp = dot(vec3(coord,3.721*float(i+1)), vec3(12.9898,78.233,45.164));
+			return fract(sin(dp) * 43758.5453);
 		}
 
 		vec3 pos_from_depth(vec2 uv, float d)
@@ -138,37 +140,34 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 			return 0.0;
 
 		mat2 deltaRotationMatrix = createRot(TWO_PI / float(nb_dirs));
-		mat2 MR = createRot( rand1Dp(tc)*TWO_PI);
+		mat2 MR = createRot( rand1Dp(tc,0)*PIOV2);
 		vec2 deltaUV = MR * vec2(screenRadius.x/float(nb_steps), 0.0);
 
 		float occlusion = 0.0;
 
-		vec2 inv_d_wh = vec2(subs)/textureSize(TUdepth,0); //  
-
+		vec2 inv_d_wh = vec2(1)/textureSize(TUdepth,0);
 		for(int i = 0; i < nb_dirs; i++)
 		{
 			deltaUV = deltaRotationMatrix * deltaUV;
-			vec2 sampleUV = gl_FragCoord.xy + (0.5+rand1Dp(tc))*deltaUV;
+			vec2 sampleUV = gl_FragCoord.xy + (1.0+rand1Dp(tc,i))*deltaUV;
 			float occ_d = 0.0;
 			for(int j = 0; j < nb_steps; j++)
 			{
 				vec2 fcoo = (sampleUV+float(j)*deltaUV);
-				ivec2 icoo = ivec2(fcoo*subs);
+				ivec2 icoo = ivec2(fcoo);
 				float depth = texelFetch(TUdepth,icoo,0).x;
 				if (depth < 1.0)
 				{
 					vec3 sampleVS = pos_from_depth(fcoo*inv_d_wh, depth);
-					vec3 sampleDirVS = sampleVS.xyz - P;
+					vec3 sampleDirVS = sampleVS - P;
 					float sampleLength = length(sampleDirVS);
-					float occ = (dot(N, sampleDirVS)/sampleLength);
-					if (occ>ANGLE_BIAS)
-					{
-						occ = (occ - ANGLE_BIAS)/(1.0-ANGLE_BIAS);
-						float att = max(0.0,1.0-sampleLength / radius);
-						occ_d = max(occ_d, occ * att);
-					}
+//					float occ = (max(ANGLE_BIAS,dot(N, sampleDirVS)/sampleLength)-ANGLE_BIAS)/(1.0-ANGLE_BIAS);
+					float occ = max(0.0,dot(N, sampleDirVS)/sampleLength);
+					float att = max(0.0,1.0-(length(sampleDirVS.xy) / radius));
+					occ_d = max(occ_d, occ * att);
 				}
 			}
+
 			occlusion += occ_d;
 		}
 		return occlusion / float(nb_dirs);
@@ -177,7 +176,7 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 
 		float random(vec3 seed,int i)
 		{
-			float dp = dot(vec4(seed,3.721*float(i)), vec4(12.9898,78.233,45.164,17.371)*time);
+			float dp = dot(vec4(seed,3.721*float(i)), vec4(12.9898,78.233,45.164,17.371));
 			return fract(sin(dp) * 43758.5453);
 		}
 
@@ -229,35 +228,33 @@ ShaderFullScreenHBAO::ShaderFullScreenHBAO()
 			else
 			{
 				vec3 P = pos_from_depth(tc,depth);
-				vec3 N = texture(TUnormal,tc).rgb;
-				float hbao = max(0.0, 0.9999 - compute_hbao(P,N) * ao_strength); // 0.9999 for the fract in final shader path
-				float shadow = compute_shadow_map(P,N);
-				frag_out = hbao*(0.25+0.75*shadow);
+				// N * 2 -1 because storage is RGB8
+				vec3 N = normalize(textureLod(TUnormal,tc,0.0).rgb*2.0-1.0);
+				float hbao = max(0.0, 0.9999 - compute_hbao(P,N)*ao_strength); // 0.9999 for the fract in final shader path
+				float shadow = amb_ratio + (1.0-amb_ratio) * compute_shadow_map(P,N);
+				frag_out = hbao * shadow;
 			}
 		}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("TUdepth", "TUnormal",	"projv", "fn", "radius", "subs", "nb_dirs", "nb_steps", "time", "ao_strength",
-		//		 "light_position", 
-		"shadow_matrix", "TUshadow", "bias_k", "bias_adapt","TUpoisson", "nb_samples",
-				 "plane");
+	get_uniforms("TUdepth", "TUnormal",	"projv", "fn", "radius", "ao_strength",
+		"shadow_matrix", "TUshadow", "bias_k", "bias_adapt","TUpoisson", "nb_samples", "plane");
 
 
 }
 
 ShaderParamFullScreenHBAO::ShaderParamFullScreenHBAO(ShaderType* sh):
-	ShaderParam(sh), tex_d_(nullptr), radius_(0.0f),
-	subs_(1.0f), nb_dirs_(7), nb_steps_(9), time_(1.0f), 
-	ao_strength_(1.0f), light_position_(10, 100, 1000)
+	ShaderParam(sh), tex_d_(nullptr), radius_(0.08f), ao_strength_(1.6f),
+	light_position_(10, 100, 1000)
 {
 }
 
 
 void ShaderParamFullScreenHBAO::set_uniforms()
 {	
-	shader_->set_uniforms_values(tex_d_->bind(0), tex_n_->bind(1), projv_, fn_, radius_, subs_, nb_dirs_, nb_steps_,
-								 time_, ao_strength_,
+	shader_->set_uniforms_values(tex_d_->bind(0), tex_n_->bind(1), projv_, fn_, radius_,
+								 ao_strength_,
 								 shadataptr_->shadow_matrix_,
 								 shadataptr_->fbo_shadows_->getDepthTexture()->bind(2), shadataptr_->bias_k_,
 								 shadataptr_->bias_adapt_, shadataptr_->tex_poisson_->bind(3),
@@ -275,7 +272,7 @@ void ShaderParamFullScreenHBAO::draw(::cgogn::ui::View* v)
 	fn_ = ::cgogn::rendering::GLVec3(float32(- 2.0 * zfar * znear), float32(zfar + znear), float32(zfar - znear));
 
 	bind();
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	release();
 }
 
@@ -283,7 +280,7 @@ void ShaderParamFullScreenHBAO::draw(::cgogn::ui::View* v)
 ShaderFullScreenApplyHBAO* ShaderFullScreenApplyHBAO::instance_ = nullptr;
 
 ShaderParamFullScreenApplyHBAO::ShaderParamFullScreenApplyHBAO(ShaderType* sh)
-	: ShaderParam(sh), ambiant_ratio_(0.5), tex_ambiant_(nullptr), tex_diffuse_(nullptr)
+	: ShaderParam(sh), tex_ambiant_(nullptr), tex_diffuse_(nullptr)
 {
 }
 
@@ -294,7 +291,7 @@ ShaderFullScreenApplyHBAO::ShaderFullScreenApplyHBAO()
 		out vec2 tc;
 		void main()
 		{
-			tc = 2.0* vec2(gl_VertexID % 2, gl_VertexID / 2);
+			tc = vec2(gl_VertexID % 2, gl_VertexID / 2);
 			gl_Position = vec4(2.0 * tc - 1.0, 0.0, 1.0);
 		}
 	)";
@@ -306,29 +303,28 @@ ShaderFullScreenApplyHBAO::ShaderFullScreenApplyHBAO()
 
 		uniform sampler2D TUambiant;
 		uniform sampler2D TUdiffuse;
-		uniform sampler2D TUplane;
 
 		void main()
 		{
 			vec3 diff = texture(TUdiffuse,tc).rgb;
-			float ao_shadow = texture(TUambiant,tc).r;
+			float ao_shadow = texture(TUambiant,tc).r ;
 			frag_out = diff * ao_shadow;
 		}
 	)";
 
 	load(vertex_shader_source, fragment_shader_source);
-	get_uniforms("TUambiant", "TUdiffuse"); //"shadow_strength");
+	get_uniforms("TUambiant", "TUdiffuse");
 }
 
 void ShaderParamFullScreenApplyHBAO::set_uniforms()
 {
-	shader_->set_uniforms_values(tex_ambiant_->bind(0), tex_diffuse_->bind(1)); // , ??);
+	shader_->set_uniforms_values(tex_ambiant_->bind(0), tex_diffuse_->bind(1));
 }
 
 void ShaderParamFullScreenApplyHBAO::draw()
 {
 	bind();
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	release();
 }
 
@@ -343,7 +339,7 @@ ShaderFSBlurAO::ShaderFSBlurAO()
 		out vec2 tc;
 		void main()
 		{
-			tc = 2.0* vec2(gl_VertexID % 2, gl_VertexID / 2);
+			tc = vec2(gl_VertexID % 2, gl_VertexID / 2);
 			gl_Position = vec4(2.0 * tc - 1.0, 0.0, 1.0);
 		}
 	)";
@@ -381,7 +377,7 @@ void ShaderParamFSBlurAO::blurH()
 {
 	dtx_ = {1, 0};
 	bind();
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	release();
 }
 
@@ -389,12 +385,9 @@ void ShaderParamFSBlurAO::blurV()
 {
 	dtx_ = {0, 1}; 
 	bind();
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	release();
 }
-
-
-
 
 
 } // namespace rendering
