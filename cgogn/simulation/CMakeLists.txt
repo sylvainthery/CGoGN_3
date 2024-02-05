@@ -18,6 +18,7 @@ set(src_list
 
 		"${CMAKE_CURRENT_LIST_DIR}/ui_modules/shallow_water.h"
 )
+
 target_sources(${PROJECT_NAME} PRIVATE ${src_list})
 source_group(TREE ${CMAKE_CURRENT_LIST_DIR} FILES ${src_list})
 
@@ -44,6 +45,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_simulation.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 	COMPONENT cgogn_simulation_libraries
 )
+
+install(TARGETS ${PROJECT_NAME} )
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/simulation

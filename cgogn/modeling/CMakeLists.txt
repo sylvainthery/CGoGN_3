@@ -63,7 +63,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} cgogn::core cgogn::geometry)
+target_link_libraries(${PROJECT_NAME} PUBLIC cgogn::core cgogn::geometry Blossom5)
 
 # Write out cgogn_modeling_export.h to the current binary directory
 generate_export_header(${PROJECT_NAME})
@@ -75,15 +75,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_modeling.pc
 	COMPONENT cgogn_modeling_libraries
 )
 
+install(TARGETS ${PROJECT_NAME} )
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/modeling
 	COMPONENT cgogn_modeling_headers
 	FILES_MATCHING PATTERN "*.h"
-	REGEX "(examples|tests)" EXCLUDE
+	REGEX "(apps|examples|tests)" EXCLUDE
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_modeling_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/modeling
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/cgogn/modeling
 	COMPONENT cgogn_modeling_headers
 )
 

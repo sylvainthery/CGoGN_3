@@ -45,7 +45,11 @@ else()
     target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 endif()
 
-install(FILES ${HEADER_FILES} DESTINATION "include/cgogn/thirdparty")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/imgui
+	COMPONENT cgogn_ui_headers
+	FILES_MATCHING PATTERN "*.h"
+)
 
 cgogn_create_package("${CMAKE_CURRENT_SOURCE_DIR}")
 

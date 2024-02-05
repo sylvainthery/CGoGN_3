@@ -56,14 +56,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty>
 )
 
 # Write out cgogn_io_export.h to the current binary directory
 generate_export_header(${PROJECT_NAME})
 
 # target_link_libraries(${PROJECT_NAME} cgogn::core Eigen3::Eigen Meshb cgns_static)
-target_link_libraries(${PROJECT_NAME} cgogn::core Eigen3::Eigen Meshb)
+target_link_libraries(${PROJECT_NAME} PUBLIC cgogn::core Eigen3::Eigen Meshb)
 
 set(PKG_CONFIG_REQUIRES "cgogn_core cgogn_geometry")
 configure_file(${PROJECT_SOURCE_DIR}/cgogn_io.pc.in ${CMAKE_CURRENT_BINARY_DIR}/cgogn_io.pc @ONLY)
@@ -72,16 +71,13 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_io.pc
 	COMPONENT cgogn_io_libraries
 )
 
+install(TARGETS ${PROJECT_NAME})
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/io
 	COMPONENT cgogn_io_headers
 	FILES_MATCHING PATTERN "*.h"
-	REGEX "(examples|tests)" EXCLUDE
-)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_io_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/io
-	COMPONENT cgogn_io_headers
+	REGEX "(apps|examples|tests)" EXCLUDE
 )
 
 cgogn_create_package("${CMAKE_CURRENT_SOURCE_DIR}")

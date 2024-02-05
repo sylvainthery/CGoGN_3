@@ -40,10 +40,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}/thirdparty/synapse/include>
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty>
 )
 
-target_link_libraries(${PROJECT_NAME} cgogn::core cgogn::rendering ImGUI synapse)
+target_link_libraries(${PROJECT_NAME} PUBLIC cgogn::core cgogn::rendering ImGUI synapse)
 
 if (CGOGN_GL43_DEBUG_MODE AND NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_compile_definitions(${PROJECT_NAME} PRIVATE "-DCGOGN_GL43_DEBUG_MODE=1")
@@ -59,16 +58,13 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_ui.pc
 	COMPONENT cgogn_ui_libraries
 )
 
+install(TARGETS ${PROJECT_NAME} )
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/ui
 	COMPONENT cgogn_ui_headers
 	FILES_MATCHING PATTERN "*.h"
-	REGEX "(examples|tests)" EXCLUDE
-)
-
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_ui_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/ui
-	COMPONENT cgogn_ui_headers
+	REGEX "(apps|examples|tests)" EXCLUDE
 )
 
 cgogn_create_package("${CMAKE_CURRENT_SOURCE_DIR}")

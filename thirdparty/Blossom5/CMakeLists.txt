@@ -46,7 +46,12 @@ if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
 endif()
 
-install(FILES ${HEADER_FILES} DESTINATION "include/cgogn/thirdparty")
+#install(FILES ${HEADER_FILES} DESTINATION "include/cgogn/thirdparty")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty
+	COMPONENT cgogn_blossom5_headers
+	FILES_MATCHING PATTERN "*.h"
+)
 
 cgogn_create_package("${CMAKE_CURRENT_SOURCE_DIR}")
 

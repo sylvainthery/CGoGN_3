@@ -33,6 +33,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER thirdparty)
 add_executable(transmesh transmesh.c)
 target_include_directories(transmesh PRIVATE
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+#	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn>
 )
 target_link_libraries(transmesh Meshb)

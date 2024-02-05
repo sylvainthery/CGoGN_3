@@ -2,6 +2,7 @@
 include(CMakeFindDependencyMacro)
 find_dependency(cgogn_core REQUIRED)
 find_dependency(cgogn_geometry REQUIRED)
+find_dependency(Blossom5 REQUIRED)
 
 if(NOT TARGET cgogn::modeling)
 	include("${CMAKE_CURRENT_LIST_DIR}/cgogn_modelingTargets.cmake")

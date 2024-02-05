@@ -37,7 +37,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty>
 )
 
-install(FILES ${HEADER_FILES} DESTINATION "include/cgogn/thirdparty")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/boost
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	COMPONENT cgogn_synapse_headers
+	FILES_MATCHING PATTERN "*.hpp"
+)
 
 cgogn_create_package("${CMAKE_CURRENT_SOURCE_DIR}")
 

@@ -1,6 +1,7 @@
 @PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
 find_dependency(cgogn_core REQUIRED)
+#find_dependency(cgogn_rendering REQUIRED)
 find_dependency(ImGUI REQUIRED)
 find_dependency(synapse REQUIRED)
 

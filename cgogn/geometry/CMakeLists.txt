@@ -70,7 +70,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}>
 	$<BUILD_INTERFACE:${EIGEN3_INCLUDE_DIR}>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+#	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(${PROJECT_NAME} cgogn::core Eigen3::Eigen)
@@ -85,6 +85,9 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_geometry.pc
 	COMPONENT cgogn_geometry_libraries
 )
 
+install(TARGETS ${PROJECT_NAME} )
+
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/geometry
 	COMPONENT cgogn_geometry_headers
@@ -93,7 +96,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_geometry_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/geometry
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/cgogn/geometry
 	COMPONENT cgogn_geometry_headers
 )
 

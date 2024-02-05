@@ -146,7 +146,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}/thirdparty/imgui>
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty>
 )
 
 target_link_libraries(${PROJECT_NAME} cgogn::core ImGUI)
@@ -161,15 +160,17 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_rendering.pc
 	COMPONENT cgogn_rendering_libraries
 )
 
+install(TARGETS ${PROJECT_NAME} )
+
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/rendering
 	COMPONENT cgogn_rendering_headers
 	FILES_MATCHING PATTERN "*.h"
-	REGEX "(examples|tests)" EXCLUDE
+	REGEX "(apps|shaders|shader_unused)" EXCLUDE
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_rendering_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/rendering
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/cgogn/rendering
 	COMPONENT cgogn_rendering_headers
 )
 
