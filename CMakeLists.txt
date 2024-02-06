@@ -20,6 +20,9 @@ foreach(p
 	endif()
 endforeach()
 
+cmake_policy(SET CMP0065 OLD)
+
+
 #### Default build type
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Release")

@@ -26,7 +26,7 @@
 
 extern "C"
 {
-#include <thirdparty/libMeshb/libmeshb.h>
+#include <libMeshb/libmeshb.h>
 }
 
 #include <cgogn/io/utils.h>

@@ -28,7 +28,7 @@ namespace cgns
 {
 extern "C"
 {
-#include <thirdparty/cgns-3.4.2/src/cgnslib.h>
+#include <cgns-3.4.2/src/cgnslib.h>
 }
 } // namespace cgns
 

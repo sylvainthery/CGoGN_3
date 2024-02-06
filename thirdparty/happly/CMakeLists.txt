@@ -1,0 +1,1 @@
+install(FILES "happly.h" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/happly)

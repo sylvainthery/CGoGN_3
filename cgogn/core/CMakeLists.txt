@@ -317,11 +317,11 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/core
 	COMPONENT cgogn_core_headers
 	FILES_MATCHING PATTERN "*.h"
-	REGEX "(examples|tests)" EXCLUDE
+	REGEX "(apps|examples|tests)" EXCLUDE
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_core_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/cgogn/core
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/core
 	COMPONENT cgogn_core_headers
 )
 

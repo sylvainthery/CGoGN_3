@@ -62,18 +62,15 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	LINKER_LANGUAGE CXX
 )
 
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty>
-)
-
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}>
 	$<BUILD_INTERFACE:${EIGEN3_INCLUDE_DIR}>
-#	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} cgogn::core Eigen3::Eigen)
+target_link_libraries(${PROJECT_NAME} PRIVATE cgogn::core)
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 
 # Write out cgogn_geometry_export.h to the current binary directory
 generate_export_header(${PROJECT_NAME})
@@ -92,11 +89,11 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/geometry
 	COMPONENT cgogn_geometry_headers
 	FILES_MATCHING PATTERN "*.h"
-	REGEX "(examples|tests)" EXCLUDE
+	REGEX "(apps|examples|tests)" EXCLUDE
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_geometry_export.h
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/cgogn/geometry
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/geometry
 	COMPONENT cgogn_geometry_headers
 )
 

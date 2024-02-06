@@ -55,6 +55,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
 	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}>
+	$<BUILD_INTERFACE:${CGOGN_SOURCE_DIR}/thirdparty>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
@@ -69,6 +70,11 @@ configure_file(${PROJECT_SOURCE_DIR}/cgogn_io.pc.in ${CMAKE_CURRENT_BINARY_DIR}/
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_io.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 	COMPONENT cgogn_io_libraries
+)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cgogn_io_export.h
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/io
+	COMPONENT cgogn_io_headers
 )
 
 install(TARGETS ${PROJECT_NAME})

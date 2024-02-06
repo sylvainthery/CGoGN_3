@@ -37,7 +37,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX "_d")
 
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 # target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
@@ -48,7 +48,7 @@ endif()
 
 #install(FILES ${HEADER_FILES} DESTINATION "include/cgogn/thirdparty")
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/cgogn/thirdparty
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/Blossom5
 	COMPONENT cgogn_blossom5_headers
 	FILES_MATCHING PATTERN "*.h"
 )

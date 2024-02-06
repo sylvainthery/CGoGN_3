@@ -30,7 +30,7 @@
 #include <cgogn/core/functions/attributes.h>
 #include <cgogn/core/functions/mesh_info.h>
 
-#include <thirdparty/happly/happly.h>
+#include <happly/happly.h>
 
 namespace cgogn
 {
