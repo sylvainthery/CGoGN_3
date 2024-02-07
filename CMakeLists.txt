@@ -12,6 +12,7 @@ project(CGoGN
 foreach(p
 	CMP0048 # version
 	CMP0054 # CMake 3.1
+	CMP0065
 	CMP0072 # opengl
         CMP0092 # remove /W3 by default in MSVC
 )
@@ -20,7 +21,7 @@ foreach(p
 	endif()
 endforeach()
 
-cmake_policy(SET CMP0065 OLD)
+#cmake_policy(SET CMP0065 OLD)
 
 
 #### Default build type
