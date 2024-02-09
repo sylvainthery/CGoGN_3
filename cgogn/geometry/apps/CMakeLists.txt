@@ -7,6 +7,7 @@ project(cgogn_geometry_examples
 find_package(cgogn_core REQUIRED)
 find_package(cgogn_ui REQUIRED)
 find_package(cgogn_io REQUIRED)
+find_package(cgogn_geometry REQUIRED)
 find_package(cgogn_rendering REQUIRED)
 
 set(CGOGN_TEST_PREFIX "test_")
@@ -17,6 +18,7 @@ target_link_libraries(filtering
 	cgogn::core
 	cgogn::ui
 	cgogn::io
+	cgogn::geometry
 	cgogn::rendering
 	${CMAKE_DL_LIBS}
 )
@@ -26,6 +28,7 @@ target_link_libraries(heat_method
 	cgogn::core
 	cgogn::ui
 	cgogn::io
+	cgogn::geometry
 	cgogn::rendering
 	${CMAKE_DL_LIBS}
 )
@@ -35,8 +38,8 @@ target_link_libraries(registration
 	cgogn::core
 	cgogn::ui
 	cgogn::io
+	cgogn::geometry
 	cgogn::rendering
-	simpleICP
 	${CMAKE_DL_LIBS}
 )
 
@@ -45,6 +48,7 @@ target_link_libraries(constriction
 	cgogn::core
 	cgogn::ui
 	cgogn::io
+	cgogn::geometry
 	cgogn::rendering
 	${CMAKE_DL_LIBS}
 )

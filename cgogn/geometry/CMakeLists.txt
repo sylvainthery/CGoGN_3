@@ -3,6 +3,7 @@ project(cgogn_geometry
 )
 
 find_package(cgogn_core REQUIRED)
+find_package(simpleICP REQUIRED)
 
 # Hide symbols by default
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -70,7 +71,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE cgogn::core)
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen simpleICP)
 
 # Write out cgogn_geometry_export.h to the current binary directory
 generate_export_header(${PROJECT_NAME})
