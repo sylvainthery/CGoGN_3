@@ -28,9 +28,9 @@
 namespace cgogn
 {
 
-MapBase::MapBase()
+MapBase::MapBase() : nb_reader(0), nb_writer_wait(0), nb_writer(0), is_modify(false)
 {
-	boundary_marker_ = darts_.get_mark_attribute();
+	boundary_marker_ = darts_.get()->get_mark_attribute();
 }
 
 MapBase::~MapBase()
@@ -39,7 +39,7 @@ MapBase::~MapBase()
 
 Dart add_dart(MapBase& m)
 {
-	uint32 index = m.darts_.new_index();
+	uint32 index = m.darts_.get()->new_index();
 	Dart d(index);
 	for (auto& rel : m.relations_)
 		(*rel)[d.index_] = d;
@@ -60,13 +60,13 @@ void remove_dart(MapBase& m, Dart d)
 				m.attribute_containers_[orbit].unref_index(index);
 		}
 	}
-	m.darts_.release_index(d.index_);
+	m.darts_.get()->.release_index(d.index_);
 }
 
 void clear(MapBase& m, bool keep_attributes)
 {
 	// clear darts and keep attributes (phi relations)
-	m.darts_.clear_attributes();
+	m.darts_.get()->clear_attributes();
 	if (!keep_attributes)
 	{
 		// remove cells indices attributes
@@ -74,7 +74,7 @@ void clear(MapBase& m, bool keep_attributes)
 		{
 			if (m.cells_indices_[orbit] != nullptr)
 			{
-				m.darts_.remove_attribute(m.cells_indices_[orbit]);
+				m.darts_.get()->remove_attribute(m.cells_indices_[orbit]);
 				m.cells_indices_[orbit].reset();
 			}
 		}

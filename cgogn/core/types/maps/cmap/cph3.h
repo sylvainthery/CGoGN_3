@@ -64,9 +64,10 @@ struct CPH3
 		: m_(m), nb_darts_per_level_(m.get_attribute<std::vector<uint32>>("cph3_nb_darts_per_level")),
 		  maximum_level_(m.get_attribute<uint32>("cph3_maximum_level")), current_level_(0)
 	{
-		dart_level_ = m_.darts_.get_attribute<uint32>("dart_level");
+		auto* mdarts = m_.darts_.get();
+		dart_level_ = mdarts->get_attribute<uint32>("dart_level");
 		if (!dart_level_)
-			dart_level_ = m_.darts_.add_attribute<uint32>("dart_level");
+			dart_level_ = mdarts->add_attribute<uint32>("dart_level");
 		// else
 		// {
 		// 	for (uint32 l : *dart_level_)
@@ -74,13 +75,13 @@ struct CPH3
 		// 			maximum_level_ = l;
 		// }
 
-		edge_id_ = m_.darts_.get_attribute<uint32>("edge_id");
+		edge_id_ = mdarts->get_attribute<uint32>("edge_id");
 		if (!edge_id_)
-			edge_id_ = m_.darts_.add_attribute<uint32>("edge_id");
+			edge_id_ = mdarts->add_attribute<uint32>("edge_id");
 
-		face_id_ = m_.darts_.get_attribute<uint32>("face_id");
+		face_id_ = mdarts->get_attribute<uint32>("face_id");
 		if (!face_id_)
-			face_id_ = m_.darts_.add_attribute<uint32>("face_id");
+			face_id_ = mdarts->add_attribute<uint32>("face_id");
 	}
 
 	CPH3(const CPH3& cph3)
@@ -101,24 +102,26 @@ struct CPH3
 
 	inline Dart begin() const
 	{
-		Dart d(m_.darts_.first_index());
-		uint32 lastidx = m_.darts_.last_index();
+		auto* mdarts = m_.darts_.get();
+		Dart d(mdarts->first_index());
+		uint32 lastidx = mdarts->last_index();
 		while (dart_level(d) > current_level_ && d.index_ < lastidx)
-			d = Dart(m_.darts_.next_index(d.index_));
+			d = Dart(mdarts->next_index(d.index_));
 		return d;
 	}
 
 	inline Dart end() const
 	{
-		return Dart(m_.darts_.last_index());
+		return Dart(m_.darts_.get()->last_index());
 	}
 
 	inline Dart next(Dart d) const
 	{
-		uint32 lastidx = m_.darts_.last_index();
+		auto* mdarts = m_.darts_.get();
+		uint32 lastidx = mdarts->last_index();
 		do
 		{
-			d = Dart(m_.darts_.next_index(d.index_));
+			d = Dart(mdarts->next_index(d.index_));
 		} while (dart_level(d) > current_level_ && d.index_ < lastidx);
 		return d;
 	}

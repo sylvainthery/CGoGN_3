@@ -66,7 +66,7 @@ struct MapBase
 	/*************************************************************************/
 	// Dart attributes container
 	/*************************************************************************/
-	mutable AttributeContainer darts_;
+	mutable std::shared_ptr<AttributeContainer> darts_;
 
 	// shortcuts to topological relations attributes
 	std::vector<std::shared_ptr<Attribute<Dart>>> relations_;
@@ -77,9 +77,19 @@ struct MapBase
 	MarkAttribute* boundary_marker_;
 
 	/*************************************************************************/
+	// Concurrence acces management
+	/*************************************************************************/
+	mutable std::condition_variable cv;
+	mutable std::mutex m_;
+	mutable int nb_reader;
+	int nb_writer_wait;
+	int nb_writer;
+	bool is_modify;
+
+	/*************************************************************************/
 	// Cells attributes containers
 	/*************************************************************************/
-	mutable std::array<AttributeContainer, NB_ORBITS> attribute_containers_;
+	mutable std::shared_ptr<std::array<AttributeContainer, NB_ORBITS>> attribute_containers_;
 
 	enum TraversalPolicy
 	{
@@ -108,7 +118,7 @@ struct MapBase
 
 	inline std::shared_ptr<Attribute<Dart>> add_relation(const std::string& name)
 	{
-		return relations_.emplace_back(darts_.add_attribute<Dart>(name));
+		return relations_.emplace_back(darts_.get()->add_attribute<Dart>(name));
 	}
 
 	/*************************************************************************/
@@ -117,17 +127,17 @@ struct MapBase
 
 	inline Dart begin() const
 	{
-		return Dart(darts_.first_index());
+		return Dart(darts_.get()->first_index());
 	}
 
 	inline Dart end() const
 	{
-		return Dart(darts_.last_index());
+		return Dart(darts_.get()->last_index());
 	}
 
 	inline Dart next(Dart d) const
 	{
-		return Dart(darts_.next_index(d.index_));
+		return Dart(darts_.get()->next_index(d.index_));
 	}
 };
 
@@ -146,7 +156,7 @@ void remove_dart(MapBase& m, Dart d);
 
 inline uint32 nb_darts(const MapBase& m)
 {
-	return m.darts_.nb_elements();
+	return m.darts_.get()->nb_elements();
 }
 
 // returns the number of darts of a given cell orbit
@@ -332,7 +342,7 @@ inline void init_cells_indexing(MapBase& m, Orbit orbit)
 	{
 		std::ostringstream oss;
 		oss << "__index_" << orbit_name(orbit);
-		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
+		m.cells_indices_[orbit] = m.darts_.get()->add_attribute<uint32>(oss.str());
 		m.cells_indices_[orbit]->fill(INVALID_INDEX);
 	}
 }
@@ -466,12 +476,12 @@ auto release_mark_attribute(const MESH& m, typename mesh_traits<MESH>::MarkAttri
 
 inline typename MapBase::MarkAttribute* get_dart_mark_attribute(const MapBase& m)
 {
-	return m.darts_.get_mark_attribute();
+	return m.darts_.get()->get_mark_attribute();
 }
 
 inline void release_dart_mark_attribute(const MapBase& m, MapBase::MarkAttribute* attribute)
 {
-	return m.darts_.release_mark_attribute(attribute);
+	return m.darts_.get()->release_mark_attribute(attribute);
 }
 
 /*************************************************************************/
