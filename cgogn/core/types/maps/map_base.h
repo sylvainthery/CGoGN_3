@@ -98,17 +98,24 @@ struct MapBase
 	};
 
 	MapBase();
+	MapBase::MapBase(std::shared_ptr<std::unordered_map<std::string, std::any>>& attributes,
+					 std::shared_ptr<AttributeContainer>& darts,
+					 std::vector<std::shared_ptr<Attribute<Dart>>>& relations,
+					 std::array<std::shared_ptr<Attribute<uint32>>, NB_ORBITS>& cells_indices,
+					 MarkAttribute* boundary_marker,
+					 std::shared_ptr<std::array<AttributeContainer, NB_ORBITS>>& attribute_containers);
+
 	~MapBase();
 
 	/*************************************************************************/
 	// Map-wise attributes container
 	/*************************************************************************/
-	std::unordered_map<std::string, std::any> attributes_;
+	std::shared_ptr < std::unordered_map<std::string, std::any>> attributes_;
 
 	template <typename T>
 	T& get_attribute(const std::string& name)
 	{
-		auto [it, inserted] = attributes_.try_emplace(name, T());
+		auto [it, inserted] = attributes_.get()->try_emplace(name, T());
 		return std::any_cast<T&>(it->second);
 	}
 
@@ -245,7 +252,7 @@ auto fill_boundaries(MESH& m, bool set_indices = true)
 template <typename CELL>
 uint32 new_index(const MapBase& m)
 {
-	return m.attribute_containers_[CELL::ORBIT].new_index();
+	return (*m.attribute_containers_)[CELL::ORBIT].new_index();
 }
 
 // set the given index to the given dart (updates the ref count of the index in the container)
@@ -258,9 +265,9 @@ void set_index(MapBase& m, Dart d, uint32 index)
 	const uint32 old = (*m.cells_indices_[orbit])[d.index_];
 	// ref_index() is done before unref_index() to avoid deleting the index line if old == index
 	if (index != INVALID_INDEX)
-		m.attribute_containers_[orbit].ref_index(index); // ref the new index
+		(*m.attribute_containers_)[orbit].ref_index(index); // ref the new index
 	if (old != INVALID_INDEX)
-		m.attribute_containers_[orbit].unref_index(old); // unref the old index
+		(*m.attribute_containers_)[orbit].unref_index(old); // unref the old index
 	(*m.cells_indices_[orbit])[d.index_] = index;		 // affect the index to the dart
 }
 
@@ -329,7 +336,7 @@ void init_cells_indexing(MapBase& m)
 	{
 		std::ostringstream oss;
 		oss << "__index_" << orbit_name(orbit);
-		m.cells_indices_[orbit] = m.darts_.add_attribute<uint32>(oss.str());
+		m.cells_indices_[orbit] = m.darts_.get()->add_attribute<uint32>(oss.str());
 		m.cells_indices_[orbit]->fill(INVALID_INDEX);
 	}
 }
@@ -400,7 +407,7 @@ std::shared_ptr<typename mesh_traits<MESH>::template Attribute<T>> add_attribute
 	if (!is_indexed<CELL>(m))
 		index_cells<CELL>(m);
 	MapBase& mb = static_cast<MapBase&>(m);
-	return mb.attribute_containers_[CELL::ORBIT].template add_attribute<T>(name);
+	return (*mb.attribute_containers_)[CELL::ORBIT].template add_attribute<T>(name);
 }
 
 template <typename T, typename CELL, typename MESH,
@@ -408,19 +415,19 @@ template <typename T, typename CELL, typename MESH,
 std::shared_ptr<MapBase::Attribute<T>> get_attribute(const MESH& m, const std::string& name)
 {
 	static_assert(has_cell_type_v<MESH, CELL>, "CELL not supported in this MESH");
-	return m.attribute_containers_[CELL::ORBIT].template get_attribute<T>(name);
+	return (*m.attribute_containers_)[CELL::ORBIT].template get_attribute<T>(name);
 }
 
 template <typename CELL>
 void remove_attribute(MapBase& m, const std::shared_ptr<MapBase::AttributeGen>& attribute)
 {
-	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
+	(*m.attribute_containers_)[CELL::ORBIT].remove_attribute(attribute);
 }
 
 template <typename CELL>
 void remove_attribute(MapBase& m, MapBase::AttributeGen* attribute)
 {
-	m.attribute_containers_[CELL::ORBIT].remove_attribute(attribute);
+	(*m.attribute_containers_)[CELL::ORBIT].remove_attribute(attribute);
 }
 
 template <typename CELL, typename FUNC>
@@ -429,7 +436,7 @@ void foreach_attribute(const MapBase& m, const FUNC& f)
 	using AttributeGen = MapBase::AttributeGen;
 	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeGen>&>::value,
 				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
+	for (const std::shared_ptr<AttributeGen>& a : (*m.attribute_containers_)[CELL::ORBIT])
 		f(a);
 }
 
@@ -440,7 +447,7 @@ void foreach_attribute(const MapBase& m, const FUNC& f)
 	using AttributeGen = MapBase::AttributeGen;
 	static_assert(is_func_parameter_same<FUNC, const std::shared_ptr<AttributeT>&>::value,
 				  "Wrong function attribute parameter type");
-	for (const std::shared_ptr<AttributeGen>& a : m.attribute_containers_[CELL::ORBIT])
+	for (const std::shared_ptr<AttributeGen>& a : (*m.attribute_containers_)[CELL::ORBIT])
 	{
 		std::shared_ptr<AttributeT> at = std::dynamic_pointer_cast<AttributeT>(a);
 		if (at)
@@ -462,7 +469,7 @@ auto get_mark_attribute(const MESH& m)
 	if (!is_indexed<CELL>(m))
 		index_cells<CELL>(const_cast<MESH&>(m));
 	const MapBase& mb = static_cast<const MapBase&>(m);
-	return mb.attribute_containers_[CELL::ORBIT].get_mark_attribute();
+	return (*mb.attribute_containers_)[CELL::ORBIT].get_mark_attribute();
 }
 
 template <typename CELL, typename MESH>
@@ -471,7 +478,7 @@ auto release_mark_attribute(const MESH& m, typename mesh_traits<MESH>::MarkAttri
 {
 	static_assert(has_cell_type_v<MESH, CELL>, "CELL not supported in this MESH");
 	const MapBase& mb = static_cast<const MapBase&>(m);
-	return mb.attribute_containers_[CELL::ORBIT].release_mark_attribute(attribute);
+	return (*mb.attribute_containers_)[CELL::ORBIT].release_mark_attribute(attribute);
 }
 
 inline typename MapBase::MarkAttribute* get_dart_mark_attribute(const MapBase& m)
@@ -682,10 +689,10 @@ auto copy(MESH& dst, const MESH& src) -> std::enable_if_t<std::is_convertible_v<
 		if (src.cells_indices_[orbit] != nullptr)
 			init_cells_indexing(dst, Orbit(orbit));
 	}
-	dst.darts_.copy(src.darts_);
+	dst.darts_.get()->copy(*src.darts_);
 	for (uint32 i = 0; i < NB_ORBITS; ++i)
-		dst.attribute_containers_[i].copy(src.attribute_containers_[i]);
-	dst.boundary_marker_ = dst.darts_.get_mark_attribute();
+		(*dst.attribute_containers_)[i].copy((*src.attribute_containers_)[i]);
+	dst.boundary_marker_ = dst.darts_.get()->get_mark_attribute();
 	dst.boundary_marker_->copy(*src.boundary_marker_);
 }
 
@@ -740,9 +747,10 @@ bool check_indexing(MESH& m, bool verbose = true)
 		MapBase::TraversalPolicy::DART_MARKING);
 
 	// check that all lines of the attribute container are used
-	for (uint32 i = m.attribute_containers_[CELL::ORBIT].first_index(),
-				end = m.attribute_containers_[CELL::ORBIT].last_index();
-		 i != end; i = m.attribute_containers_[CELL::ORBIT].next_index(i))
+	const auto& attc = (*m.attribute_containers_)[CELL::ORBIT];
+	for (uint32 i = attc.first_index(),
+				end = attc.last_index();
+		 i != end; i = attc.next_index(i))
 	{
 		if ((*counter)[i] == 0)
 		{

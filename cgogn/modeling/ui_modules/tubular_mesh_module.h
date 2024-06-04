@@ -1154,9 +1154,10 @@ public:
 		uint32 nb_vertices = volume_provider_->mesh_data(*volume_).template nb_cells<VolumeVertex>();
 		out_file << nb_vertices << " " << animate_volume_vertex_positions_.size() << "\n";
 
-		for (uint32 i = volume_->attribute_containers_[VolumeVertex::ORBIT].first_index(),
-					end = volume_->attribute_containers_[VolumeVertex::ORBIT].last_index();
-			 i != end; i = volume_->attribute_containers_[VolumeVertex::ORBIT].next_index(i))
+		const auto& vattc = (*volume_->attribute_containers_)[VolumeVertex::ORBIT];
+		for (uint32 i = vattc.first_index(),
+					end = vattc.last_index();
+			 i != end; i = vattc.next_index(i))
 		{
 			for (uint32 j = 0; j < animate_volume_vertex_positions_.size(); ++j)
 			{
@@ -1187,7 +1188,7 @@ public:
 			animate_volume_vertex_positions_.push_back(pos);
 		}
 
-		uint32 vertex_id = volume_->attribute_containers_[VolumeVertex::ORBIT].first_index();
+		uint32 vertex_id = (*volume_->attribute_containers_)[VolumeVertex::ORBIT].first_index();
 		for (uint32 i = 0u; i < nb_vertices; ++i)
 		{
 			for (uint32 j = 0u; j < nb_animation_position; ++j)
@@ -1197,7 +1198,7 @@ public:
 				float64 z = io::read_double(fp, line);
 				(*animate_volume_vertex_positions_[j])[vertex_id] = {x, y, z};
 			}
-			vertex_id = volume_->attribute_containers_[VolumeVertex::ORBIT].next_index(vertex_id);
+			vertex_id = (*volume_->attribute_containers_)[VolumeVertex::ORBIT].next_index(vertex_id);
 		}
 
 		volume_vertex_position_->copy(animate_volume_vertex_positions_.back().get());

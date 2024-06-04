@@ -42,6 +42,20 @@ set(src_list
 		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/cph3.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/graph.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/graph.cpp"
+
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_MapBase.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_MapBase.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map1.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map1.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map2.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map2.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map3.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map3.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map3_adaptative.h"
+		"${CMAKE_CURRENT_LIST_DIR}/types/maps/cmap/EMR_Map3_adaptative.cpp"
+
+
+
 		
 		"${CMAKE_CURRENT_LIST_DIR}/types/maps/gmap/gmap_base.h"
 		"${CMAKE_CURRENT_LIST_DIR}/types/maps/gmap/gmap0.h"

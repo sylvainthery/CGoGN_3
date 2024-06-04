@@ -30,8 +30,24 @@ namespace cgogn
 
 MapBase::MapBase() : nb_reader(0), nb_writer_wait(0), nb_writer(0), is_modify(false)
 {
-	boundary_marker_ = darts_.get()->get_mark_attribute();
+	darts_ = std::shared_ptr<AttributeContainer>(new AttributeContainer());
+	boundary_marker_ = darts_->get_mark_attribute();
+	attribute_containers_ =
+		std::shared_ptr<std::array<AttributeContainer, NB_ORBITS>>(new std::array<AttributeContainer, NB_ORBITS>());
 }
+
+MapBase::MapBase(std::shared_ptr<std::unordered_map<std::string, std::any>>& attributes,
+				   std::shared_ptr<AttributeContainer>& darts,
+				   std::vector<std::shared_ptr<Attribute<Dart>>>& relations,
+				   std::array<std::shared_ptr<Attribute<uint32>>, NB_ORBITS>& cells_indices,
+				   MarkAttribute* boundary_marker,
+				   std::shared_ptr<std::array<AttributeContainer, NB_ORBITS>>& attribute_containers)
+	: attributes_(attributes), darts_(darts), relations_(relations), cells_indices_(cells_indices),
+	  boundary_marker_(boundary_marker), attribute_containers_(attribute_containers), nb_reader(0), nb_writer(0),
+	  is_modify(false)
+{
+}
+
 
 MapBase::~MapBase()
 {
@@ -57,10 +73,10 @@ void remove_dart(MapBase& m, Dart d)
 		{
 			uint32 index = (*m.cells_indices_[orbit])[d.index_];
 			if (index != INVALID_INDEX)
-				m.attribute_containers_[orbit].unref_index(index);
+				(*m.attribute_containers_)[orbit].unref_index(index);
 		}
 	}
-	m.darts_.get()->.release_index(d.index_);
+	m.darts_.get()->release_index(d.index_);
 }
 
 void clear(MapBase& m, bool keep_attributes)
@@ -81,7 +97,7 @@ void clear(MapBase& m, bool keep_attributes)
 	}
 
 	// clear all cell attributes
-	for (MapBase::AttributeContainer& container : m.attribute_containers_)
+	for (MapBase::AttributeContainer& container : *m.attribute_containers_)
 	{
 		container.clear_attributes();
 		if (!keep_attributes)
